@@ -24,11 +24,18 @@ module.exports = async (req, res) => {
   }
 
   const body = req.body || {};
+  const formType = body.formType || "waitlist";
 
   // Minimal server-side sanity check. The browser form already
   // validates required fields, but a server should never trust the
-  // client alone.
-  if (!body.email) {
+  // client alone. Different forms collect different fields, so what
+  // counts as "required" depends on which one this is.
+  const isValid =
+    formType === "address-check"
+      ? !!body.streetAddress && !!body.zip
+      : !!body.email;
+
+  if (!isValid) {
     res.status(400).json({ error: "Missing required fields." });
     return;
   }
