@@ -38,6 +38,30 @@
     el.classList.add(type === "success" ? "is-success" : "is-error");
   }
 
+  // When an address-check comes back with no route yet, we still want a
+  // way to reach that person later — but the address-check form itself
+  // never asks for a name/email/phone. So instead of only saying "we'll
+  // be in touch," carry over what they already typed into the full
+  // waitlist form below and invite them to finish it.
+  function prefillWaitlistForm(addressForm) {
+    var waitlistForm = document.querySelector("#waitlist-form");
+    if (!waitlistForm) return;
+
+    var fieldMap = {
+      streetAddress: "#wl-street",
+      city: "#wl-city",
+      zip: "#wl-zip",
+    };
+
+    Object.keys(fieldMap).forEach(function (name) {
+      var sourceField = addressForm.querySelector('[name="' + name + '"]');
+      var targetField = waitlistForm.querySelector(fieldMap[name]);
+      if (sourceField && targetField && sourceField.value) {
+        targetField.value = sourceField.value;
+      }
+    });
+  }
+
   async function handleSubmit(form, statusEl, formType) {
     var config = (window.STREETSIDE_CONFIG || {}).waitlistForm || {};
     var payload = serializeForm(form);
@@ -83,11 +107,21 @@
             "success"
           );
         } else {
-          showStatus(
-            statusEl,
-            "There aren't any routes in your area yet, but we've added you to the waitlist — more neighbors signing up is what helps us open one there.",
-            "success"
-          );
+          prefillWaitlistForm(form);
+          statusEl.classList.remove("is-error");
+          statusEl.classList.add("is-success");
+
+          var nearby = data.nearbyCount || 0;
+          var intro =
+            nearby > 1
+              ? nearby +
+                " neighbors near you are already interested, but that's not quite enough yet to open a route."
+              : "There aren't any routes in your area yet.";
+
+          statusEl.innerHTML =
+            intro +
+            " <strong>Add your contact info below</strong> and we'll reach out as soon as one opens near you. " +
+            '<a href="#waitlist-form" class="form-status__link">Jump to the form &darr;</a>';
         }
       } else {
         showStatus(
