@@ -11,6 +11,29 @@
 
 const { neon } = require("@neondatabase/serverless");
 
+// ---------------------------------------------------------------
+// LIVE SERVICE AREAS
+// ---------------------------------------------------------------
+// Empty until a real route opens somewhere — keep this in sync with
+// config/site-config.js's serviceArea section (that file drives what
+// the site SAYS about coverage; this one drives what the address
+// checker actually DOES). Add a city name and/or ZIP code here once
+// a route is genuinely live there.
+//
+// Example once you have a real route:
+//   const ACTIVE_CITIES = ["Lancaster", "Pickerington"];
+//   const ACTIVE_ZIPS = ["43130", "43147"];
+const ACTIVE_CITIES = [];
+const ACTIVE_ZIPS = [];
+
+function isAddressInServiceArea(city, zip) {
+  var cityMatch = !!city && ACTIVE_CITIES.some(function (c) {
+    return c.toLowerCase() === city.trim().toLowerCase();
+  });
+  var zipMatch = !!zip && ACTIVE_ZIPS.includes(zip.trim());
+  return cityMatch || zipMatch;
+}
+
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
@@ -69,7 +92,11 @@ module.exports = async (req, res) => {
       )
     `;
 
-    res.status(200).json({ ok: true });
+    res.status(200).json({
+      ok: true,
+      formType: formType,
+      available: formType === "address-check" ? isAddressInServiceArea(body.city, body.zip) : undefined,
+    });
   } catch (err) {
     console.error("[streetside] Failed to save submission:", err);
     res.status(500).json({ error: "Something went wrong saving your submission." });
