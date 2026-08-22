@@ -1,0 +1,86 @@
+/* ==========================================================================
+   STREETSIDE — DESIGN TOKENS
+   Source of truth for color, type, spacing, and motion.
+   Derived from the supplied Streetside logo files and brand brief.
+   ========================================================================== */
+
+:root {
+  /* ---- Brand color (sampled from the supplied logo) ---- */
+  --green-900: #0f2010;   /* deepest bg, footer */
+  --green-800: #16311a;   /* primary dark forest green */
+  --green-700: #1e4322;   /* hover / lighter surface */
+  --green-600: #2c5a31;   /* accents on dark */
+  --green-tint: #eef2ec;  /* faint green tint for light-section backgrounds */
+
+  --charcoal-900: #121416; /* near-black */
+  --charcoal-700: #2a2d31;
+
+  --white: #ffffff;
+  --off-white: #f6f5f1;
+  --paper: #f1f0ea;
+
+  --gray-200: #e4e2da;
+  --gray-400: #b7b4a8;
+  --gray-500: #6b7280;
+  --gray-700: #43473f;
+
+  --red-600: #c81e2c;   /* accent — dividers, icons, small highlights only */
+  --red-700: #a8121e;
+
+  /* ---- Semantic color ---- */
+  --color-bg: var(--off-white);
+  --color-bg-alt: var(--paper);
+  --color-surface: var(--white);
+  --color-ink: var(--charcoal-900);
+  --color-ink-muted: var(--gray-700);
+  --color-brand: var(--green-800);
+  --color-brand-strong: var(--green-900);
+  --color-accent: var(--red-600);
+  --color-border: rgba(18, 20, 22, 0.1);
+  --color-border-on-dark: rgba(255, 255, 255, 0.16);
+
+  /* ---- Type ----
+     Display: bold / condensed / industrial — carries the logo's road-sign energy.
+     We stack widely-installed condensed/narrow system faces first, with
+     `font-stretch: condensed` as a progressive enhancement, so the brand's
+     "bold condensed" personality holds even without a custom webfont.
+     See README for how to self-host Oswald/Bebas Neue later for exact match. */
+  --font-display: "Archivo Narrow", "Roboto Condensed", "Arial Narrow",
+    "Helvetica Neue Condensed", "Liberation Sans Narrow", sans-serif;
+  --font-body: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+
+  --tracking-tight: -0.01em;
+  --tracking-wide: 0.04em;
+  --tracking-wider: 0.12em;
+
+  /* ---- Spacing scale (4px base) ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+  --space-9: 6.5rem;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+
+  --container-max: 1240px;
+
+  --shadow-sm: 0 2px 10px rgba(15, 32, 16, 0.08);
+  --shadow-md: 0 12px 32px rgba(15, 32, 16, 0.14);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 160ms;
+  --dur-med: 420ms;
+
+  --header-height: 96px;
+}
+
+@media (max-width: 720px) {
+  :root {
+    --header-height: 76px;
+  }
+}
