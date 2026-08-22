@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Streetside | Trash & Recycling Bin Valet Service in Southeastern Ohio</title>
-<meta name="description" content="Streetside brings your trash and recycling bins to the curb before collection and returns them after — a residential bin valet service serving Southeastern Ohio. Trash day, handled." />
-<meta name="keywords" content="trash can service Southeastern Ohio, trash bin service, bin valet service, trash can to curb service, residential trash bin service" />
+<title>Streetside | Trash & Recycling Bin Valet Service in Southeastern Columbus</title>
+<meta name="description" content="Streetside brings your trash and recycling bins to the curb before collection and returns them after — a residential bin valet service serving Southeastern Columbus. Trash day, handled." />
+<meta name="keywords" content="trash can service Southeastern Columbus, trash bin service, bin valet service, trash can to curb service, residential trash bin service" />
 <link rel="canonical" href="https://www.streetsidebins.com/" />
 
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
 <meta property="og:title" content="Streetside | Professional Bin Valet Service" />
-<meta property="og:description" content="We take your bins to the curb and bring them back. Trash day, handled. Serving Southeastern Ohio." />
+<meta property="og:description" content="We take your bins to the curb and bring them back. Trash day, handled. Serving Southeastern Columbus." />
 <meta property="og:image" content="/images/streetside-logo-circular.png" />
 <meta property="og:url" content="https://www.streetsidebins.com/" />
 <meta property="og:locale" content="en_US" />
@@ -26,11 +26,6 @@
 <link rel="stylesheet" href="styles/components.css" />
 <link rel="stylesheet" href="styles/sections.css" />
 
-<!-- Leaflet (free, open-source map library — no account or API key
-     needed) powers the service-area interest map. -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
-
 <!-- Structured data: local business -->
 <script type="application/ld+json">
 {
@@ -38,7 +33,7 @@
   "@type": "LocalBusiness",
   "name": "Streetside",
   "description": "Residential trash and recycling bin valet service — bins taken to the curb before collection and returned after.",
-  "areaServed": "Southeastern Ohio",
+  "areaServed": "Southeastern Columbus",
   "slogan": "We take it to the street. You don't have to."
 }
 </script>
@@ -104,7 +99,7 @@
       <div class="hero__bottom">
         <span class="hero__location">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 15S13 10.2 13 6.5A5 5 0 1 0 3 6.5C3 10.2 8 15 8 15Z" stroke="currentColor" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.8" stroke="currentColor" stroke-width="1.4"/></svg>
-          Serving Southeastern Ohio
+          Serving Southeastern Columbus
         </span>
 
         <div class="hero__row">
@@ -249,7 +244,7 @@
             <strong data-counter-value>0</strong>
             <span>Neighbors on board</span>
           </div>
-          <span class="pill">More neighbors = more routes</span>
+          <span class="pill">Every signup brings a route closer</span>
         </div>
 
         <a href="#waitlist" class="btn btn-accent">
@@ -281,7 +276,7 @@
       <div class="service-area__grid">
         <div class="reveal">
           <span class="eyebrow">Service Area</span>
-          <h2 class="display-md">Serving Southeastern Ohio, one neighborhood at a time.</h2>
+          <h2 class="display-md">Serving Southeastern Columbus, one neighborhood at a time.</h2>
           <p class="lede" style="margin-top: var(--space-4);">Streetside opens routes based on service availability and neighborhood demand — the more neighbors on a street or in a subdivision, the sooner a route can open there.</p>
 
           <div class="address-check" style="margin-top: var(--space-6);">
@@ -314,11 +309,103 @@
 
         <div class="reveal">
           <div class="service-area__map" data-interest-map>
-            <svg width="280" height="280" viewBox="0 0 280 280" fill="none" aria-hidden="true">
-              <circle cx="140" cy="140" r="90" stroke="#fff" stroke-opacity="0.25" stroke-width="1.5"/>
-              <circle cx="140" cy="140" r="60" stroke="#fff" stroke-opacity="0.35" stroke-width="1.5"/>
-              <circle cx="140" cy="140" r="6" fill="#c81e2c"/>
-              <path d="M140 20V0M140 280v-20M20 140H0M280 140h-20" stroke="#fff" stroke-opacity="0.3" stroke-width="1.5"/>
+            <svg viewBox="0 0 760 560" class="interest-map-svg" role="img" aria-label="Map of Southeastern Columbus towns where neighbors have shown interest in Streetside">
+              <defs>
+                <pattern id="map-grid" width="38" height="38" patternUnits="userSpaceOnUse">
+                  <path d="M38 0H0V38" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+                </pattern>
+                <radialGradient id="map-glow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="rgba(255,255,255,0.10)"/>
+                  <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+                </radialGradient>
+              </defs>
+
+              <rect x="0" y="0" width="760" height="560" fill="url(#map-grid)"></rect>
+              <ellipse cx="106.2" cy="164.9" rx="230" ry="170" fill="url(#map-glow)"></ellipse>
+
+              <!-- Stylized roads, redrawn to match the real relative
+                   layout in a reference road map (illustrative, not
+                   survey-precise, but shaped correctly relative to these
+                   towns rather than approximated from memory): -->
+
+              <!-- I-270 outerbelt: Whitehall sits just inside it; Groveport
+                   and Lockbourne straddle its southwest edge; Reynoldsburg
+                   and Pickerington sit outside it to the east. -->
+              <path class="map-road map-road--beltway" d="M106,95 C185,100 260,140 275,190 C290,235 260,275 200,295 C140,310 90,290 65,240 C45,195 55,130 106,95 Z"></path>
+
+              <!-- I-70: Columbus through Whitehall, Reynoldsburg, then the
+                   Kirkersville/Hebron corridor. -->
+              <path class="map-road" d="M0,163 L106.2,164.9 L232.0,154.8 L309.9,173.3 L445.4,187.7 L611.6,161.2 L653.8,196 L760,182"></path>
+
+              <!-- SR-310 spur up to Pataskala. -->
+              <path class="map-road map-road--minor" d="M445.4,187.7 L450.4,113.6"></path>
+
+              <!-- US-23: Columbus south through Obetz and Lockbourne. -->
+              <path class="map-road" d="M106.2,164.9 L179.9,227.6 L106.6,336.9 L100,470"></path>
+
+              <!-- SR-317: Groveport to Canal Winchester connector. -->
+              <path class="map-road map-road--minor" d="M223.2,280.5 L316.4,303.2"></path>
+
+              <!-- US-33: Columbus through Canal Winchester, past Carroll,
+                   swinging south of Lancaster rather than straight through
+                   it, matching the real bypass route. -->
+              <path class="map-road" d="M106.2,164.9 Q230,250 316.4,303.2 Q380,340 404.4,391.9 Q470,430 500,470 Q515,500 542.7,552.5"></path>
+
+              <g class="map-compass" transform="translate(695,60)">
+                <line x1="0" y1="14" x2="0" y2="-14" />
+                <path d="M0,-14 L-5,-4 L5,-4 Z" />
+                <text x="0" y="-18" text-anchor="middle">N</text>
+              </g>
+
+              <!-- Real local landmarks — icon only, no labels, just enough
+                   to mark where they are. -->
+              <path class="map-landmark" transform="translate(181.7,332.4)" aria-label="Rickenbacker International Airport" d="M-7,2 L7,2 L2,-6 L-1,-6 L-1,-1 L-9,-3 L-9,-1 L-1,2 Z" />
+              <path class="map-landmark" transform="translate(279.9,199.4)" aria-label="Blacklick Woods Metro Park" d="M0,-8 L5,0 L2,0 L6,7 L-6,7 L-2,0 L-5,0 Z" />
+              <path class="map-landmark" transform="translate(353.9,293.6)" aria-label="Pickerington Ponds Metro Park" d="M0,-8 L5,0 L2,0 L6,7 L-6,7 L-2,0 L-5,0 Z" />
+              <path class="map-landmark" transform="translate(294.8,418.6)" aria-label="Slate Run Metro Park" d="M0,-8 L5,0 L2,0 L6,7 L-6,7 L-2,0 L-5,0 Z" />
+              <path class="map-landmark" transform="translate(542.7,520)" aria-label="Clear Creek Metro Park" d="M0,-8 L5,0 L2,0 L6,7 L-6,7 L-2,0 L-5,0 Z" />
+              <rect class="map-landmark" x="518.3" y="438.8" width="12" height="12" aria-label="Fairfield County Fairgrounds" />
+              <ellipse class="map-landmark map-landmark--water" cx="650.0" cy="202.6" rx="16" ry="9" aria-label="Buckeye Lake"></ellipse>
+
+              <circle class="map-town-dot" data-city="columbus" data-tier="city" cx="106.2" cy="164.9" r="7"></circle>
+              <circle class="map-town-dot" data-city="canal winchester" data-tier="city" cx="316.4" cy="303.2" r="7"></circle>
+              <circle class="map-town-dot" data-city="pickerington" data-tier="city" cx="363.7" cy="246.7" r="7"></circle>
+              <circle class="map-town-dot" data-city="groveport" data-tier="city" cx="223.2" cy="280.5" r="7"></circle>
+              <circle class="map-town-dot" data-city="reynoldsburg" data-tier="city" cx="309.9" cy="173.3" r="7"></circle>
+              <circle class="map-town-dot" data-city="lancaster" data-tier="city" cx="530.7" cy="446.4" r="7"></circle>
+
+              <circle class="map-town-dot" data-city="blacklick" data-tier="town" cx="264.8" cy="198.4" r="4"></circle>
+              <circle class="map-town-dot" data-city="lithopolis" data-tier="town" cx="309.1" cy="351.1" r="4"></circle>
+              <circle class="map-town-dot" data-city="baltimore" data-tier="town" cx="526.6" cy="293.4" r="4"></circle>
+              <circle class="map-town-dot" data-city="carroll" data-tier="town" cx="404.4" cy="391.9" r="4"></circle>
+              <circle class="map-town-dot" data-city="millersport" data-tier="town" cx="595.3" cy="241.9" r="4"></circle>
+              <circle class="map-town-dot" data-city="lockbourne" data-tier="town" cx="106.6" cy="336.9" r="4"></circle>
+              <circle class="map-town-dot" data-city="etna" data-tier="town" cx="445.4" cy="187.7" r="4"></circle>
+              <circle class="map-town-dot" data-city="buckeye lake" data-tier="town" cx="653.8" cy="203.1" r="4"></circle>
+              <circle class="map-town-dot" data-city="hebron" data-tier="town" cx="611.6" cy="161.2" r="4"></circle>
+              <circle class="map-town-dot" data-city="obetz" data-tier="town" cx="179.9" cy="227.6" r="4"></circle>
+              <circle class="map-town-dot" data-city="whitehall" data-tier="town" cx="232.0" cy="154.8" r="4"></circle>
+              <circle class="map-town-dot" data-city="pataskala" data-tier="town" cx="450.4" cy="113.6" r="4"></circle>
+
+              <text class="map-town-label" data-city-label="columbus" data-tier="city" x="116.2" y="168.9">Columbus</text>
+              <text class="map-town-label" data-city-label="canal winchester" data-tier="city" x="326.4" y="307.2">Canal Winchester</text>
+              <text class="map-town-label" data-city-label="pickerington" data-tier="city" x="373.7" y="250.7">Pickerington</text>
+              <text class="map-town-label" data-city-label="groveport" data-tier="city" x="233.2" y="284.5">Groveport</text>
+              <text class="map-town-label" data-city-label="reynoldsburg" data-tier="city" x="319.9" y="177.3">Reynoldsburg</text>
+              <text class="map-town-label" data-city-label="lancaster" data-tier="city" x="540.7" y="450.4">Lancaster</text>
+
+              <text class="map-town-label" data-city-label="blacklick" data-tier="town" x="274.8" y="202.4">Blacklick</text>
+              <text class="map-town-label" data-city-label="lithopolis" data-tier="town" x="319.1" y="355.1">Lithopolis</text>
+              <text class="map-town-label" data-city-label="baltimore" data-tier="town" x="536.6" y="297.4">Baltimore</text>
+              <text class="map-town-label" data-city-label="carroll" data-tier="town" x="414.4" y="395.9">Carroll</text>
+              <text class="map-town-label" data-city-label="millersport" data-tier="town" x="605.3" y="245.9">Millersport</text>
+              <text class="map-town-label" data-city-label="lockbourne" data-tier="town" x="116.6" y="340.9">Lockbourne</text>
+              <text class="map-town-label" data-city-label="etna" data-tier="town" x="455.4" y="191.7">Etna</text>
+              <text class="map-town-label" data-city-label="buckeye lake" data-tier="town" x="663.8" y="207.1">Buckeye Lake</text>
+              <text class="map-town-label" data-city-label="hebron" data-tier="town" x="621.6" y="165.2">Hebron</text>
+              <text class="map-town-label" data-city-label="obetz" data-tier="town" x="189.9" y="231.6">Obetz</text>
+              <text class="map-town-label" data-city-label="whitehall" data-tier="town" x="242.0" y="158.8">Whitehall</text>
+              <text class="map-town-label" data-city-label="pataskala" data-tier="town" x="460.4" y="117.6">Pataskala</text>
             </svg>
             <p class="map-caption">Loading interest map…</p>
           </div>
@@ -456,7 +543,7 @@
           <span class="footer-brand__name">Streetside<small>Waste &amp; Property Services</small></span>
         </div>
         <p class="footer-brand__tagline">"We take it to the street. You don't have to."</p>
-        <p class="footer-brand__area">Serving Southeastern Ohio</p>
+        <p class="footer-brand__area">Serving Southeastern Columbus</p>
         <div class="social-links" data-social-links>
           <a href="#" aria-label="Streetside on Facebook">f</a>
           <a href="#" aria-label="Streetside on Instagram">i</a>
@@ -494,7 +581,6 @@
 </footer>
 
 <script src="config/site-config.js"></script>
-<script src="config/city-coordinates.js"></script>
 <script src="scripts/nav.js"></script>
 <script src="scripts/reveal.js"></script>
 <script src="scripts/counter.js"></script>
