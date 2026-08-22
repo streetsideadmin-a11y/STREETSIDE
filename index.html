@@ -26,6 +26,11 @@
 <link rel="stylesheet" href="styles/components.css" />
 <link rel="stylesheet" href="styles/sections.css" />
 
+<!-- Leaflet (free, open-source map library — no account or API key
+     needed) powers the service-area interest map. -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+
 <!-- Structured data: local business -->
 <script type="application/ld+json">
 {
@@ -312,14 +317,14 @@
         </div>
 
         <div class="reveal">
-          <div class="service-area__map">
+          <div class="service-area__map" data-interest-map>
             <svg width="280" height="280" viewBox="0 0 280 280" fill="none" aria-hidden="true">
               <circle cx="140" cy="140" r="90" stroke="#fff" stroke-opacity="0.25" stroke-width="1.5"/>
               <circle cx="140" cy="140" r="60" stroke="#fff" stroke-opacity="0.35" stroke-width="1.5"/>
               <circle cx="140" cy="140" r="6" fill="#c81e2c"/>
               <path d="M140 20V0M140 280v-20M20 140H0M280 140h-20" stroke="#fff" stroke-opacity="0.3" stroke-width="1.5"/>
             </svg>
-            <p class="map-caption">Interactive service-area map coming soon — for now, check your address above.</p>
+            <p class="map-caption">Loading interest map…</p>
           </div>
         </div>
       </div>
@@ -493,10 +498,12 @@
 </footer>
 
 <script src="config/site-config.js"></script>
+<script src="config/city-coordinates.js"></script>
 <script src="scripts/nav.js"></script>
 <script src="scripts/reveal.js"></script>
 <script src="scripts/counter.js"></script>
 <script src="scripts/waitlist-form.js"></script>
+<script src="scripts/interest-map.js"></script>
 <script src="scripts/main.js"></script>
 </body>
 </html>
