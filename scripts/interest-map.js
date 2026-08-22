@@ -14,18 +14,20 @@
  * it never fakes data.
  */
 (function () {
-  var REGION_CENTER = [39.6, -82.4]; // roughly the middle of Southeastern Ohio
-  var REGION_ZOOM = 8;
+  var REGION_CENTER = [39.7134, -82.5993]; // Lancaster, OH — the focal point
+  var REGION_ZOOM = 10; // closer regional view centered on Lancaster
 
   function showFallback(container, message) {
     var note = container.querySelector(".map-caption");
     if (note && message) note.textContent = message;
   }
 
-  function radiusForCount(count) {
-    // Modest, readable scaling — not a precise formula, just keeps a
-    // single signup visible and a busier town visibly bigger.
-    return Math.min(10 + count * 3, 32);
+  function radiusForCount(count, tier) {
+    // Base size reflects the town's general prominence; actual
+    // interest (signup count) adds on top, so a small town with a
+    // lot of interest can still grow past a quiet big city.
+    var base = tier === "city" ? 14 : 7;
+    return Math.min(base + count * 3, 34);
   }
 
   async function init() {
@@ -65,11 +67,11 @@
       var plotted = 0;
       cities.forEach(function (entry) {
         var key = (entry.city || "").trim().toLowerCase();
-        var latLng = coords[key];
-        if (!latLng) return; // no coordinates on file yet for this town — skip silently
+        var place = coords[key];
+        if (!place) return; // no coordinates on file yet for this town — skip silently
 
-        L.circleMarker(latLng, {
-          radius: radiusForCount(entry.count),
+        L.circleMarker(place.coords, {
+          radius: radiusForCount(entry.count, place.tier),
           color: "#c81e2c",
           weight: 2,
           fillColor: "#16311a",
