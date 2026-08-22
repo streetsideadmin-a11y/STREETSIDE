@@ -66,11 +66,37 @@
 
       if (!res.ok) throw new Error("Form endpoint responded with " + res.status);
 
-      showStatus(
-        statusEl,
-        "You're on the list! We'll be in touch about Streetside service in your neighborhood.",
-        "success"
-      );
+      var data = {};
+      try {
+        data = await res.json();
+      } catch (parseErr) {
+        // Some form backends (e.g. Formspree) don't return JSON we
+        // control — that's fine, we just fall back to the generic
+        // waitlist message below.
+      }
+
+      if (formType === "address-check") {
+        if (data.available === true) {
+          showStatus(
+            statusEl,
+            "Good news — Streetside already serves your area! We'll be in touch to get you set up.",
+            "success"
+          );
+        } else {
+          showStatus(
+            statusEl,
+            "There aren't any routes in your area yet, but we've added you to the waitlist — more neighbors signing up is what helps us open one there.",
+            "success"
+          );
+        }
+      } else {
+        showStatus(
+          statusEl,
+          "You're on the list! We'll be in touch about Streetside service in your neighborhood.",
+          "success"
+        );
+      }
+
       form.reset();
     } catch (err) {
       console.error("[streetside] Waitlist submission failed:", err);
