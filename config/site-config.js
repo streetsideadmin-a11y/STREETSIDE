@@ -22,9 +22,9 @@ window.STREETSIDE_CONFIG = {
     contactEmail: null, // e.g. "hello@streetsidebins.com"
     contactPhone: null, // e.g. "(740) 555-0100"
     socialLinks: {
-      // TODO: add real profile URLs when created.
-      instagram: null,
-      facebook: null,
+      instagram: "https://www.instagram.com/streetside_wnps",
+      facebook: "https://www.facebook.com/profile.php?id=61593453727059",
+      tiktok: "https://www.tiktok.com/@streetside56",
     },
   },
 

@@ -141,10 +141,20 @@
 
     var socialWrap = document.querySelector("[data-social-links]");
     if (socialWrap && business.socialLinks) {
-      var any = Object.keys(business.socialLinks).some(function (k) {
-        return !!business.socialLinks[k];
+      var anyLink = false;
+      socialWrap.querySelectorAll("[data-social]").forEach(function (link) {
+        var url = business.socialLinks[link.getAttribute("data-social")];
+        if (url) {
+          link.href = url;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.style.display = "";
+          anyLink = true;
+        } else {
+          link.style.display = "none";
+        }
       });
-      if (!any) socialWrap.style.display = "none";
+      socialWrap.style.display = anyLink ? "" : "none";
     }
   }
 
