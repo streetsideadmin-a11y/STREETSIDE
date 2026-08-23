@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "description": "Streetside marketing site — static HTML/CSS/JS with two optional Vercel serverless functions (api/waitlist.js, api/neighbor-count.js) for real form storage.",
   "dependencies": {
-    "@neondatabase/serverless": "*"
+    "@neondatabase/serverless": "*",
+    "@vercel/analytics": "^2.0.1"
   }
 }
