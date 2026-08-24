@@ -78,47 +78,83 @@ window.STREETSIDE_CONFIG = {
    * dollar amount — see how price-card renders this in main.js.
    * Fill these in with real, approved prices before launch.
    */
-  pricing: [
+  /**
+   * PRICING
+   * -----------------
+   * Real pricing, decided by the business owner (not invented).
+   * Subscription is the core offering — a flat weekly bin-out-and-back
+   * service, priced per month with a per-extra-can add-on. One-time
+   * service exists for people who need it just once. The Founding 250
+   * offer is a real, decided promotion for the first 250 subscribers,
+   * but its "spots remaining" is NOT tracked live here — there's no
+   * payment/subscriber system built yet, only a waitlist. Don't wire
+   * this to a live countdown until that exists; a fabricated number
+   * would be worse than none.
+   */
+  pricingTiers: [
     {
       id: "curb",
       name: "Curb Service",
       description: "Bins taken from their designated storage spot to the curb before collection.",
-      price: null, // TODO: set price, e.g. 24.99
-      billingUnit: "month", // shown as "/ month" once price is set
+      price: 12.5,
+      billingUnit: "month",
       features: [
-        "Bins brought to the curb on your collection day",
+        "Bins taken to the curb before collection",
         "Trash and recycling bins included",
-        "Weekly service",
+        "Weekly service, every week",
+        "+$10/month for each additional can",
       ],
       featured: false,
+      comingSoon: false,
     },
     {
       id: "full",
       name: "Full Service",
       description: "Bins taken to the curb before collection and returned to storage afterward.",
-      price: null, // TODO: set price
+      price: 25,
       billingUnit: "month",
       features: [
         "Everything in Curb Service",
         "Bins returned to storage after pickup",
-        "Most popular for busy households",
+        "Weekly service, every week",
+        "+$10/month for each additional can",
       ],
       featured: true,
+      comingSoon: false,
     },
     {
-      id: "additional-bins",
-      name: "Additional Bins",
-      description: "Support for households with more than the standard number of containers.",
-      price: null, // TODO: set price, e.g. per extra bin
-      billingUnit: "bin / month",
+      id: "premium",
+      name: "Premium",
+      description: "Full Service plus periodic bin cleaning, to keep your cans fresh — coming soon.",
+      price: null,
+      billingUnit: "month",
       features: [
-        "Add extra trash or recycling bins",
-        "Yard waste and compost bins supported",
-        "Combine with Curb or Full Service",
+        "Everything in Full Service",
+        "Periodic bin cleaning",
       ],
       featured: false,
+      comingSoon: true,
     },
   ],
+
+  oneTimeService: {
+    name: "One-Time Service",
+    description: "Need it just once — a single trip, an injury, an event? We've got you covered without a subscription.",
+    priceLow: 10,
+    priceHigh: 15,
+  },
+
+  foundingOffer: {
+    enabled: true,
+    name: "Founding 250",
+    headline: "Lock in founding-member pricing.",
+    description: "The first 250 subscribers get 50% off their first month, and their rate locked in for 2 years, as long as they stay subscribed.",
+    discountPercent: 50,
+    discountMonths: 1,
+    lockYears: 2,
+    spotsTotal: 250,
+    // Intentionally no "spotsRemaining" — see note above.
+  },
 
   /**
    * SERVICE AREA
