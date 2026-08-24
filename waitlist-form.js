@@ -1,65 +1,78 @@
 /**
- * Header / navigation behavior:
- * - toggles the mobile menu
- * - closes the mobile menu on link click or Escape
- * - marks the active nav link based on scroll position
+ * Neighbor counter
+ * -----------------
+ * Renders the real "N neighbors on board" value from
+ * window.STREETSIDE_CONFIG.neighborCounter. Never invents a number.
+ *
+ * - source: "manual" -> uses config.count as-is (today's mode).
+ * - source: "api"    -> fetches config.apiEndpoint, expects { count }.
+ *   If the fetch fails, falls back to config.count and logs a warning
+ *   rather than showing a fake or stale number silently.
  */
 (function () {
-  function init() {
-    var toggle = document.querySelector(".nav-toggle");
-    var menu = document.querySelector(".mobile-menu");
-    if (!toggle || !menu) return;
+  function animateCount(el, target) {
+    var prefersReduced = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
 
-    function closeMenu() {
-      toggle.setAttribute("aria-expanded", "false");
-      menu.classList.remove("is-open");
-      document.body.style.overflow = "";
+    if (prefersReduced || target === 0) {
+      el.textContent = String(target);
+      return;
     }
 
-    function openMenu() {
-      toggle.setAttribute("aria-expanded", "true");
-      menu.classList.add("is-open");
-      document.body.style.overflow = "hidden";
+    var start = 0;
+    var duration = 900;
+    var startTime = null;
+
+    function step(timestamp) {
+      if (startTime === null) startTime = timestamp;
+      var progress = Math.min((timestamp - startTime) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      var value = Math.round(start + (target - start) * eased);
+      el.textContent = String(value);
+      if (progress < 1) requestAnimationFrame(step);
     }
 
-    toggle.addEventListener("click", function () {
-      var expanded = toggle.getAttribute("aria-expanded") === "true";
-      expanded ? closeMenu() : openMenu();
-    });
+    requestAnimationFrame(step);
+  }
 
-    menu.querySelectorAll("a").forEach(function (link) {
-      link.addEventListener("click", closeMenu);
-    });
-
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") closeMenu();
-    });
-
-    // Active link highlighting via IntersectionObserver
-    var sections = Array.prototype.slice.call(
-      document.querySelectorAll("main section[id]")
-    );
-    var navLinks = Array.prototype.slice.call(
-      document.querySelectorAll(".primary-nav a[href^='#']")
-    );
-
-    if ("IntersectionObserver" in window && sections.length && navLinks.length) {
-      var observer = new IntersectionObserver(
-        function (entries) {
-          entries.forEach(function (entry) {
-            if (!entry.isIntersecting) return;
-            navLinks.forEach(function (link) {
-              var isMatch = link.getAttribute("href") === "#" + entry.target.id;
-              link.toggleAttribute("aria-current", isMatch);
-              if (isMatch) link.setAttribute("aria-current", "true");
-              else link.removeAttribute("aria-current");
-            });
-          });
-        },
-        { rootMargin: "-45% 0px -50% 0px", threshold: 0 }
-      );
-      sections.forEach(function (s) { observer.observe(s); });
+  function renderCopy(count) {
+    var noteEl = document.querySelector("[data-counter-note]");
+    if (!noteEl) return;
+    if (count <= 0) {
+      noteEl.textContent = "Be one of the first neighbors on board.";
+    } else {
+      noteEl.textContent = "Thank you to our growing community of neighbors!";
     }
+  }
+
+  function render(count) {
+    var numberEls = document.querySelectorAll("[data-counter-value]");
+    numberEls.forEach(function (el) { animateCount(el, count); });
+    renderCopy(count);
+  }
+
+  async function init() {
+    var config = (window.STREETSIDE_CONFIG || {}).neighborCounter;
+    if (!config) return;
+
+    if (config.source === "api" && config.apiEndpoint) {
+      try {
+        var res = await fetch(config.apiEndpoint, { headers: { Accept: "application/json" } });
+        if (!res.ok) throw new Error("Neighbor count API responded with " + res.status);
+        var data = await res.json();
+        if (typeof data.count !== "number") throw new Error("Neighbor count API returned no count");
+        render(data.count);
+        return;
+      } catch (err) {
+        console.warn(
+          "[streetside] Could not load live neighbor count, falling back to config.count:",
+          err
+        );
+      }
+    }
+
+    render(config.count || 0);
   }
 
   document.addEventListener("DOMContentLoaded", init);

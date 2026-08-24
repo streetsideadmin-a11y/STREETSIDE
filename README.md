@@ -32,11 +32,17 @@ in a future session if useful.
 ```
 streetside-website/
 ├── index.html              All page markup (one page, anchor-linked sections)
+├── privacy-policy.html     Privacy policy page
+├── terms.html              Terms of service page
+├── 404.html                Custom not-found page (Vercel serves this automatically)
+├── robots.txt              Tells search engines they can crawl the site
+├── sitemap.xml             Lists real pages for search engines
 ├── package.json            Only needed if you use the optional /api functions below
 ├── schema.sql              Database table definition (optional, see below)
 ├── api/                     Optional Vercel serverless functions
-│   ├── waitlist.js           Saves form submissions to Postgres
-│   └── neighbor-count.js     Returns the real signup count
+│   ├── waitlist.js           Saves form submissions to Postgres (+ optional Sheets/email)
+│   ├── neighbor-count.js     Returns the real signup count
+│   └── interest-map.js       Returns signups grouped by city, for the map
 ├── config/
 │   └── site-config.js      Editable business data — START HERE
 ├── styles/
@@ -49,6 +55,7 @@ streetside-website/
 │   ├── reveal.js             Scroll-reveal animation
 │   ├── counter.js            Neighbor counter (manual today, API-ready)
 │   ├── waitlist-form.js      Waitlist + address-check form handling
+│   ├── interest-map.js       Draws the service-area map from real signups
 │   └── main.js                Renders pricing/FAQ from config
 └── images/
     ├── streetside-logo-horizontal.png   Your real logo (header)
@@ -169,6 +176,31 @@ setup needed, just a script pasted into the Sheet itself.
        data.consent ? "Yes" : "No"
      ]);
 
+     // Send the person a confirmation email — only for full waitlist
+     // signups, since the address-check form doesn't collect an email.
+     // Sent from your own Gmail account (whichever Google account owns
+     // this script); wrapped in try/catch so a mail hiccup never
+     // breaks the row from being saved above.
+     if (data.formType === "waitlist" && data.email) {
+       try {
+         var subject = "You're on the Streetside waitlist!";
+         var body =
+           "Hi " + (data.firstName || "there") + ",\n\n" +
+           "Thanks for joining the Streetside waitlist! We've got your details for " +
+           (data.streetAddress ? data.streetAddress + ", " : "") +
+           (data.city || "your area") + ".\n\n" +
+           "We'll reach out as soon as a route opens near you. In the meantime, " +
+           "every neighbor who signs up helps bring that day closer.\n\n" +
+           "— Streetside\n" +
+           "We take it to the street. You don't have to.";
+         MailApp.sendEmail(data.email, subject, body);
+       } catch (err) {
+         // Logged in Apps Script's execution log (View > Executions)
+         // if you ever want to check — never blocks the row save above.
+         console.error("Confirmation email failed: " + err);
+       }
+     }
+
      return ContentService.createTextOutput(JSON.stringify({ ok: true }))
        .setMimeType(ContentService.MimeType.JSON);
    }
@@ -176,6 +208,12 @@ setup needed, just a script pasted into the Sheet itself.
 
 4. **Save** (the disk-icon button, or Ctrl+S), giving the project any
    name when prompted.
+
+   If you already deployed this script before adding the email step,
+   you'll need to re-authorize it — Google will prompt for an
+   additional "send email on your behalf" permission the next time
+   you run or redeploy it. That's expected; approve it the same way
+   as the first authorization.
 5. **Deploy it**: click **Deploy → New deployment**. Next to "Select
    type," click the gear icon and choose **Web app**. Set:
    - **Execute as**: Me
@@ -195,12 +233,18 @@ setup needed, just a script pasted into the Sheet itself.
    variable changed — Vercel needs a fresh deployment to pick up a
    new environment variable).
 9. **Test it** — submit the waitlist form on your live site and check
-   that a new row appears in the Sheet within a few seconds.
+   that a new row appears in the Sheet, and that the email address you
+   used receives a confirmation email within a minute or two.
 
 If this ever stops working, the database save still always succeeds
 independently — check your Vercel function logs for a
 "Google Sheets sync failed" warning to see what went wrong, without
 worrying about losing the actual signup.
+
+A personal Gmail account can send about 100 emails/day through
+Apps Script (a Google Workspace account gets more) — plenty for a
+launching business, but worth knowing if signups ever spike hard in
+one day.
 
 ## Launch checklist — what still needs real data
 

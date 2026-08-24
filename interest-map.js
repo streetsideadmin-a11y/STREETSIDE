@@ -1,31 +1,66 @@
-// Vercel serverless function — GET /api/neighbor-count
-// ---------------------------------------------------------------
-// Returns { count: <real number of waitlist signups> } straight from
-// the database. scripts/counter.js already knows how to call this —
-// just flip neighborCounter.source to "api" in config/site-config.js
-// once this is deployed and working (see README.md).
+/**
+ * Header / navigation behavior:
+ * - toggles the mobile menu
+ * - closes the mobile menu on link click or Escape
+ * - marks the active nav link based on scroll position
+ */
+(function () {
+  function init() {
+    var toggle = document.querySelector(".nav-toggle");
+    var menu = document.querySelector(".mobile-menu");
+    if (!toggle || !menu) return;
 
-const { neon } = require("@neondatabase/serverless");
+    function closeMenu() {
+      toggle.setAttribute("aria-expanded", "false");
+      menu.classList.remove("is-open");
+      document.body.style.overflow = "";
+    }
 
-module.exports = async (req, res) => {
-  if (!process.env.DATABASE_URL) {
-    console.error("[streetside] DATABASE_URL is not set — see README.md.");
-    res.status(500).json({ error: "Server is not configured yet." });
-    return;
+    function openMenu() {
+      toggle.setAttribute("aria-expanded", "true");
+      menu.classList.add("is-open");
+      document.body.style.overflow = "hidden";
+    }
+
+    toggle.addEventListener("click", function () {
+      var expanded = toggle.getAttribute("aria-expanded") === "true";
+      expanded ? closeMenu() : openMenu();
+    });
+
+    menu.querySelectorAll("a").forEach(function (link) {
+      link.addEventListener("click", closeMenu);
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeMenu();
+    });
+
+    // Active link highlighting via IntersectionObserver
+    var sections = Array.prototype.slice.call(
+      document.querySelectorAll("main section[id]")
+    );
+    var navLinks = Array.prototype.slice.call(
+      document.querySelectorAll(".primary-nav a[href^='#']")
+    );
+
+    if ("IntersectionObserver" in window && sections.length && navLinks.length) {
+      var observer = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            navLinks.forEach(function (link) {
+              var isMatch = link.getAttribute("href") === "#" + entry.target.id;
+              link.toggleAttribute("aria-current", isMatch);
+              if (isMatch) link.setAttribute("aria-current", "true");
+              else link.removeAttribute("aria-current");
+            });
+          });
+        },
+        { rootMargin: "-45% 0px -50% 0px", threshold: 0 }
+      );
+      sections.forEach(function (s) { observer.observe(s); });
+    }
   }
 
-  try {
-    const sql = neon(process.env.DATABASE_URL);
-    const rows = await sql`
-      SELECT COUNT(*)::int AS count
-      FROM signups
-      WHERE form_type = 'waitlist'
-    `;
-
-    res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=120");
-    res.status(200).json({ count: rows[0].count });
-  } catch (err) {
-    console.error("[streetside] Failed to load neighbor count:", err);
-    res.status(500).json({ error: "Could not load neighbor count." });
-  }
-};
+  document.addEventListener("DOMContentLoaded", init);
+})();

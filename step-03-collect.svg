@@ -1,0 +1,11 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="t4">
+<title id="t4">Bins returned icon</title>
+<rect width="200" height="200" fill="#F1F0EA"/>
+<path d="M30 70 L100 30 L170 70" stroke="#15171A" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="55" y="70" width="90" height="70" fill="#FFFFFF" stroke="#15171A" stroke-width="4"/>
+<rect x="85" y="100" width="30" height="40" fill="#1B3A1D"/>
+<rect x="90" y="120" width="34" height="54" rx="4" fill="#1B3A1D"/>
+<rect x="90" y="112" width="34" height="12" rx="3" fill="#15171A"/>
+<path d="M60 150 L30 150" stroke="#CC1F2B" stroke-width="5" stroke-linecap="round"/>
+<path d="M38 142 L30 150 L38 158" stroke="#CC1F2B" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

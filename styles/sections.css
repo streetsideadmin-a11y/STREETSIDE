@@ -471,15 +471,16 @@ rect.map-landmark {
   transition: r 0.4s var(--ease-out), fill 0.4s var(--ease-out), opacity 0.4s var(--ease-out);
 }
 
-/* Smaller towns stay hidden until they actually get real interest —
-   only the bigger anchor cities show by default. */
+/* Smaller towns show dimmer than the main cities by default, so the
+   map reads as a full regional reference — real interest still
+   brightens a dot and gives it the red accent treatment below. */
 .map-town-dot[data-tier="town"] {
-  opacity: 0;
+  opacity: 0.55;
 }
 
 
 .map-town-dot--active {
-  opacity: 1;
+  opacity: 1 !important;
   fill: var(--color-accent);
   stroke: rgba(255, 255, 255, 0.85);
   stroke-width: 1.5;
@@ -502,14 +503,15 @@ rect.map-landmark {
   transition: opacity 0.4s var(--ease-out);
 }
 
-/* Smaller-town labels only appear once their dot lights up. */
+/* Smaller-town labels show dimmer by default, brighten with real
+   interest (see .map-town-label--visible below). */
 .map-town-label[data-tier="town"] {
-  opacity: 0;
+  opacity: 0.5;
 }
 
 
 .map-town-label--visible {
-  opacity: 1;
+  opacity: 1 !important;
 }
 
 .service-area__map .map-caption {

@@ -1,91 +1,166 @@
 /**
- * Service-area interest map.
+ * Waitlist form + "check your address" mini-form.
  * ---------------------------------------------------------------
- * This is a simple illustrated map, not a real interactive map
- * library — every town's dot is drawn directly in index.html's
- * inline SVG, positioned from real coordinates but simplified into
- * a flat illustration. That's intentional: it has no external
- * dependency (no map tiles, no CDN, nothing that can silently fail
- * to load), so the one thing it does — light up and grow a town's
- * dot when real interest comes in — works reliably every time.
+ * IMPORTANT — read this before launch:
  *
- * Data comes from /api/interest-map (see api/interest-map.js),
- * which reports signups grouped by CITY ONLY — never an exact
- * street address — matching an existing dot in the SVG by its
- * data-city attribute. A city typed in a form that doesn't match any
- * dot on file simply doesn't light one up; it's still saved
- * everywhere else on the site (the database, the neighbor counter).
+ * Neither form has a real backend connected yet. There is no
+ * database behind this site. Submitting the form will:
+ *
+ *   1. Validate the fields in the browser.
+ *   2. If window.STREETSIDE_CONFIG.waitlistForm.endpoint is set,
+ *      POST the data there as JSON and show success/error based on
+ *      the real response.
+ *   3. If no endpoint is configured, the form clearly tells the
+ *      person that signups aren't being collected yet — it never
+ *      claims to have saved or received their information.
+ *
+ * To go live: pick a form backend (Formspree, Getform, Basin, your
+ * own serverless function, etc.), put the endpoint URL into
+ * config/site-config.js under waitlistForm.endpoint, and this file
+ * needs no further changes.
  */
 (function () {
-  // Normalizes a typed city name for matching against the SVG's
-  // data-city attributes. People type their city all kinds of ways
-  // ("Lancaster", "Lancaster, OH", "lancaster ohio") — this strips
-  // common state suffixes and punctuation so those all match the
-  // same dot instead of silently missing one.
-  function normalizeCityKey(raw) {
-    return (raw || "")
-      .toLowerCase()
-      .replace(/,/g, " ")
-      .replace(/\boh\b/g, " ")
-      .replace(/\bohio\b/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
+  function serializeForm(form) {
+    var data = {};
+    new FormData(form).forEach(function (value, key) {
+      if (data[key] !== undefined) {
+        data[key] = [].concat(data[key], value);
+      } else {
+        data[key] = value;
+      }
+    });
+    return data;
   }
 
-  function baseRadius(tier) {
-    return tier === "city" ? 7 : 4;
+  function showStatus(el, message, type) {
+    el.textContent = message;
+    el.classList.remove("is-success", "is-error");
+    el.classList.add(type === "success" ? "is-success" : "is-error");
   }
 
-  function radiusForCount(tier, count) {
-    return Math.min(baseRadius(tier) + count * 2.5, 22);
+  // When an address-check comes back with no route yet, we still want a
+  // way to reach that person later — but the address-check form itself
+  // never asks for a name/email/phone. So instead of only saying "we'll
+  // be in touch," carry over what they already typed into the full
+  // waitlist form below and invite them to finish it.
+  function prefillWaitlistForm(addressForm) {
+    var waitlistForm = document.querySelector("#waitlist-form");
+    if (!waitlistForm) return;
+
+    var fieldMap = {
+      streetAddress: "#wl-street",
+      city: "#wl-city",
+      zip: "#wl-zip",
+    };
+
+    Object.keys(fieldMap).forEach(function (name) {
+      var sourceField = addressForm.querySelector('[name="' + name + '"]');
+      var targetField = waitlistForm.querySelector(fieldMap[name]);
+      if (sourceField && targetField && sourceField.value) {
+        targetField.value = sourceField.value;
+      }
+    });
   }
 
-  async function init() {
-    var svg = document.querySelector(".interest-map-svg");
-    var caption = document.querySelector("[data-interest-map] .map-caption");
-    if (!svg) return;
+  async function handleSubmit(form, statusEl, formType) {
+    var config = (window.STREETSIDE_CONFIG || {}).waitlistForm || {};
+    var payload = serializeForm(form);
+    payload.formType = formType; // "waitlist" or "address-check"
+    payload.submittedAt = new Date().toISOString();
+
+    if (!config.endpoint) {
+      showStatus(
+        statusEl,
+        "Thanks for the details — signups aren't connected to a live system yet, so nothing has been saved. (Site owner: set waitlistForm.endpoint in config/site-config.js to start collecting real submissions.)",
+        "error"
+      );
+      console.info("[streetside] Waitlist submission captured locally only (no endpoint configured):", payload);
+      return;
+    }
+
+    var submitBtn = form.querySelector("button[type='submit']");
+    if (submitBtn) submitBtn.disabled = true;
 
     try {
-      var res = await fetch("/api/interest-map", { headers: { Accept: "application/json" } });
-      if (!res.ok) throw new Error("interest-map API responded with " + res.status);
-      var data = await res.json();
-      var cities = data.cities || [];
-      var plotted = 0;
-
-      cities.forEach(function (entry) {
-        var key = normalizeCityKey(entry.city);
-        var dot = svg.querySelector('[data-city="' + key + '"]');
-        if (!dot) return; // no dot on file yet for this town — skip silently
-
-        var tier = dot.getAttribute("data-tier");
-        dot.setAttribute("r", radiusForCount(tier, entry.count));
-        dot.classList.add("map-town-dot--active");
-        dot.setAttribute(
-          "aria-label",
-          entry.city + ": " + entry.count + (entry.count === 1 ? " neighbor interested" : " neighbors interested")
-        );
-
-        // Reveal a label for any town with real interest, even ones
-        // that don't get a permanent label by default.
-        var label = svg.querySelector('[data-city-label="' + key + '"]');
-        if (label) label.classList.add("map-town-label--visible");
-
-        plotted += 1;
+      var res = await fetch(config.endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(payload),
       });
 
-      if (caption) {
-        caption.textContent =
-          plotted > 0
-            ? "Lit-up towns show real neighbor interest so far."
-            : "Be the first neighbor to light up your town — join the waitlist above.";
+      if (!res.ok) throw new Error("Form endpoint responded with " + res.status);
+
+      var data = {};
+      try {
+        data = await res.json();
+      } catch (parseErr) {
+        // Some form backends (e.g. Formspree) don't return JSON we
+        // control — that's fine, we just fall back to the generic
+        // waitlist message below.
       }
+
+      if (formType === "address-check") {
+        if (data.available === true) {
+          showStatus(
+            statusEl,
+            "Good news — Streetside already serves your area! We'll be in touch to get you set up.",
+            "success"
+          );
+        } else {
+          prefillWaitlistForm(form);
+          statusEl.classList.remove("is-error");
+          statusEl.classList.add("is-success");
+
+          var nearby = data.nearbyCount || 0;
+          var intro =
+            nearby > 1
+              ? nearby +
+                " neighbors near you are already interested, but that's not quite enough yet to open a route."
+              : "There aren't any routes in your area yet.";
+
+          statusEl.innerHTML =
+            intro +
+            " <strong>Add your contact info below</strong> and we'll reach out as soon as one opens near you. " +
+            '<a href="#waitlist-form" class="form-status__link">Jump to the form &darr;</a>';
+        }
+      } else {
+        showStatus(
+          statusEl,
+          "You're on the list! We'll be in touch about Streetside service in your neighborhood.",
+          "success"
+        );
+      }
+
+      form.reset();
     } catch (err) {
-      console.warn("[streetside] Could not load interest map data:", err);
-      if (caption) {
-        caption.textContent = "Check your address above to see where Streetside is headed next.";
-      }
+      console.error("[streetside] Waitlist submission failed:", err);
+      showStatus(
+        statusEl,
+        "Something went wrong sending that — please try again, or reach out to us directly.",
+        "error"
+      );
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
     }
   }
 
-  document.addEventListener("DOMContentLoaded", init);
+  function initForm(formSelector, statusSelector, formType) {
+    var form = document.querySelector(formSelector);
+    if (!form) return;
+    var statusEl = document.querySelector(statusSelector);
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      handleSubmit(form, statusEl, formType);
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    initForm("#waitlist-form", "#waitlist-form-status", "waitlist");
+    initForm("#address-check-form", "#address-check-status", "address-check");
+  });
 })();
