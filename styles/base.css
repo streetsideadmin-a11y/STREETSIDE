@@ -177,6 +177,17 @@ section {
 .reveal-item:nth-child(5) { transition-delay: 320ms; }
 .reveal-item:nth-child(6) { transition-delay: 400ms; }
 
+/* Slides in from the right instead of fading up — used for the
+   pricing cards so they read as one row arriving together rather
+   than stacking in from below. */
+.reveal-item--from-right {
+  transform: translateX(48px);
+}
+
+.reveal-group.is-visible .reveal-item--from-right {
+  transform: translateX(0);
+}
+
 /* Angular section transitions — a recurring Streetside motif */
 .angle-top {
   clip-path: polygon(0 4%, 100% 0, 100% 100%, 0 100%);

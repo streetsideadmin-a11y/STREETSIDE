@@ -35,30 +35,28 @@
     if (!mount || !tiers.length) return;
 
     tiers.forEach(function (tier) {
-      var classes = "price-card reveal-item";
+      var classes = "price-card reveal-item reveal-item--from-right";
       if (tier.featured) classes += " price-card--featured";
-      if (tier.comingSoon) classes += " price-card--coming-soon";
       var card = el("div", classes);
 
       if (tier.featured) {
         card.appendChild(el("span", "price-card__tag", "Most popular"));
-      } else if (tier.comingSoon) {
-        card.appendChild(el("span", "price-card__tag price-card__tag--soon", "Coming soon"));
       }
 
       card.appendChild(el("h3", null, tier.name));
       card.appendChild(el("p", "price-card__desc", tier.description));
 
-      if (tier.comingSoon || tier.price === null || tier.price === undefined) {
+      if (tier.price === null || tier.price === undefined) {
         card.appendChild(el("div", "price-card__value", "TBD"));
       } else if (founding && founding.enabled) {
         var discounted = formatPrice(tier.price * (1 - founding.discountPercent / 100));
         var valueEl = el(
           "div",
-          "price-card__value",
-          "$" + discounted +
-            ' <span class="price-card__strike">$' + formatPrice(tier.price) + '</span>' +
-            ' <span class="unit">first month</span>'
+          "price-card__value price-card__value--deal",
+          '<span class="price-card__save">Save ' + founding.discountPercent + "%</span>" +
+            '<span class="price-card__big">$' + discounted + '</span>' +
+            '<span class="price-card__strike">$' + formatPrice(tier.price) + '</span>' +
+            '<span class="unit">first month</span>'
         );
         card.appendChild(valueEl);
         card.appendChild(el("p", "price-card__then", "Then $" + formatPrice(tier.price) + " / " + tier.billingUnit + " — rate locked for " + founding.lockYears + " years"));
@@ -74,29 +72,20 @@
       });
       card.appendChild(list);
 
-      if (tier.comingSoon) {
-        var notifyBtn = el("a", "btn btn-primary btn-block", "Notify Me");
-        notifyBtn.setAttribute("href", "#waitlist");
-        card.appendChild(notifyBtn);
-      } else {
-        var cta = el("a", "btn btn-primary btn-block", "Join the Waitlist");
-        cta.setAttribute("href", "#waitlist");
-        card.appendChild(cta);
-      }
+      var cta = el("a", "btn btn-primary btn-block", "Join the Waitlist");
+      cta.setAttribute("href", "#waitlist");
+      card.appendChild(cta);
 
       mount.appendChild(card);
     });
 
     // --- One-time service card ---
     if (oneTime) {
-      var otCard = el("div", "price-card reveal-item");
+      var otCard = el("div", "price-card reveal-item reveal-item--from-right");
       otCard.appendChild(el("h3", null, oneTime.name));
       otCard.appendChild(el("p", "price-card__desc", oneTime.description));
 
-      var priceText =
-        oneTime.priceLow != null && oneTime.priceHigh != null
-          ? "$" + oneTime.priceLow + "\u2013$" + oneTime.priceHigh
-          : "TBD";
+      var priceText = oneTime.price != null ? "$" + formatPrice(oneTime.price) : "TBD";
       otCard.appendChild(el("div", "price-card__value", priceText));
 
       var otList = el("ul");

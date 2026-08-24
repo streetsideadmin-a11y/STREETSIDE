@@ -129,6 +129,79 @@ silently pretending to work — the site's existing error-handling in
 `scripts/waitlist-form.js` and `scripts/counter.js` already accounts
 for that.
 
+## Optional: also mirror submissions to a Google Sheet
+
+The database (above) is the real source of truth — the neighbor
+counter, the map, and the address-check logic all read from it. But
+if you'd like a plain spreadsheet copy of every submission too (handy
+for skimming without opening Neon), `api/waitlist.js` can also send
+each one to a Google Sheet. This uses a **Google Apps Script Web App**
+instead of Google's full API — no service account or Cloud Console
+setup needed, just a script pasted into the Sheet itself.
+
+1. **Create a new Google Sheet** (or use an existing one) at
+   sheets.google.com. Name it something like "Streetside Signups."
+2. **Open the script editor**: in the Sheet, click
+   **Extensions → Apps Script**.
+3. **Delete whatever's in the editor** and paste this in its place:
+
+   ```javascript
+   function doPost(e) {
+     var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+     var data = JSON.parse(e.postData.contents);
+
+     var headers = ["Submitted At", "Form Type", "First Name", "Last Name",
+       "Email", "Phone", "Street Address", "City", "ZIP", "Collection Day",
+       "Waste Provider", "Trash Bins", "Recycling Bins",
+       "Bin Storage Location", "Heard About Us", "Consent"];
+
+     if (sheet.getLastRow() === 0) {
+       sheet.appendRow(headers);
+     }
+
+     sheet.appendRow([
+       data.submittedAt || "", data.formType || "", data.firstName || "",
+       data.lastName || "", data.email || "", data.phone || "",
+       data.streetAddress || "", data.city || "", data.zip || "",
+       data.collectionDay || "", data.wasteProvider || "",
+       data.trashBinCount || "", data.recyclingBinCount || "",
+       data.binStorageLocation || "", data.hearAboutUs || "",
+       data.consent ? "Yes" : "No"
+     ]);
+
+     return ContentService.createTextOutput(JSON.stringify({ ok: true }))
+       .setMimeType(ContentService.MimeType.JSON);
+   }
+   ```
+
+4. **Save** (the disk-icon button, or Ctrl+S), giving the project any
+   name when prompted.
+5. **Deploy it**: click **Deploy → New deployment**. Next to "Select
+   type," click the gear icon and choose **Web app**. Set:
+   - **Execute as**: Me
+   - **Who has access**: Anyone
+   Click **Deploy**. The first time, Google will ask you to authorize
+   the script — click through the consent screens (it'll warn that
+   the app isn't verified, which is expected for a script you wrote
+   yourself; click **Advanced → Go to \[project name\] (unsafe)** to
+   proceed).
+6. **Copy the Web App URL** it gives you after deploying — it looks
+   like `https://script.google.com/macros/s/AKfycb.../exec`.
+7. **Add it to Vercel**: in your project on vercel.com, go to
+   **Settings → Environment Variables**, add a new one named
+   `GOOGLE_SHEETS_WEBHOOK_URL` with that URL as the value.
+8. **Redeploy** (upload the updated `api/waitlist.js` the same way as
+   any other update, or just redeploy if only the environment
+   variable changed — Vercel needs a fresh deployment to pick up a
+   new environment variable).
+9. **Test it** — submit the waitlist form on your live site and check
+   that a new row appears in the Sheet within a few seconds.
+
+If this ever stops working, the database save still always succeeds
+independently — check your Vercel function logs for a
+"Google Sheets sync failed" warning to see what went wrong, without
+worrying about losing the actual signup.
+
 ## Launch checklist — what still needs real data
 
 Nothing fake is shown anywhere on the site. Instead, these are clearly

@@ -122,26 +122,12 @@ window.STREETSIDE_CONFIG = {
       featured: true,
       comingSoon: false,
     },
-    {
-      id: "premium",
-      name: "Premium",
-      description: "Full Service plus periodic bin cleaning, to keep your cans fresh — coming soon.",
-      price: null,
-      billingUnit: "month",
-      features: [
-        "Everything in Full Service",
-        "Periodic bin cleaning",
-      ],
-      featured: false,
-      comingSoon: true,
-    },
   ],
 
   oneTimeService: {
     name: "One-Time Service",
     description: "Need it just once — a single trip, an injury, an event? We've got you covered without a subscription.",
-    priceLow: 10,
-    priceHigh: 15,
+    price: 10,
   },
 
   foundingOffer: {

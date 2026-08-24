@@ -34,6 +34,32 @@ function isAddressInServiceArea(city, zip) {
   return cityMatch || zipMatch;
 }
 
+// ---------------------------------------------------------------
+// GOOGLE SHEETS SYNC (optional)
+// ---------------------------------------------------------------
+// If GOOGLE_SHEETS_WEBHOOK_URL is set (a Google Apps Script Web App
+// URL — see README.md for the exact setup steps), every submission
+// is also sent there to be appended as a row in a Google Sheet.
+// This is a best-effort mirror, not the source of truth — the
+// database save above always happens first and is what the site's
+// own features (neighbor counter, map, address-check) rely on. If
+// the Sheets sync fails for any reason, it's logged but never
+// blocks or breaks the person's actual submission.
+async function syncToGoogleSheet(payload) {
+  var url = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
+  if (!url) return;
+
+  try {
+    await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+  } catch (err) {
+    console.warn("[streetside] Google Sheets sync failed (submission was still saved to the database):", err);
+  }
+}
+
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
@@ -91,6 +117,27 @@ module.exports = async (req, res) => {
         ${body.submittedAt || new Date().toISOString()}
       )
     `;
+
+    // Best-effort mirror to Google Sheets — never blocks or breaks
+    // the response if it fails; the database row above already saved.
+    await syncToGoogleSheet({
+      formType: body.formType || "waitlist",
+      firstName: body.firstName || "",
+      lastName: body.lastName || "",
+      email: body.email || "",
+      phone: body.phone || "",
+      streetAddress: body.streetAddress || "",
+      city: body.city || "",
+      zip: body.zip || "",
+      collectionDay: body.collectionDay || "",
+      wasteProvider: body.wasteProvider || "",
+      trashBinCount: body.trashBinCount || "",
+      recyclingBinCount: body.recyclingBinCount || "",
+      binStorageLocation: body.binStorageLocation || "",
+      hearAboutUs: body.hearAboutUs || "",
+      consent: !!body.consent,
+      submittedAt: body.submittedAt || new Date().toISOString(),
+    });
 
     const available = formType === "address-check" ? isAddressInServiceArea(body.city, body.zip) : undefined;
 
