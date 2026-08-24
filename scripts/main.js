@@ -43,6 +43,15 @@
         card.appendChild(el("span", "price-card__tag", "Most popular"));
       }
 
+      if (founding && founding.enabled && tier.price !== null && tier.price !== undefined) {
+        var ribbonClip = el(
+          "div",
+          "price-card__ribbon-clip",
+          '<span class="price-card__save">Save ' + founding.discountPercent + '%</span>'
+        );
+        card.appendChild(ribbonClip);
+      }
+
       card.appendChild(el("h3", null, tier.name));
       card.appendChild(el("p", "price-card__desc", tier.description));
 
@@ -53,8 +62,7 @@
         var valueEl = el(
           "div",
           "price-card__value price-card__value--deal",
-          '<span class="price-card__save">Save ' + founding.discountPercent + "%</span>" +
-            '<span class="price-card__big">$' + discounted + '</span>' +
+          '<span class="price-card__big">$' + discounted + '</span>' +
             '<span class="price-card__strike">$' + formatPrice(tier.price) + '</span>' +
             '<span class="unit">first month</span>'
         );

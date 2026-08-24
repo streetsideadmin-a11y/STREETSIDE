@@ -551,18 +551,29 @@
   gap: 0 8px;
 }
 
+.price-card__ribbon-clip {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 110px;
+  height: 110px;
+  overflow: hidden;
+  pointer-events: none;
+  border-top-right-radius: var(--radius-md);
+}
+
 .price-card__save {
   position: absolute;
   top: 18px;
-  right: -34px;
-  width: 150px;
+  right: -30px;
+  width: 130px;
   transform: rotate(45deg);
   background: var(--color-accent);
   color: var(--white);
   font-family: var(--font-display);
   font-stretch: condensed;
   font-weight: 800;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   letter-spacing: var(--tracking-wide);
   text-transform: uppercase;
   text-align: center;
