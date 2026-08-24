@@ -1,104 +1,86 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Terms of Service | Streetside</title>
-<meta name="description" content="The terms that apply to using this website and joining the Streetside waitlist." />
-<meta name="robots" content="noindex" />
-<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
-<link rel="stylesheet" href="styles/tokens.css" />
-<link rel="stylesheet" href="styles/base.css" />
-<link rel="stylesheet" href="styles/components.css" />
-<link rel="stylesheet" href="styles/sections.css" />
-<style>
-  .legal-page { padding: var(--space-9) 0 var(--space-8); background: var(--color-bg); }
-  .legal-page .container { max-width: 780px; }
-  .legal-page h1 { color: var(--color-brand-strong); margin-bottom: var(--space-3); }
-  .legal-page .updated { color: var(--color-ink-muted); font-size: 0.9rem; margin-bottom: var(--space-8); }
-  .legal-page h2 { font-family: var(--font-display); font-stretch: condensed; font-weight: 800; text-transform: uppercase; color: var(--color-brand-strong); font-size: 1.3rem; margin-top: var(--space-8); margin-bottom: var(--space-4); }
-  .legal-page p, .legal-page li { color: var(--color-ink); line-height: 1.7; margin-bottom: var(--space-4); }
-  .legal-page ul { padding-left: var(--space-5); margin-bottom: var(--space-4); }
-  .legal-page a { color: var(--color-brand); text-decoration: underline; }
-  .legal-note { display: inline-block; margin-top: var(--space-2); font-size: 0.8rem; padding: 2px 10px; border-radius: 999px; background: #fdf1e7; color: #8a5a1f; border: 1px solid #ecd3ad; }
-</style>
-</head>
-<body>
-<header class="site-header">
-  <div class="container site-header__inner">
-    <a href="index.html" class="brand-logo" aria-label="Streetside home">
-      <img src="images/streetside-logo-horizontal.png" alt="Streetside — Waste & Property Services" width="400" height="203" />
-    </a>
-    <nav class="primary-nav" aria-label="Primary">
-      <ul>
-        <li><a href="index.html#how-it-works">How It Works</a></li>
-        <li><a href="index.html#why-streetside">Why Streetside</a></li>
-        <li><a href="index.html#pricing">Pricing</a></li>
-        <li><a href="index.html#service-area">Service Area</a></li>
-        <li><a href="index.html#faq">FAQ</a></li>
-      </ul>
-    </nav>
-    <div class="header-actions">
-      <a href="index.html#waitlist" class="btn btn-primary">Join the Waitlist <span class="btn-icon" aria-hidden="true">→</span></a>
-    </div>
-  </div>
-</header>
+/* ==========================================================================
+   STREETSIDE — DESIGN TOKENS
+   Source of truth for color, type, spacing, and motion.
+   Derived from the supplied Streetside logo files and brand brief.
+   ========================================================================== */
 
-<main class="legal-page">
-  <div class="container">
-    <h1>Terms of Service</h1>
-    <p class="updated">Last updated: August 2026</p>
+:root {
+  /* ---- Brand color (sampled from the supplied logo) ---- */
+  --green-900: #0f2010;   /* deepest bg, footer */
+  --green-800: #16311a;   /* primary dark forest green */
+  --green-700: #1e4322;   /* hover / lighter surface */
+  --green-600: #2c5a31;   /* accents on dark */
+  --green-tint: #eef2ec;  /* faint green tint for light-section backgrounds */
 
-    <p>These terms apply to your use of this website and to joining the Streetside waitlist. By using this site, you agree to them.</p>
+  --charcoal-900: #121416; /* near-black */
+  --charcoal-700: #2a2d31;
 
-    <h2>What Streetside Does</h2>
-    <p>Streetside is a residential bin valet service: we move your trash and recycling bins to the curb before your scheduled collection, and return them to storage afterward. Streetside does not collect, haul, or dispose of garbage. Your existing waste and recycling provider continues to collect and empty your bins as normal — Streetside works alongside them, not in place of them.</p>
+  --white: #ffffff;
+  --off-white: #f6f5f1;
+  --paper: #f1f0ea;
 
-    <h2>Joining the Waitlist</h2>
-    <p>Submitting the waitlist form or the address-check tool expresses interest in Streetside service — it is not a guarantee that service is currently available at your address, or a booking of any kind. Routes open based on demand in a given area, and we'll reach out using the contact information you provide once service is available near you.</p>
+  --gray-200: #e4e2da;
+  --gray-400: #b7b4a8;
+  --gray-500: #6b7280;
+  --gray-700: #43473f;
 
-    <h2>Pricing</h2>
-    <p>Any pricing shown on this site is subject to change and is not final until confirmed directly with you at signup. No payment is collected through this website.</p>
+  --red-600: #c81e2c;   /* accent — dividers, icons, small highlights only */
+  --red-700: #a8121e;
 
-    <h2>Accurate Information</h2>
-    <p>You agree to provide accurate contact and address information when using our forms. We can't reach out about service availability if the information we have is incorrect.</p>
+  /* ---- Semantic color ---- */
+  --color-bg: var(--off-white);
+  --color-bg-alt: var(--paper);
+  --color-surface: var(--white);
+  --color-ink: var(--charcoal-900);
+  --color-ink-muted: var(--gray-700);
+  --color-brand: var(--green-800);
+  --color-brand-strong: var(--green-900);
+  --color-accent: var(--red-600);
+  --color-border: rgba(18, 20, 22, 0.1);
+  --color-border-on-dark: rgba(255, 255, 255, 0.16);
 
-    <h2>Communications</h2>
-    <p>By submitting a form and providing consent, you agree that Streetside may contact you by email, phone, or text regarding service availability and related updates. You can ask us to stop contacting you at any time.</p>
+  /* ---- Type ----
+     Display: bold / condensed / industrial — carries the logo's road-sign energy.
+     We stack widely-installed condensed/narrow system faces first, with
+     `font-stretch: condensed` as a progressive enhancement, so the brand's
+     "bold condensed" personality holds even without a custom webfont.
+     See README for how to self-host Oswald/Bebas Neue later for exact match. */
+  --font-display: "Archivo Narrow", "Roboto Condensed", "Arial Narrow",
+    "Helvetica Neue Condensed", "Liberation Sans Narrow", sans-serif;
+  --font-body: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 
-    <h2>No Warranties</h2>
-    <p>This website and the information on it are provided "as is." While we try to keep everything accurate and up to date, we don't guarantee the site will be error-free or uninterrupted.</p>
+  --tracking-tight: -0.01em;
+  --tracking-wide: 0.04em;
+  --tracking-wider: 0.12em;
 
-    <h2>Limitation of Liability</h2>
-    <p>To the fullest extent permitted by law, Streetside is not liable for indirect, incidental, or consequential damages arising from your use of this website or the waitlist.</p>
+  /* ---- Spacing scale (4px base) ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+  --space-9: 6.5rem;
 
-    <h2>Governing Law</h2>
-    <p>These terms are governed by the laws of the State of Ohio, without regard to its conflict-of-law provisions.</p>
+  --radius-sm: 4px;
+  --radius-md: 8px;
 
-    <h2>Changes to These Terms</h2>
-    <p>We may update these terms as Streetside grows. Continued use of the site after changes means you accept the updated terms.</p>
+  --container-max: 1240px;
 
-    <h2>Contact Us</h2>
-    <p>Questions about these terms? Reach out via the contact details in the footer of this site.</p>
+  --shadow-sm: 0 2px 10px rgba(15, 32, 16, 0.08);
+  --shadow-md: 0 12px 32px rgba(15, 32, 16, 0.14);
 
-    <p class="legal-note" style="display:block; margin-top: var(--space-8);">This page is a plain-language starting point, not legal advice. Consider having an attorney review it before relying on it, especially as the business grows.</p>
-  </div>
-</main>
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 160ms;
+  --dur-med: 420ms;
 
-<footer class="site-footer">
-  <div class="container">
-    <div class="site-footer__bottom" style="border-top:none; padding-top:0;">
-      <span>&copy; <span data-year>2026</span> Streetside Waste &amp; Property Services. All rights reserved.</span>
-      <div class="legal-links">
-        <a href="privacy-policy.html">Privacy Policy</a>
-        <a href="terms.html">Terms</a>
-      </div>
-    </div>
-  </div>
-</footer>
+  --header-height: 96px;
+}
 
-<script>
-  document.querySelector('[data-year]').textContent = new Date().getFullYear();
-</script>
-</body>
-</html>
+@media (max-width: 720px) {
+  :root {
+    --header-height: 76px;
+  }
+}

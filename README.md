@@ -1,209 +1,650 @@
-# Streetside — Website
+/* ==========================================================================
+   SECTIONS
+   ========================================================================== */
 
-A production-ready marketing site for Streetside's residential bin valet
-service, built from your logos, your Wix hero photo, and the brand
-direction in your brief.
+/* ---- HERO ---- */
+.hero {
+  position: relative;
+  background: var(--color-brand-strong);
+  padding-bottom: 90px; /* room for angled transition */
+  overflow: hidden;
+}
 
-## Read this first: why it's HTML/CSS/JS instead of Next.js
+.hero__photo {
+  position: absolute;
+  inset: 0;
+  background-image: url("../images/hero-bins-house.jpg");
+  background-size: cover;
+  background-position: 68% 62%;
+}
 
-The brief asked for Next.js + TypeScript. The environment this was built
-in has **no internet access**, so `npm install next` (or any package,
-or any CDN font) simply cannot run here — there's no way around that
-from inside this sandbox.
+/* Narrower viewports crop more of the photo's width, so shift the
+   focal point right to keep the bins themselves in frame rather than
+   just the house. */
+@media (max-width: 960px) {
+  .hero__photo { background-position: 78% 60%; }
+}
+@media (max-width: 600px) {
+  .hero__photo { background-position: 88% 55%; }
+}
 
-Rather than fake a Next.js project that couldn't actually be installed
-or run, this is a **complete, dependency-free static site** — plain
-HTML, CSS, and vanilla JavaScript. It's fully real, fully functional,
-and deployable right now to Vercel, Netlify, GitHub Pages, or any static
-host with zero build step. Every interactive piece (mobile menu, scroll
-reveal, the neighbor counter, form handling, FAQ accordion, pricing/FAQ
-rendering) is implemented and tested — nothing here is a mockup.
+.hero__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    rgba(10, 20, 11, 0.96) 0%,
+    rgba(10, 20, 11, 0.9) 32%,
+    rgba(10, 20, 11, 0.55) 52%,
+    rgba(10, 20, 11, 0.08) 68%,
+    rgba(10, 20, 11, 0) 78%
+  );
+}
 
-If you do want this ported into Next.js/TypeScript later (for a CMS,
-server-rendered forms, etc.), the structure below maps over directly:
-`index.html` → `app/page.tsx` broken into components per section,
-`config/site-config.js` → a typed `config/site.ts`, and each CSS file
-becomes global or module CSS. That's a well-scoped follow-up task for
-an environment with package-registry access — happy to do that conversion
-in a future session if useful.
+.hero__content {
+  position: relative;
+  padding-top: clamp(3rem, 8vw, 6.5rem);
+  padding-bottom: clamp(2.5rem, 6vw, 4rem);
+  min-height: clamp(560px, 88vh, 800px);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 
-## What's in here
+.hero__top {
+  max-width: 640px;
+}
 
-```
-streetside-website/
-├── index.html              All page markup (one page, anchor-linked sections)
-├── package.json            Only needed if you use the optional /api functions below
-├── schema.sql              Database table definition (optional, see below)
-├── api/                     Optional Vercel serverless functions
-│   ├── waitlist.js           Saves form submissions to Postgres
-│   └── neighbor-count.js     Returns the real signup count
-├── config/
-│   └── site-config.js      Editable business data — START HERE
-├── styles/
-│   ├── tokens.css          Colors, type scale, spacing (design tokens)
-│   ├── base.css            Reset + global typography/utilities
-│   ├── components.css      Buttons, nav, cards, forms, FAQ, counter
-│   └── sections.css        Per-section layout (hero, pricing, footer…)
-├── scripts/
-│   ├── nav.js               Sticky header + mobile menu + active link
-│   ├── reveal.js             Scroll-reveal animation
-│   ├── counter.js            Neighbor counter (manual today, API-ready)
-│   ├── waitlist-form.js      Waitlist + address-check form handling
-│   └── main.js                Renders pricing/FAQ from config
-└── images/
-    ├── streetside-logo-horizontal.png   Your real logo (header)
-    ├── streetside-logo-circular.png     Your real logo (footer/favicon)
-    ├── hero-bins-house.jpg              Your real hero photo
-    ├── favicon-*.png, icon-*.png, apple-touch-icon.png
-    └── how-it-works/*.svg               Placeholder step icons (see below)
-```
+.hero__headline {
+  color: var(--white);
+  font-size: clamp(2.6rem, 6.4vw, 5.1rem);
+  line-height: 1;
+}
 
-## How to run it locally
+.hero__rule {
+  width: 130px;
+  height: 4px;
+  background: var(--color-accent);
+  margin: var(--space-5) 0;
+}
 
-No install needed. From this folder:
+.hero__support {
+  color: var(--off-white);
+  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+  max-width: 46ch;
+  margin-bottom: var(--space-3);
+}
 
-```bash
-python3 -m http.server 8000
-# then open http://localhost:8000
-```
+.hero__tagline {
+  font-family: var(--font-display);
+  font-stretch: condensed;
+  font-weight: 700;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--white);
+  font-size: 1rem;
+  opacity: 0.92;
+}
 
-Or just open `index.html` directly in a browser (a couple of things,
-like `fetch`-based form submission, work best served over http:// rather
-than file://).
+.hero__bottom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin-top: var(--space-8);
+}
 
-## How to deploy
+.hero__location {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--white);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.hero__location svg { color: var(--color-accent); }
 
-Any static host works as-is:
-- **Vercel**: `vercel deploy` from this folder (framework preset: "Other").
-- **Netlify**: drag-and-drop this folder, or connect the repo (no build
-  command needed, publish directory = this folder).
-- **GitHub Pages**: push this folder to a repo and enable Pages.
+.hero__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: var(--space-5);
+}
 
-## Optional: real form storage with Vercel Functions + Postgres
+.hero .neighbor-counter {
+  flex: 1 1 320px;
+  max-width: 420px;
+}
 
-The site ships with two ready-to-use serverless functions in `/api` —
-`waitlist.js` and `neighbor-count.js` — that save real form
-submissions to a Postgres database and let the neighbor counter read
-its number live. **These only run if you deploy on Vercel** (a plain
-static host like Netlify/GitHub Pages will ignore the `/api` folder).
-If you'd rather not deal with a database at all, skip this section
-and use a forms service like Formspree instead — either one plugs
-into the same `waitlistForm.endpoint` config value.
+.hero__cta {
+  display: flex;
+  align-items: center;
+}
 
-Important: Vercel's free "Hobby" plan is for non-commercial projects
-only. Since Streetside is a business, you'll want a **Pro plan**
-(~$20/month) to use Vercel for this site.
+.hero__cta .btn {
+  padding: 1.1rem 1.9rem;
+  font-size: 1rem;
+  height: 100%;
+}
 
-1. **Install the Vercel CLI** (one-time): `npm install -g vercel`,
-   then `vercel login`.
-2. **Link this folder to a Vercel project**: from inside
-   `streetside-website/`, run `vercel link` (creates the project on
-   your Vercel account if it doesn't exist yet).
-3. **Provision a database** — from the same folder, run
-   `vercel install neon` and follow the prompts (or do this from the
-   Vercel dashboard under your project's Storage tab → Marketplace →
-   Neon). This automatically sets a `DATABASE_URL` environment
-   variable on your project — you don't need to copy/paste a
-   connection string by hand.
-4. **Create the table** — open your new database in the Neon
-   dashboard, go to its SQL Editor, and run everything in
-   `schema.sql` (included in this folder) once.
-5. **Deploy**: `vercel --prod` from this folder. Vercel will run
-   `npm install` (picking up `@neondatabase/serverless` from
-   `package.json`) and publish both the site and the two functions
-   at `/api/waitlist` and `/api/neighbor-count`.
-6. **Test it** — submit the waitlist form on your live Vercel URL and
-   confirm a new row shows up in Neon's table view. Once that works:
-   - Set `waitlistForm.endpoint` to `"/api/waitlist"` in
-     `config/site-config.js`.
-   - Set `neighborCounter.source` to `"api"` and
-     `neighborCounter.apiEndpoint` to `"/api/neighbor-count"` in the
-     same file.
-   - Redeploy (`vercel --prod` again). From then on, the counter
-     reads the real signup count automatically — no more hand-editing
-     `neighborCounter.count`.
+@media (max-width: 720px) {
+  .hero__row { flex-direction: column; }
+  .hero .neighbor-counter { max-width: none; }
+  .hero__cta .btn { width: 100%; }
+}
 
-If anything about your database connection is misconfigured, both
-functions fail loudly (a 500 response and a console log) rather than
-silently pretending to work — the site's existing error-handling in
-`scripts/waitlist-form.js` and `scripts/counter.js` already accounts
-for that.
+.hero .angle-bottom-white {
+  height: 110px;
+}
+@media (max-width: 720px) {
+  .hero .angle-bottom-white { height: 56px; }
+}
 
-## Launch checklist — what still needs real data
+/* ---- HOW IT WORKS ---- */
+.how-it-works {
+  padding: var(--space-9) 0 var(--space-8);
+  background: var(--color-bg);
+}
 
-Nothing fake is shown anywhere on the site. Instead, these are clearly
-marked as pending in `config/site-config.js` and in the UI itself:
+.steps-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
 
-- [ ] **Pricing** — all three plans show "TBD" until you set real `price`
-      values in `config/site-config.js`.
-- [ ] **Waitlist form backend** — forms currently tell the visitor
-      honestly that signups aren't connected yet. Either (a) sign up
-      for a forms service like Formspree/Getform/Basin and set
-      `waitlistForm.endpoint` to that URL, or (b) use the built-in
-      Vercel Functions + Postgres setup described above and set it to
-      `"/api/waitlist"`. See the comment block at the top of
-      `scripts/waitlist-form.js` for exactly what happens before and
-      after you do this.
-- [ ] **Neighbor counter** — starts at `0` as required. Update
-      `neighborCounter.count` by hand as real signups come in, or wire
-      `neighborCounter.apiEndpoint` once you have a backend (see the
-      comments in `scripts/counter.js` and the config file).
-- [ ] **Contact email / phone** — set `business.contactEmail` /
-      `contactPhone` in the config; the footer will switch out of its
-      "coming soon" placeholder automatically.
-- [ ] **Social links** — set them in `business.socialLinks`, or leave
-      blank (the icons hide themselves rather than link nowhere).
-- [ ] **Service area list** — `serviceArea.activeAreas` /
-      `waitlistAreas` are empty arrays, ready for you to add real
-      cities/ZIPs/neighborhoods as routes open.
-- [ ] **FAQ answers** — a handful of FAQ entries (delayed collection,
-      holiday schedule, billing, cancellation, service confirmation)
-      have no established policy yet, so they render as an orange
-      "not yet finalized" placeholder chip instead of an invented
-      answer. Fill in the `a` field for each once you've decided.
-- [ ] **How It Works photography** — the four step icons are simple
-      brand-colored placeholder graphics (not real photos), each
-      tagged "Photo coming soon." Swap the `<img>` src in `index.html`
-      for real photos once you have them — same 1:1 aspect ratio.
-- [ ] **Legal pages** — Privacy Policy / Terms footer links point to
-      `#` placeholders; no such pages exist yet.
+@media (min-width: 720px) {
+  .steps-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1100px) {
+  .steps-grid { grid-template-columns: repeat(4, 1fr); }
+}
 
-## About the fonts
+.step-card {
+  display: flex;
+  flex-direction: column;
+}
 
-The brief asked for a bold/condensed/industrial display face. Because
-this environment can't reach Google Fonts or any CDN, headings use a
-carefully chosen **system font stack** (`Archivo Narrow` /
-`Roboto Condensed` / `Arial Narrow` and similar, with `font-stretch:
-condensed`) — so the look holds up on real devices without a webfont
-download, though it won't be pixel-identical to a specific font like
-Oswald or Bebas Neue.
+.step-card__media {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  background: var(--paper);
+  margin-bottom: var(--space-5);
+}
 
-To get an exact match later: download **Oswald** or **Bebas Neue**
-(both free/open-license) from Google Fonts, drop the `.woff2` files
-into a new `fonts/` folder, and add an `@font-face` block at the top
-of `styles/tokens.css` pointing `--font-display` at it. Everything
-else (sizing, spacing, weight) is already set up to take it as-is.
+.step-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
 
-## About the hero photo
+.step-card__media .media-tag {
+  position: absolute;
+  bottom: var(--space-3);
+  left: var(--space-3);
+  background: rgba(18, 20, 22, 0.72);
+  color: var(--white);
+  font-size: 0.68rem;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
 
-Your uploaded Wix screenshot had the hero photo and the on-page text/
-buttons flattened into one image, so the original clean photo (behind
-your text) wasn't separately available. `hero-bins-house.jpg` is a
-crop taken from the unobstructed right-hand portion of that same
-screenshot — the actual house and bins from your photo, just isolated
-from the overlaid UI. If you have the original, uncropped photo file,
-drop it in as `images/hero-bins-house.jpg` (same filename) for a
-higher-resolution version.
+.step-card h3 { color: var(--color-brand-strong); margin-bottom: var(--space-2); }
+.step-card p { color: var(--color-ink-muted); font-size: 0.95rem; }
 
-## Accessibility & performance notes
+.how-it-works__banner {
+  margin-top: var(--space-8);
+  background: var(--color-brand-strong);
+  border-radius: var(--radius-md);
+  padding: var(--space-7) var(--space-6);
+  text-align: center;
+}
 
-- Skip-to-content link, visible focus states, `prefers-reduced-motion`
-  respected throughout.
-- All images have descriptive alt text; decorative icons are
-  `aria-hidden`.
-- Semantic landmarks (`header`, `nav`, `main`, `section`, `footer`) and
-  a heading hierarchy that starts at one `<h1>` in the hero.
-- Tested at 1440px (desktop), 820px (tablet), and 390px (mobile) with
-  zero console errors, plus interaction tests for the mobile menu, FAQ
-  accordion, anchor navigation, and both forms (empty-state validation
-  and a full valid submission).
+.how-it-works__banner h3 {
+  color: var(--white);
+  font-size: clamp(1.3rem, 2.6vw, 1.9rem);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.how-it-works__banner p {
+  color: var(--off-white);
+  margin-top: var(--space-3);
+  opacity: 0.85;
+}
+
+.how-it-works__banner .check-badge {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ---- WHY STREETSIDE ---- */
+.why-streetside {
+  padding: var(--space-9) 0;
+  background: var(--color-bg-alt);
+  clip-path: polygon(0 3%, 100% 0, 100% 97%, 0 100%);
+  margin-block: -2vw;
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-5);
+}
+
+@media (min-width: 640px) {
+  .benefits-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 1000px) {
+  .benefits-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ---- NEIGHBORHOOD ---- */
+.neighborhood {
+  padding: var(--space-9) 0;
+  background: var(--color-brand-strong);
+  position: relative;
+  overflow: hidden;
+}
+
+.neighborhood::before {
+  content: "";
+  position: absolute;
+  right: -8%;
+  top: -20%;
+  width: 60%;
+  height: 140%;
+  background: var(--green-700);
+  opacity: 0.4;
+  transform: rotate(-8deg);
+}
+
+.neighborhood__inner {
+  position: relative;
+  max-width: 760px;
+}
+
+.neighborhood h2 { color: var(--white); }
+
+.neighborhood p.lede {
+  color: var(--off-white);
+  opacity: 0.9;
+  margin-top: var(--space-5);
+  max-width: 56ch;
+}
+
+.neighborhood__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-6);
+  margin: var(--space-7) 0;
+}
+
+.neighborhood__stat {
+  color: var(--white);
+}
+
+.neighborhood__stat strong {
+  display: block;
+  font-family: var(--font-display);
+  font-stretch: condensed;
+  font-weight: 800;
+  font-size: 1.5rem;
+}
+
+.neighborhood__stat span {
+  font-size: 0.82rem;
+  color: var(--off-white);
+  opacity: 0.75;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-wide);
+}
+
+/* ---- PRICING ---- */
+.pricing {
+  padding: var(--space-9) 0;
+  background: var(--color-bg);
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+@media (min-width: 640px) {
+  .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1100px) {
+  .pricing-grid { grid-template-columns: repeat(4, 1fr); }
+  .pricing-grid--two { grid-template-columns: repeat(2, 1fr); max-width: 780px; }
+}
+
+.founding-offer {
+  display: none; /* toggled on via JS when foundingOffer.enabled is true */
+  background: linear-gradient(135deg, var(--green-800), var(--green-700));
+  border-radius: var(--radius-md);
+  padding: var(--space-6) var(--space-7);
+  margin-bottom: var(--space-7);
+  color: var(--white);
+}
+
+.founding-offer h3 {
+  font-family: var(--font-display);
+  font-stretch: condensed;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: clamp(1.2rem, 2.2vw, 1.6rem);
+  color: var(--white);
+  margin-bottom: var(--space-3);
+}
+
+.founding-offer p {
+  color: var(--off-white);
+  opacity: 0.92;
+  max-width: 62ch;
+  font-size: 0.98rem;
+}
+
+.pricing__footnote {
+  margin-top: var(--space-6);
+  font-size: 0.9rem;
+  color: var(--color-ink-muted);
+  max-width: 70ch;
+}
+
+/* ---- SERVICE AREA ---- */
+.service-area {
+  padding: var(--space-9) 0;
+  background: var(--color-bg-alt);
+}
+
+.service-area__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-7);
+  align-items: start;
+}
+
+@media (min-width: 960px) {
+  .service-area__grid { grid-template-columns: 1fr 1fr; }
+}
+
+.service-area__map {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--color-brand-strong);
+  aspect-ratio: 4 / 3;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.service-area__map .interest-map-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.map-road {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.22);
+  stroke-width: 2.5;
+  stroke-dasharray: 1 7;
+  stroke-linecap: round;
+}
+
+.map-road--beltway {
+  fill: none;
+  stroke-dasharray: 1 6;
+  stroke-width: 2;
+  opacity: 0.7;
+}
+
+.map-road--minor {
+  stroke-width: 1.5;
+  opacity: 0.55;
+}
+
+.map-landmark,
+rect.map-landmark {
+  fill: rgba(255, 255, 255, 0.32);
+  stroke: rgba(255, 255, 255, 0.5);
+  stroke-width: 0.75;
+}
+
+.map-landmark--water {
+  fill: rgba(120, 190, 220, 0.35);
+  stroke: rgba(120, 190, 220, 0.6);
+}
+
+.map-compass line {
+  stroke: rgba(255, 255, 255, 0.4);
+  stroke-width: 1.5;
+}
+
+.map-compass path {
+  fill: rgba(255, 255, 255, 0.4);
+}
+
+.map-compass text {
+  font-family: var(--font-display);
+  font-stretch: condensed;
+  font-size: 12px;
+  font-weight: 700;
+  fill: rgba(255, 255, 255, 0.55);
+}
+
+.map-town-dot {
+  fill: rgba(255, 255, 255, 0.28);
+  stroke: rgba(255, 255, 255, 0.5);
+  stroke-width: 1;
+  transition: r 0.4s var(--ease-out), fill 0.4s var(--ease-out), opacity 0.4s var(--ease-out);
+}
+
+/* Smaller towns stay hidden until they actually get real interest —
+   only the bigger anchor cities show by default. */
+.map-town-dot[data-tier="town"] {
+  opacity: 0;
+}
+
+
+.map-town-dot--active {
+  opacity: 1;
+  fill: var(--color-accent);
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 1.5;
+  animation: town-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes town-pulse {
+  0%, 100% { filter: drop-shadow(0 0 0 rgba(200, 30, 44, 0.5)); }
+  50% { filter: drop-shadow(0 0 6px rgba(200, 30, 44, 0.85)); }
+}
+
+.map-town-label {
+  font-family: var(--font-display);
+  font-stretch: condensed;
+  font-size: 13px;
+  font-weight: 700;
+  fill: var(--off-white);
+  opacity: 0.85;
+  pointer-events: none;
+  transition: opacity 0.4s var(--ease-out);
+}
+
+/* Smaller-town labels only appear once their dot lights up. */
+.map-town-label[data-tier="town"] {
+  opacity: 0;
+}
+
+
+.map-town-label--visible {
+  opacity: 1;
+}
+
+.service-area__map .map-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: var(--space-6) var(--space-5) var(--space-4);
+  margin: 0;
+  color: var(--off-white);
+  font-size: 0.85rem;
+  background: linear-gradient(to top, rgba(15, 32, 16, 0.92), rgba(15, 32, 16, 0));
+}
+
+/* ---- FAQ ---- */
+.faq {
+  padding: var(--space-9) 0;
+  background: var(--color-bg);
+}
+
+.faq__list {
+  max-width: 820px;
+}
+
+/* ---- FOOTER ---- */
+.site-footer {
+  background: var(--charcoal-900);
+  color: var(--off-white);
+  padding: var(--space-8) 0 var(--space-6);
+}
+
+.site-footer__top {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-7);
+  padding-bottom: var(--space-7);
+  border-bottom: 1px solid rgba(255,255,255,0.12);
+}
+
+@media (min-width: 780px) {
+  .site-footer__top { grid-template-columns: 1.4fr 1fr 1fr; }
+}
+
+.footer-brand__logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.footer-brand__logo img { width: 48px; height: 48px; }
+
+.footer-brand__name {
+  font-family: var(--font-display);
+  font-stretch: condensed;
+  font-weight: 800;
+  letter-spacing: var(--tracking-tight);
+  text-transform: uppercase;
+  font-size: 1.2rem;
+  color: var(--white);
+  line-height: 1.1;
+}
+
+.footer-brand__name small {
+  display: block;
+  font-family: var(--font-body);
+  font-weight: 400;
+  text-transform: none;
+  font-size: 0.72rem;
+  color: var(--gray-400);
+  letter-spacing: 0;
+}
+
+.footer-brand__tagline {
+  font-style: normal;
+  color: var(--off-white);
+  opacity: 0.85;
+  max-width: 34ch;
+  margin-bottom: var(--space-3);
+}
+
+.footer-brand__area {
+  font-size: 0.88rem;
+  color: var(--gray-400);
+}
+
+.footer-col h4 {
+  font-family: var(--font-display);
+  font-stretch: condensed;
+  font-size: 0.82rem;
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--gray-400);
+  margin-bottom: var(--space-4);
+}
+
+.footer-col ul { display: flex; flex-direction: column; gap: var(--space-3); }
+.footer-col a { color: var(--off-white); font-size: 0.95rem; }
+.footer-col a:hover { color: var(--white); text-decoration: underline; }
+
+.footer-col .contact-placeholder {
+  font-size: 0.85rem;
+  color: var(--gray-400);
+  font-style: italic;
+}
+
+.site-footer__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-top: var(--space-6);
+  font-size: 0.82rem;
+  color: var(--gray-400);
+}
+
+.site-footer__bottom .legal-links {
+  display: flex;
+  gap: var(--space-5);
+}
+
+.social-links {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.social-links a {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--off-white);
+  transition: border-color var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+.social-links a:hover { border-color: var(--color-accent); color: var(--color-accent); }
+
+/* ---- Waitlist form section ---- */
+.waitlist-section {
+  padding: var(--space-9) 0;
+  background: var(--color-brand-strong);
+}
+
+.waitlist-panel {
+  background: var(--white);
+  border-radius: var(--radius-md);
+  padding: clamp(var(--space-6), 4vw, var(--space-8));
+  box-shadow: var(--shadow-md);
+}
+
+.waitlist-panel__head {
+  max-width: 640px;
+  margin-bottom: var(--space-7);
+}

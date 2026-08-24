@@ -1,114 +1,195 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Privacy Policy | Streetside</title>
-<meta name="description" content="How Streetside collects, uses, and protects the information you share with us." />
-<meta name="robots" content="noindex" />
-<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
-<link rel="stylesheet" href="styles/tokens.css" />
-<link rel="stylesheet" href="styles/base.css" />
-<link rel="stylesheet" href="styles/components.css" />
-<link rel="stylesheet" href="styles/sections.css" />
-<style>
-  .legal-page { padding: var(--space-9) 0 var(--space-8); background: var(--color-bg); }
-  .legal-page .container { max-width: 780px; }
-  .legal-page h1 { color: var(--color-brand-strong); margin-bottom: var(--space-3); }
-  .legal-page .updated { color: var(--color-ink-muted); font-size: 0.9rem; margin-bottom: var(--space-8); }
-  .legal-page h2 { font-family: var(--font-display); font-stretch: condensed; font-weight: 800; text-transform: uppercase; color: var(--color-brand-strong); font-size: 1.3rem; margin-top: var(--space-8); margin-bottom: var(--space-4); }
-  .legal-page p, .legal-page li { color: var(--color-ink); line-height: 1.7; margin-bottom: var(--space-4); }
-  .legal-page ul { padding-left: var(--space-5); margin-bottom: var(--space-4); }
-  .legal-page a { color: var(--color-brand); text-decoration: underline; }
-  .legal-note { display: inline-block; margin-top: var(--space-2); font-size: 0.8rem; padding: 2px 10px; border-radius: 999px; background: #fdf1e7; color: #8a5a1f; border: 1px solid #ecd3ad; }
-</style>
-</head>
-<body>
-<header class="site-header">
-  <div class="container site-header__inner">
-    <a href="index.html" class="brand-logo" aria-label="Streetside home">
-      <img src="images/streetside-logo-horizontal.png" alt="Streetside — Waste & Property Services" width="400" height="203" />
-    </a>
-    <nav class="primary-nav" aria-label="Primary">
-      <ul>
-        <li><a href="index.html#how-it-works">How It Works</a></li>
-        <li><a href="index.html#why-streetside">Why Streetside</a></li>
-        <li><a href="index.html#pricing">Pricing</a></li>
-        <li><a href="index.html#service-area">Service Area</a></li>
-        <li><a href="index.html#faq">FAQ</a></li>
-      </ul>
-    </nav>
-    <div class="header-actions">
-      <a href="index.html#waitlist" class="btn btn-primary">Join the Waitlist <span class="btn-icon" aria-hidden="true">→</span></a>
-    </div>
-  </div>
-</header>
+/* ==========================================================================
+   BASE — reset, typography, utilities
+   ========================================================================== */
 
-<main class="legal-page">
-  <div class="container">
-    <h1>Privacy Policy</h1>
-    <p class="updated">Last updated: August 2026</p>
+*, *::before, *::after { box-sizing: border-box; }
 
-    <p>Streetside ("we," "us," "our") operates a residential trash and recycling bin valet service in Southeastern Columbus. This page explains what information we collect through this website, why we collect it, and how it's handled.</p>
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--header-height) + 12px);
+}
 
-    <h2>Information We Collect</h2>
-    <p>We only collect information you choose to give us by filling out a form on this site — the waitlist signup or the "check your address" tool. Depending on which form you use, that may include:</p>
-    <ul>
-      <li>Name, email address, and phone number</li>
-      <li>Street address, city, and ZIP code</li>
-      <li>Trash collection day and current waste provider (optional)</li>
-      <li>Number of trash and recycling bins, and where they're normally stored</li>
-      <li>How you heard about Streetside</li>
-    </ul>
-    <p>We do not collect payment information through this site, and there is currently no way to create an account or log in.</p>
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
 
-    <h2>How We Use Your Information</h2>
-    <p>We use the information you submit to:</p>
-    <ul>
-      <li>Contact you about Streetside service availability in your area</li>
-      <li>Set up and provide service once you become a customer</li>
-      <li>Respond to questions you send us directly</li>
-      <li>Understand where interest in Streetside is coming from, so we know where to open new routes</li>
-    </ul>
-    <p>We do not sell your information, and we do not share it with third parties for their own marketing purposes.</p>
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--color-ink);
+  background: var(--color-bg);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
 
-    <h2>Cookies &amp; Tracking</h2>
-    <p>As of this policy's last update, this website does not use cookies, analytics scripts, or third-party advertising trackers. If that changes in the future — for example, if we add website analytics — this policy will be updated to reflect it.</p>
-    <span class="legal-note">Site owner: update this section if analytics/ads are added later.</span>
+img { max-width: 100%; display: block; }
 
-    <h2>Where Your Information Is Stored</h2>
-    <p>Form submissions are stored in a database used to operate this website and are accessible only to Streetside. We take reasonable steps to keep this information secure, but no method of electronic storage is 100% secure.</p>
+a { color: inherit; text-decoration: none; }
 
-    <h2>Your Choices</h2>
-    <p>You can ask us to access, correct, or delete the information you've submitted at any time by contacting us using the details below. If you no longer wish to be contacted, let us know and we'll remove you from our list.</p>
+button { font-family: inherit; cursor: pointer; }
 
-    <h2>Children's Privacy</h2>
-    <p>This site and our service are intended for adults. We do not knowingly collect information from children.</p>
+ul, ol { margin: 0; padding: 0; list-style: none; }
 
-    <h2>Changes to This Policy</h2>
-    <p>We may update this policy as Streetside grows. Significant changes will be reflected by updating the "Last updated" date above.</p>
+h1, h2, h3, h4, p, figure { margin: 0; }
 
-    <h2>Contact Us</h2>
-    <p>Questions about this policy or your information? Reach out via the contact details in the footer of this site.</p>
+svg { display: block; }
 
-    <p class="legal-note" style="display:block; margin-top: var(--space-8);">This page is a plain-language summary provided as a starting point, not legal advice. Consider having an attorney review it before relying on it, especially as the business grows or its data practices change.</p>
-  </div>
-</main>
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: var(--space-5);
+}
 
-<footer class="site-footer">
-  <div class="container">
-    <div class="site-footer__bottom" style="border-top:none; padding-top:0;">
-      <span>&copy; <span data-year>2026</span> Streetside Waste &amp; Property Services. All rights reserved.</span>
-      <div class="legal-links">
-        <a href="privacy-policy.html">Privacy Policy</a>
-        <a href="terms.html">Terms</a>
-      </div>
-    </div>
-  </div>
-</footer>
+@media (max-width: 720px) {
+  .container { padding-inline: var(--space-4); }
+}
 
-<script>
-  document.querySelector('[data-year]').textContent = new Date().getFullYear();
-</script>
-</body>
-</html>
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-family: var(--font-display);
+  font-stretch: condensed;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.eyebrow::before {
+  content: "";
+  width: 22px;
+  height: 2px;
+  background: var(--color-accent);
+  display: inline-block;
+}
+
+h1, h2, h3, .display {
+  font-family: var(--font-display);
+  font-stretch: condensed;
+  font-weight: 800;
+  letter-spacing: var(--tracking-tight);
+  text-transform: uppercase;
+  line-height: 1.02;
+}
+
+h2 {
+  font-size: clamp(2rem, 4.4vw, 3.35rem);
+  color: var(--color-brand-strong);
+}
+
+h3 {
+  font-size: clamp(1.15rem, 1.6vw, 1.4rem);
+  letter-spacing: 0.01em;
+}
+
+/* Smaller display heading for narrower/two-column layouts where the
+   default h2 clamp would wrap into too many short lines. */
+.display-md {
+  font-size: clamp(1.9rem, 3vw, 2.6rem) !important;
+  line-height: 1.08 !important;
+}
+
+.section-head {
+  max-width: 640px;
+  margin-bottom: var(--space-7);
+}
+
+.section-head p {
+  margin-top: var(--space-4);
+  font-size: 1.08rem;
+  color: var(--color-ink-muted);
+}
+
+.lede {
+  font-size: 1.08rem;
+  color: var(--color-ink-muted);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute;
+  left: var(--space-4);
+  top: -60px;
+  background: var(--color-brand-strong);
+  color: var(--white);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-sm);
+  z-index: 1000;
+  transition: top var(--dur-fast) var(--ease-out);
+}
+
+.skip-link:focus {
+  top: var(--space-4);
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+section {
+  position: relative;
+}
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity var(--dur-med) var(--ease-out), transform var(--dur-med) var(--ease-out);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-group.is-visible .reveal-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-item {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity var(--dur-med) var(--ease-out), transform var(--dur-med) var(--ease-out);
+}
+
+.reveal-item:nth-child(2) { transition-delay: 80ms; }
+.reveal-item:nth-child(3) { transition-delay: 160ms; }
+.reveal-item:nth-child(4) { transition-delay: 240ms; }
+.reveal-item:nth-child(5) { transition-delay: 320ms; }
+.reveal-item:nth-child(6) { transition-delay: 400ms; }
+
+/* Angular section transitions — a recurring Streetside motif */
+.angle-top {
+  clip-path: polygon(0 4%, 100% 0, 100% 100%, 0 100%);
+}
+
+.angle-bottom-white {
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 90px;
+  background: var(--color-bg);
+  clip-path: polygon(0 45%, 100% 0, 100% 100%, 0% 100%);
+}
+
+@media (max-width: 720px) {
+  .angle-bottom-white { height: 48px; }
+}
