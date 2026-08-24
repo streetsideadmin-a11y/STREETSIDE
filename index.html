@@ -333,7 +333,7 @@
               </defs>
 
               <rect x="0" y="0" width="760" height="560" fill="url(#map-grid)"></rect>
-              <ellipse cx="81.6" cy="143.6" rx="230" ry="170" fill="url(#map-glow)"></ellipse>
+              <ellipse cx="179.2" cy="198.8" rx="230" ry="170" fill="url(#map-glow)"></ellipse>
 
               <g class="map-compass" transform="translate(695,40)">
                 <line x1="0" y1="14" x2="0" y2="-14" />
@@ -341,54 +341,64 @@
                 <text x="0" y="-18" text-anchor="middle">N</text>
               </g>
 
+              <!-- Roads traced from real reference maps: town positions used
+                   as calibration anchors to convert pixel coordinates to real
+                   lat/lng, then projected the same way as every other point on
+                   this map. I-270 traced from its 4 numbered shield markers plus
+                   the visible connecting highway line between them. -->
+              <path class="map-road map-road--beltway" d="M 121.6,70.1 L 142.7,69.4 L 172.8,70.4 L 202.8,71.2 L 232.9,72.6 L 247.6,77.9 L 253.0,88.2 L 255.3,98.5 L 257.7,108.8 L 258.3,122.8 L 259.2,133.5 L 255.4,145.8 L 248.7,155.9 L 245.1,166.2 L 247.5,176.4 L 256.0,184.8 L 270.6,191.1 L 291.3,197.5 L 309.1,201.9 L 325.3,208.6 L 328.9,222.6 L 322.0,236.9 L 306.2,249.0 L 281.4,259.0 L 250.8,266.8 L 220.3,272.6 L 190.0,276.3 L 159.8,277.6 L 143.2,277.8 L 129.9,273.5 L 115.2,267.2 L 100.7,258.8 L 86.2,250.4 L 71.6,243.0 L 62.9,236.3 L 57.6,225.4 L 55.4,213.0 L 54.8,198.6 L 51.1,184.2 L 48.9,171.9 L 48.2,159.6 L 50.4,147.3 L 57.5,130.9 L 64.2,120.7 L 73.8,110.6 L 83.5,100.5 L 93.2,90.3 L 102.7,82.2 L 110.7,75.1 L 121.6,70.1 Z"></path>
+              <path class="map-road" d="M 213.1,205.9 L 262.1,204.7 L 311.2,204.6 L 363.9,205.3 L 409.6,205.7 L 458.7,205.6 L 507.7,204.4 L 532.8,202.7 L 578.0,205.9 L 622.5,208.4 L 646.6,210.7"></path>
+              <path class="map-road" d="M 282.6,294.2 L 319.8,302.7 L 355.6,311.1 L 384.2,317.0 L 412.3,317.1 L 429.9,317.9 L 445.6,336.8 L 454.0,352.5 L 469.5,369.1 L 485.1,386.8 L 500.7,404.6 L 516.0,419.5 L 534.4,428.8 L 553.1,434.2"></path>
+              <path class="map-road map-road--minor" d="M 508.6,214.7 L 495.8,228.3 L 482.9,241.9 L 470.1,255.5 L 460.8,269.3 L 450.8,276.2 L 429.9,317.9"></path>
+
               <!-- Real local landmarks -- icon only, no labels. -->
-              <path class="map-landmark" transform="translate(154.0,289.3)" aria-label="Rickenbacker International Airport" d="M-7,2 L7,2 L2,-6 L-1,-6 L-1,-1 L-9,-3 L-9,-1 L-1,2 Z" />
-              <path class="map-landmark" transform="translate(248.2,173.5)" aria-label="Blacklick Woods Metro Park" d="M0,-8 L5,0 L2,0 L6,7 L-6,7 L-2,0 L-5,0 Z" />
-              <path class="map-landmark" transform="translate(319.3,255.6)" aria-label="Pickerington Ponds Metro Park" d="M0,-8 L5,0 L2,0 L6,7 L-6,7 L-2,0 L-5,0 Z" />
-              <path class="map-landmark" transform="translate(262.6,364.3)" aria-label="Slate Run Metro Park" d="M0,-8 L5,0 L2,0 L6,7 L-6,7 L-2,0 L-5,0 Z" />
-              <path class="map-landmark" transform="translate(500.5,480.9)" aria-label="Clear Creek Metro Park" d="M0,-8 L5,0 L2,0 L6,7 L-6,7 L-2,0 L-5,0 Z" />
-              <path class="map-landmark" transform="translate(482.8,387.2)" aria-label="Fairfield County Fairgrounds" d="M0,-8 L5,0 L2,0 L6,7 L-6,7 L-2,0 L-5,0 Z" />
-              <path class="map-landmark map-landmark--water" transform="translate(607.0,176.8)" aria-label="Buckeye Lake" d="M -39.6,3.1 L -37.6,-0.4 L -33.3,-3.9 L -26.0,-5.4 L -18.6,-6.2 L -13.7,-6.6 L -5.2,-5.8 L 3.4,-5.4 L 10.7,-5.1 L 16.8,-4.3 L 21.7,-3.9 L 24.7,-4.7 L 27.2,-3.5 L 30.2,-2.7 L 32.7,-1.6 L 35.1,-0.4 L 38.2,0.8 L 37.6,2.7 L 33.9,3.1 L 29.0,3.5 L 21.7,3.9 L 13.1,4.3 L 4.6,4.7 L -4.0,4.9 L -11.3,5.1 L -18.6,5.2 L -23.5,5.7 L -27.2,6.6 L -30.2,6.2 L -33.3,5.4 L -36.3,4.7 L -38.8,3.9 Z"></path>
+              <path class="map-landmark" transform="translate(246.2,331.5)" aria-label="Rickenbacker International Airport" d="M-7,2 L7,2 L2,-6 L-1,-6 L-1,-1 L-9,-3 L-9,-1 L-1,2 Z" />
+              <path class="map-landmark" transform="translate(333.4,226.1)" aria-label="Blacklick Woods Metro Park" d="M0,-8 L5,0 L2,0 L6,7 L-6,7 L-2,0 L-5,0 Z" />
+              <path class="map-landmark" transform="translate(399.2,300.8)" aria-label="Pickerington Ponds Metro Park" d="M0,-8 L5,0 L2,0 L6,7 L-6,7 L-2,0 L-5,0 Z" />
+              <path class="map-landmark" transform="translate(346.8,399.8)" aria-label="Slate Run Metro Park" d="M0,-8 L5,0 L2,0 L6,7 L-6,7 L-2,0 L-5,0 Z" />
+              <path class="map-landmark" transform="translate(567.0,506.0)" aria-label="Clear Creek Metro Park" d="M0,-8 L5,0 L2,0 L6,7 L-6,7 L-2,0 L-5,0 Z" />
+              <path class="map-landmark" transform="translate(550.6,420.6)" aria-label="Fairfield County Fairgrounds" d="M0,-8 L5,0 L2,0 L6,7 L-6,7 L-2,0 L-5,0 Z" />
+              <path class="map-landmark map-landmark--water" transform="translate(665.6,229.1)" aria-label="Buckeye Lake" d="M -39.6,3.1 L -37.6,-0.4 L -33.3,-3.9 L -26.0,-5.4 L -18.6,-6.2 L -13.7,-6.6 L -5.2,-5.8 L 3.4,-5.4 L 10.7,-5.1 L 16.8,-4.3 L 21.7,-3.9 L 24.7,-4.7 L 27.2,-3.5 L 30.2,-2.7 L 32.7,-1.6 L 35.1,-0.4 L 38.2,0.8 L 37.6,2.7 L 33.9,3.1 L 29.0,3.5 L 21.7,3.9 L 13.1,4.3 L 4.6,4.7 L -4.0,4.9 L -11.3,5.1 L -18.6,5.2 L -23.5,5.7 L -27.2,6.6 L -30.2,6.2 L -33.3,5.4 L -36.3,4.7 L -38.8,3.9 Z"></path>
 
               <!-- Town dots -->
-              <circle class="map-town-dot" data-city="columbus" data-tier="city" cx="81.6" cy="143.6" r="7"></circle>
-              <circle class="map-town-dot" data-city="canal winchester" data-tier="city" cx="283.3" cy="263.9" r="7"></circle>
-              <circle class="map-town-dot" data-city="pickerington" data-tier="city" cx="328.7" cy="214.7" r="7"></circle>
-              <circle class="map-town-dot" data-city="groveport" data-tier="city" cx="193.8" cy="244.1" r="7"></circle>
-              <circle class="map-town-dot" data-city="reynoldsburg" data-tier="city" cx="277.1" cy="150.9" r="7"></circle>
-              <circle class="map-town-dot" data-city="lancaster" data-tier="city" cx="489.0" cy="388.6" r="7"></circle>
-              <circle class="map-town-dot" data-city="lithopolis" data-tier="town" cx="276.2" cy="305.6" r="4"></circle>
-              <circle class="map-town-dot" data-city="baltimore" data-tier="town" cx="485.0" cy="255.4" r="4"></circle>
-              <circle class="map-town-dot" data-city="carroll" data-tier="town" cx="367.7" cy="341.1" r="4"></circle>
-              <circle class="map-town-dot" data-city="millersport" data-tier="town" cx="551.0" cy="210.6" r="4"></circle>
-              <circle class="map-town-dot" data-city="lockbourne" data-tier="town" cx="81.9" cy="293.2" r="4"></circle>
-              <circle class="map-town-dot" data-city="etna" data-tier="town" cx="407.1" cy="163.3" r="4"></circle>
-              <circle class="map-town-dot" data-city="buckeye lake" data-tier="town" cx="607.0" cy="176.8" r="4"></circle>
-              <circle class="map-town-dot" data-city="hebron" data-tier="town" cx="566.6" cy="140.3" r="4"></circle>
-              <circle class="map-town-dot" data-city="obetz" data-tier="town" cx="152.2" cy="198.1" r="4"></circle>
-              <circle class="map-town-dot" data-city="whitehall" data-tier="town" cx="202.3" cy="134.8" r="4"></circle>
-              <circle class="map-town-dot" data-city="pataskala" data-tier="town" cx="411.9" cy="98.9" r="4"></circle>
-              <circle class="map-town-dot" data-city="ashville" data-tier="town" cx="129.8" cy="377.3" r="4"></circle>
+              <circle class="map-town-dot" data-city="columbus" data-tier="city" cx="179.2" cy="198.8" r="7"></circle>
+              <circle class="map-town-dot" data-city="canal winchester" data-tier="city" cx="365.9" cy="308.4" r="7"></circle>
+              <circle class="map-town-dot" data-city="pickerington" data-tier="city" cx="407.9" cy="263.6" r="7"></circle>
+              <circle class="map-town-dot" data-city="groveport" data-tier="city" cx="283.1" cy="290.4" r="7"></circle>
+              <circle class="map-town-dot" data-city="reynoldsburg" data-tier="city" cx="360.2" cy="205.5" r="7"></circle>
+              <circle class="map-town-dot" data-city="lancaster" data-tier="city" cx="556.3" cy="421.9" r="7"></circle>
+              <circle class="map-town-dot" data-city="lithopolis" data-tier="town" cx="359.4" cy="346.4" r="4"></circle>
+              <circle class="map-town-dot" data-city="baltimore" data-tier="town" cx="552.6" cy="300.6" r="4"></circle>
+              <circle class="map-town-dot" data-city="carroll" data-tier="town" cx="444.1" cy="378.7" r="4"></circle>
+              <circle class="map-town-dot" data-city="millersport" data-tier="town" cx="613.7" cy="259.8" r="4"></circle>
+              <circle class="map-town-dot" data-city="lockbourne" data-tier="town" cx="179.5" cy="335.1" r="4"></circle>
+              <circle class="map-town-dot" data-city="etna" data-tier="town" cx="480.5" cy="216.8" r="4"></circle>
+              <circle class="map-town-dot" data-city="buckeye lake" data-tier="town" cx="665.6" cy="229.1" r="4"></circle>
+              <circle class="map-town-dot" data-city="hebron" data-tier="town" cx="628.1" cy="195.8" r="4"></circle>
+              <circle class="map-town-dot" data-city="obetz" data-tier="town" cx="244.6" cy="248.5" r="4"></circle>
+              <circle class="map-town-dot" data-city="whitehall" data-tier="town" cx="291.0" cy="190.8" r="4"></circle>
+              <circle class="map-town-dot" data-city="pataskala" data-tier="town" cx="484.9" cy="158.1" r="4"></circle>
+              <circle class="map-town-dot" data-city="ashville" data-tier="town" cx="223.9" cy="411.6" r="4"></circle>
 
               <!-- Labels -->
-              <text class="map-town-label" data-city-label="columbus" data-tier="city" x="91.6" y="147.6">Columbus</text>
-              <text class="map-town-label" data-city-label="canal winchester" data-tier="city" x="293.3" y="267.9">Canal Winchester</text>
-              <text class="map-town-label" data-city-label="pickerington" data-tier="city" x="338.7" y="218.7">Pickerington</text>
-              <text class="map-town-label" data-city-label="groveport" data-tier="city" x="203.8" y="248.1">Groveport</text>
-              <text class="map-town-label" data-city-label="reynoldsburg" data-tier="city" x="287.1" y="154.9">Reynoldsburg</text>
-              <text class="map-town-label" data-city-label="lancaster" data-tier="city" x="499.0" y="392.6">Lancaster</text>
-              <text class="map-town-label" data-city-label="lithopolis" data-tier="town" x="284.2" y="309.6">Lithopolis</text>
-              <text class="map-town-label" data-city-label="baltimore" data-tier="town" x="493.0" y="259.4">Baltimore</text>
-              <text class="map-town-label" data-city-label="carroll" data-tier="town" x="375.7" y="345.1">Carroll</text>
-              <text class="map-town-label" data-city-label="millersport" data-tier="town" x="559.0" y="204.6">Millersport</text>
-              <text class="map-town-label" data-city-label="lockbourne" data-tier="town" x="89.9" y="297.2">Lockbourne</text>
-              <text class="map-town-label" data-city-label="etna" data-tier="town" x="415.1" y="167.3">Etna</text>
-              <text class="map-town-label" data-city-label="buckeye lake" data-tier="town" x="607.0" y="162.8" text-anchor="middle">Buckeye Lake</text>
-              <text class="map-town-label" data-city-label="hebron" data-tier="town" x="574.6" y="134.3">Hebron</text>
-              <text class="map-town-label" data-city-label="obetz" data-tier="town" x="160.2" y="202.1">Obetz</text>
-              <text class="map-town-label" data-city-label="whitehall" data-tier="town" x="210.3" y="138.8">Whitehall</text>
-              <text class="map-town-label" data-city-label="pataskala" data-tier="town" x="419.9" y="102.9">Pataskala</text>
-              <text class="map-town-label" data-city-label="ashville" data-tier="town" x="137.8" y="381.3">Ashville</text>
+              <text class="map-town-label" data-city-label="columbus" data-tier="city" x="189.2" y="202.8">Columbus</text>
+              <text class="map-town-label" data-city-label="canal winchester" data-tier="city" x="375.9" y="312.4">Canal Winchester</text>
+              <text class="map-town-label" data-city-label="pickerington" data-tier="city" x="417.9" y="267.6">Pickerington</text>
+              <text class="map-town-label" data-city-label="groveport" data-tier="city" x="293.1" y="294.4">Groveport</text>
+              <text class="map-town-label" data-city-label="reynoldsburg" data-tier="city" x="370.2" y="209.5">Reynoldsburg</text>
+              <text class="map-town-label" data-city-label="lancaster" data-tier="city" x="566.3" y="425.9">Lancaster</text>
+              <text class="map-town-label" data-city-label="lithopolis" data-tier="town" x="367.4" y="350.4">Lithopolis</text>
+              <text class="map-town-label" data-city-label="baltimore" data-tier="town" x="560.6" y="304.6">Baltimore</text>
+              <text class="map-town-label" data-city-label="carroll" data-tier="town" x="452.1" y="382.7">Carroll</text>
+              <text class="map-town-label" data-city-label="millersport" data-tier="town" x="621.7" y="253.8">Millersport</text>
+              <text class="map-town-label" data-city-label="lockbourne" data-tier="town" x="187.5" y="339.1">Lockbourne</text>
+              <text class="map-town-label" data-city-label="etna" data-tier="town" x="488.5" y="220.8">Etna</text>
+              <text class="map-town-label" data-city-label="buckeye lake" data-tier="town" x="665.6" y="215.1" text-anchor="middle">Buckeye Lake</text>
+              <text class="map-town-label" data-city-label="hebron" data-tier="town" x="636.1" y="189.8">Hebron</text>
+              <text class="map-town-label" data-city-label="obetz" data-tier="town" x="252.6" y="252.5">Obetz</text>
+              <text class="map-town-label" data-city-label="whitehall" data-tier="town" x="299.0" y="194.8">Whitehall</text>
+              <text class="map-town-label" data-city-label="pataskala" data-tier="town" x="492.9" y="162.1">Pataskala</text>
+              <text class="map-town-label" data-city-label="ashville" data-tier="town" x="231.9" y="415.6">Ashville</text>
             </svg>
             <p class="map-caption">Loading interest map…</p>
           </div>
