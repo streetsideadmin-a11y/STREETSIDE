@@ -19,7 +19,7 @@ window.STREETSIDE_CONFIG = {
     tagline: "We take it to the street. You don't have to.",
     serviceRegion: "Southeastern Columbus",
     // TODO: real support contact details before launch.
-    contactEmail: null, // e.g. "hello@streetsidebins.com"
+    contactEmail: null, // e.g. "hello@streetsideoh.com"
     contactPhone: null, // e.g. "(740) 555-0100"
     socialLinks: {
       instagram: "https://www.instagram.com/streetside_wnps",
@@ -105,7 +105,6 @@ window.STREETSIDE_CONFIG = {
         "+$10/month for each additional can",
       ],
       featured: false,
-      comingSoon: false,
     },
     {
       id: "full",
@@ -120,7 +119,6 @@ window.STREETSIDE_CONFIG = {
         "+$10/month for each additional can",
       ],
       featured: true,
-      comingSoon: false,
     },
   ],
 
@@ -187,7 +185,7 @@ window.STREETSIDE_CONFIG = {
     },
     {
       q: "Can I register multiple bins?",
-      a: "Yes. Let us know how many trash and recycling bins you have when you sign up, and see Additional Bins pricing for households with more than the standard number.",
+      a: "Yes. Let us know how many trash and recycling bins you have when you sign up — each additional can beyond the first is $10/month, shown on the pricing plans above.",
     },
     {
       q: "Where should I leave my bins?",
@@ -226,8 +224,8 @@ window.STREETSIDE_CONFIG = {
     },
     {
       q: "How does billing work?",
-      a: null,
-      placeholder: "Billing cadence and payment method not yet finalized.",
+      a: "Billing is monthly, based on the plan you choose. Founding 250 members get 50% off their first month, then their regular rate for as long as they stay subscribed — locked in for 2 years.",
+      placeholder: "Exact payment method/processor not yet finalized.",
     },
     {
       q: "Can I cancel?",
