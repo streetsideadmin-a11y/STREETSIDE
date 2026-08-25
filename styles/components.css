@@ -23,6 +23,16 @@
 
 .btn:active { transform: translateY(1px); }
 
+/* Long button labels (like the neighborhood CTA) would otherwise
+   overflow past the edge of narrow phone screens since buttons
+   don't wrap by default — let them wrap and stay centered instead. */
+@media (max-width: 600px) {
+  .btn {
+    white-space: normal;
+    text-align: center;
+  }
+}
+
 .btn-primary {
   background: var(--color-brand);
   color: var(--white);
@@ -42,6 +52,15 @@
   border: 2px solid rgba(255,255,255,0.55);
 }
 .btn-outline:hover { border-color: var(--white); background: rgba(255,255,255,0.08); }
+
+/* Same idea as .btn-outline, but for use on light backgrounds
+   (like the white waitlist panel) instead of dark green sections. */
+.btn-outline-brand {
+  background: transparent;
+  color: var(--color-brand);
+  border: 2px solid var(--color-brand);
+}
+.btn-outline-brand:hover { background: var(--green-tint); }
 
 .btn-icon {
   display: inline-flex;
@@ -413,6 +432,29 @@
   background: #fbeaea;
   color: var(--red-700);
   border: 1px solid var(--red-600);
+}
+
+.neighbor-share {
+  margin-top: var(--space-4);
+  padding: var(--space-5);
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--color-border);
+  background: var(--off-white);
+  text-align: center;
+}
+
+.neighbor-share__prompt {
+  font-size: 0.95rem;
+  color: var(--color-ink);
+  margin-bottom: var(--space-4);
+}
+
+.neighbor-share__copied {
+  margin-top: var(--space-3);
+  margin-bottom: 0;
+  font-size: 0.85rem;
+  color: var(--color-brand);
+  font-weight: 600;
 }
 
 /* ---- FAQ accordion ---- */

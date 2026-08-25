@@ -82,6 +82,7 @@
 
       var cta = el("a", "btn btn-primary btn-block", "Join the Waitlist");
       cta.setAttribute("href", "#waitlist");
+      cta.setAttribute("data-package", tier.id);
       card.appendChild(cta);
 
       mount.appendChild(card);
@@ -97,7 +98,7 @@
       otCard.appendChild(el("div", "price-card__value", priceText));
 
       var otList = el("ul");
-      ["No subscription required", "Great for a one-off need", "Same reliable service"].forEach(
+      (oneTime.features || ["No subscription required", "Great for a one-off need", "Same reliable service"]).forEach(
         function (f) {
           otList.appendChild(el("li", null, checkIcon() + "<span>" + f + "</span>"));
         }
@@ -106,6 +107,7 @@
 
       var otCta = el("a", "btn btn-primary btn-block", "Join the Waitlist");
       otCta.setAttribute("href", "#waitlist");
+      otCta.setAttribute("data-package", "one-time");
       otCard.appendChild(otCta);
       mount.appendChild(otCard);
     }
@@ -214,11 +216,30 @@
     if (yearEl) yearEl.textContent = new Date().getFullYear();
   }
 
+  // When someone clicks "Join the Waitlist" from a specific pricing
+  // card, pre-select that plan in the waitlist form below — one less
+  // thing for them to fill in, and gives you real data on which plan
+  // people are actually interested in.
+  function initPackagePreselect() {
+    document.addEventListener("click", function (e) {
+      var link = e.target.closest("[data-package]");
+      if (!link) return;
+      var select = document.querySelector("#wl-package");
+      if (!select) return;
+      var value = link.getAttribute("data-package");
+      var optionExists = Array.prototype.some.call(select.options, function (o) {
+        return o.value === value;
+      });
+      if (optionExists) select.value = value;
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     renderPricing();
     renderFAQ();
     renderHearAboutUs();
     renderFooterContact();
     setYear();
+    initPackagePreselect();
   });
 })();

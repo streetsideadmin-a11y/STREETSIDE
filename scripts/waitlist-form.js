@@ -62,6 +62,58 @@
     });
   }
 
+  // After a real waitlist signup, prompt them to bring a neighbor
+  // along too — routes only open once there's enough interest nearby,
+  // so this turns one signup into a chance at several.
+  function showNeighborShare(form) {
+    var existing = document.querySelector("[data-neighbor-share]");
+    if (existing) existing.remove();
+
+    var shareText =
+      "I just joined the waitlist for Streetside — they take your trash & recycling bins to the curb and back every week so you don't have to. The more neighbors who join, the sooner a route opens!";
+    var shareUrl = "https://streetsideoh.com/#waitlist";
+
+    var wrap = document.createElement("div");
+    wrap.className = "neighbor-share";
+    wrap.setAttribute("data-neighbor-share", "");
+    wrap.innerHTML =
+      "<p class=\"neighbor-share__prompt\">Know a neighbor who'd want this too? Routes open faster with more signups nearby.</p>" +
+      "<button type=\"button\" class=\"btn btn-outline-brand neighbor-share__btn\">Share With a Neighbor</button>" +
+      "<p class=\"neighbor-share__copied\" data-copied-msg hidden>Link copied — paste it in a text!</p>";
+
+    var statusEl = document.querySelector("#waitlist-form-status");
+    if (statusEl && statusEl.parentNode) {
+      statusEl.parentNode.insertBefore(wrap, statusEl.nextSibling);
+    } else {
+      form.parentNode.appendChild(wrap);
+    }
+
+    var btn = wrap.querySelector(".neighbor-share__btn");
+    btn.addEventListener("click", async function () {
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: "Streetside", text: shareText, url: shareUrl });
+          return;
+        } catch (err) {
+          // Person cancelled the native share sheet, or it's not
+          // supported for this content — fall back to copying below.
+        }
+      }
+      try {
+        await navigator.clipboard.writeText(shareText + " " + shareUrl);
+        var copiedMsg = wrap.querySelector("[data-copied-msg]");
+        if (copiedMsg) {
+          copiedMsg.hidden = false;
+          setTimeout(function () {
+            copiedMsg.hidden = true;
+          }, 4000);
+        }
+      } catch (err) {
+        console.warn("[streetside] Could not copy share text:", err);
+      }
+    });
+  }
+
   async function handleSubmit(form, statusEl, formType) {
     var config = (window.STREETSIDE_CONFIG || {}).waitlistForm || {};
     var payload = serializeForm(form);
@@ -129,6 +181,7 @@
           "You're on the list! We'll be in touch about Streetside service in your neighborhood.",
           "success"
         );
+        showNeighborShare(form);
       }
 
       form.reset();

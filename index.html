@@ -278,7 +278,7 @@
 
       <div class="pricing-grid reveal-group" data-pricing-grid></div>
 
-      <p class="pricing__footnote">Additional-can pricing and the Founding 250 offer are described above — final billing details are confirmed when your service starts.</p>
+      <p class="pricing__footnote">Additional-bin pricing and the Founding 250 offer are described above — final billing details are confirmed when your service starts.</p>
     </div>
   </section>
 
@@ -488,6 +488,17 @@
           <div class="field">
             <label for="wl-storage">Where Bins Are Normally Stored</label>
             <input id="wl-storage" name="binStorageLocation" type="text" placeholder="e.g. side yard, garage, backyard gate" required />
+          </div>
+
+          <div class="field">
+            <label for="wl-package">Which Plan Are You Interested In?</label>
+            <select id="wl-package" name="interestedPackage" required>
+              <option value="" disabled selected>Select a plan</option>
+              <option value="curb">Curb Service</option>
+              <option value="full">Full Service</option>
+              <option value="one-time">One-Time Service</option>
+              <option value="not-sure">Not sure yet</option>
+            </select>
           </div>
 
           <div class="field">

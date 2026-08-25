@@ -97,7 +97,7 @@ module.exports = async (req, res) => {
         form_type, first_name, last_name, email, phone,
         street_address, city, zip, collection_day, waste_provider,
         trash_bin_count, recycling_bin_count, bin_storage_location,
-        hear_about_us, consent, submitted_at
+        interested_package, hear_about_us, consent, submitted_at
       ) VALUES (
         ${body.formType || "waitlist"},
         ${body.firstName || null},
@@ -112,6 +112,7 @@ module.exports = async (req, res) => {
         ${body.trashBinCount ? parseInt(body.trashBinCount, 10) : null},
         ${body.recyclingBinCount ? parseInt(body.recyclingBinCount, 10) : null},
         ${body.binStorageLocation || null},
+        ${body.interestedPackage || null},
         ${body.hearAboutUs || null},
         ${!!body.consent},
         ${body.submittedAt || new Date().toISOString()}
@@ -134,6 +135,7 @@ module.exports = async (req, res) => {
       trashBinCount: body.trashBinCount || "",
       recyclingBinCount: body.recyclingBinCount || "",
       binStorageLocation: body.binStorageLocation || "",
+      interestedPackage: body.interestedPackage || "",
       hearAboutUs: body.hearAboutUs || "",
       consent: !!body.consent,
       submittedAt: body.submittedAt || new Date().toISOString(),

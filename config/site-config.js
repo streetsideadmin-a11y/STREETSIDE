@@ -95,28 +95,27 @@ window.STREETSIDE_CONFIG = {
     {
       id: "curb",
       name: "Curb Service",
-      description: "Bins taken from their designated storage spot to the curb before collection.",
+      description: "Your first bin taken from its designated storage spot to the curb before collection.",
       price: 12.5,
       billingUnit: "month",
       features: [
-        "Bins taken to the curb before collection",
-        "Trash and recycling bins included",
+        "1 bin taken to the curb before collection",
         "Weekly service, every week",
-        "+$10/month for each additional can",
+        "+$10/month for each additional bin (trash or recycling)",
       ],
       featured: false,
     },
     {
       id: "full",
       name: "Full Service",
-      description: "Bins taken to the curb before collection and returned to storage afterward.",
+      description: "Your first bin taken to the curb before collection and returned to storage afterward.",
       price: 25,
       billingUnit: "month",
       features: [
         "Everything in Curb Service",
-        "Bins returned to storage after pickup",
+        "Your bin returned to storage after pickup",
         "Weekly service, every week",
-        "+$10/month for each additional can",
+        "+$10/month for each additional bin (trash or recycling)",
       ],
       featured: true,
     },
@@ -126,6 +125,13 @@ window.STREETSIDE_CONFIG = {
     name: "One-Time Service",
     description: "Need it just once — a single trip, an injury, an event? We've got you covered without a subscription.",
     price: 10,
+    additionalBinPrice: 10,
+    features: [
+      "1 bin taken to the curb and brought back",
+      "+$10 for each additional bin",
+      "No subscription required",
+      "Great for a one-off need",
+    ],
   },
 
   foundingOffer: {
@@ -181,11 +187,11 @@ window.STREETSIDE_CONFIG = {
     },
     {
       q: "Can you handle recycling?",
-      a: "Yes. Recycling bins are included as part of the service alongside trash bins.",
+      a: "Yes — recycling bins work the same as trash bins. Your first bin (trash or recycling) is included in your plan's base price, and each additional bin is +$10/month (or +$10 for one-time service).",
     },
     {
       q: "Can I register multiple bins?",
-      a: "Yes. Let us know how many trash and recycling bins you have when you sign up — each additional can beyond the first is $10/month, shown on the pricing plans above.",
+      a: "Yes. Let us know how many trash and recycling bins you have when you sign up — your first bin is included in the base price, and each additional bin is $10/month, shown on the pricing plans above.",
     },
     {
       q: "Where should I leave my bins?",

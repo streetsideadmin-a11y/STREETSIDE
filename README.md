@@ -160,7 +160,7 @@ setup needed, just a script pasted into the Sheet itself.
      var headers = ["Submitted At", "Form Type", "First Name", "Last Name",
        "Email", "Phone", "Street Address", "City", "ZIP", "Collection Day",
        "Waste Provider", "Trash Bins", "Recycling Bins",
-       "Bin Storage Location", "Heard About Us", "Consent"];
+       "Bin Storage Location", "Interested Package", "Heard About Us", "Consent"];
 
      if (sheet.getLastRow() === 0) {
        sheet.appendRow(headers);
@@ -172,8 +172,8 @@ setup needed, just a script pasted into the Sheet itself.
        data.streetAddress || "", data.city || "", data.zip || "",
        data.collectionDay || "", data.wasteProvider || "",
        data.trashBinCount || "", data.recyclingBinCount || "",
-       data.binStorageLocation || "", data.hearAboutUs || "",
-       data.consent ? "Yes" : "No"
+       data.binStorageLocation || "", data.interestedPackage || "",
+       data.hearAboutUs || "", data.consent ? "Yes" : "No"
      ]);
 
      // Send the person a confirmation email — only for full waitlist

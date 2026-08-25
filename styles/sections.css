@@ -324,6 +324,10 @@
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
+  padding-top: 20px; /* room for the "Most Popular" tag, which pokes
+    above the card — needed because setting overflow-x here makes
+    the browser treat overflow-y as clipped too, per the CSS spec,
+    even though only horizontal scrolling was intended. */
   padding-bottom: var(--space-3);
   scrollbar-width: thin;
 }

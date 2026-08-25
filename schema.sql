@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS signups (
   trash_bin_count        INTEGER,
   recycling_bin_count    INTEGER,
   bin_storage_location   TEXT,
+  interested_package     TEXT,                    -- 'curb', 'full', 'one-time', or 'not-sure'
   hear_about_us          TEXT,
   consent                BOOLEAN DEFAULT FALSE,
   submitted_at           TIMESTAMPTZ DEFAULT now()
@@ -27,3 +28,14 @@ CREATE TABLE IF NOT EXISTS signups (
 
 -- Speeds up the neighbor-count endpoint, which filters by form_type.
 CREATE INDEX IF NOT EXISTS idx_signups_form_type ON signups (form_type);
+
+-- ---------------------------------------------------------------
+-- MIGRATION — if your database already exists (you set it up before
+-- this column was added), run just this one line instead of the
+-- CREATE TABLE above, in Neon's SQL Editor:
+--
+--   ALTER TABLE signups ADD COLUMN IF NOT EXISTS interested_package TEXT;
+--
+-- The CREATE TABLE above uses IF NOT EXISTS, so it's harmless to
+-- re-run the whole file too — it just won't add the new column to an
+-- already-existing table, which is what this ALTER TABLE line is for.
