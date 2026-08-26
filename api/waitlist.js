@@ -92,32 +92,67 @@ module.exports = async (req, res) => {
   try {
     const sql = neon(process.env.DATABASE_URL);
 
-    await sql`
-      INSERT INTO signups (
-        form_type, first_name, last_name, email, phone,
-        street_address, city, zip, collection_day, waste_provider,
-        trash_bin_count, recycling_bin_count, bin_storage_location,
-        interested_package, hear_about_us, consent, submitted_at
-      ) VALUES (
-        ${body.formType || "waitlist"},
-        ${body.firstName || null},
-        ${body.lastName || null},
-        ${body.email || null},
-        ${body.phone || null},
-        ${body.streetAddress || null},
-        ${body.city || null},
-        ${body.zip || null},
-        ${body.collectionDay || null},
-        ${body.wasteProvider || null},
-        ${body.trashBinCount ? parseInt(body.trashBinCount, 10) : null},
-        ${body.recyclingBinCount ? parseInt(body.recyclingBinCount, 10) : null},
-        ${body.binStorageLocation || null},
-        ${body.interestedPackage || null},
-        ${body.hearAboutUs || null},
-        ${!!body.consent},
-        ${body.submittedAt || new Date().toISOString()}
-      )
-    `;
+    const values = [
+      body.formType || "waitlist",
+      body.firstName || null,
+      body.lastName || null,
+      body.email || null,
+      body.phone || null,
+      body.streetAddress || null,
+      body.city || null,
+      body.zip || null,
+      body.collectionDay || null,
+      body.wasteProvider || null,
+      body.trashBinCount ? parseInt(body.trashBinCount, 10) : null,
+      body.recyclingBinCount ? parseInt(body.recyclingBinCount, 10) : null,
+      body.binStorageLocation || null,
+      body.interestedPackage || null,
+      body.hearAboutUs || null,
+      !!body.consent,
+      body.submittedAt || new Date().toISOString(),
+    ];
+
+    try {
+      await sql`
+        INSERT INTO signups (
+          form_type, first_name, last_name, email, phone,
+          street_address, city, zip, collection_day, waste_provider,
+          trash_bin_count, recycling_bin_count, bin_storage_location,
+          interested_package, hear_about_us, consent, submitted_at
+        ) VALUES (
+          ${values[0]}, ${values[1]}, ${values[2]}, ${values[3]}, ${values[4]},
+          ${values[5]}, ${values[6]}, ${values[7]}, ${values[8]}, ${values[9]},
+          ${values[10]}, ${values[11]}, ${values[12]}, ${values[13]}, ${values[14]},
+          ${values[15]}, ${values[16]}
+        )
+      `;
+    } catch (insertErr) {
+      // If interested_package hasn't been added to the database yet
+      // (a migration step documented in schema.sql), don't let that
+      // break every single submission — save everything else and log
+      // a clear warning instead, so the fix is a config problem you
+      // can find in the logs, never a lost signup.
+      const missingColumn =
+        insertErr && (insertErr.code === "42703" || /interested_package/i.test(String(insertErr.message)));
+      if (!missingColumn) throw insertErr;
+
+      console.warn(
+        "[streetside] 'interested_package' column not found — run the migration in schema.sql. Saving this submission without it for now."
+      );
+      await sql`
+        INSERT INTO signups (
+          form_type, first_name, last_name, email, phone,
+          street_address, city, zip, collection_day, waste_provider,
+          trash_bin_count, recycling_bin_count, bin_storage_location,
+          hear_about_us, consent, submitted_at
+        ) VALUES (
+          ${values[0]}, ${values[1]}, ${values[2]}, ${values[3]}, ${values[4]},
+          ${values[5]}, ${values[6]}, ${values[7]}, ${values[8]}, ${values[9]},
+          ${values[10]}, ${values[11]}, ${values[12]}, ${values[14]},
+          ${values[15]}, ${values[16]}
+        )
+      `;
+    }
 
     // Best-effort mirror to Google Sheets — never blocks or breaks
     // the response if it fails; the database row above already saved.
