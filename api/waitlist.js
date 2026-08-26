@@ -78,11 +78,14 @@ module.exports = async (req, res) => {
   // Minimal server-side sanity check. The browser form already
   // validates required fields, but a server should never trust the
   // client alone. Different forms collect different fields, so what
-  // counts as "required" depends on which one this is.
+  // counts as "required" depends on which one this is. The waitlist
+  // form's "Email or Phone" field means either one on its own is a
+  // valid submission — requiring email specifically would silently
+  // reject every phone-only signup.
   const isValid =
     formType === "address-check"
       ? !!body.streetAddress && !!body.zip
-      : !!body.email;
+      : !!body.email || !!body.phone;
 
   if (!isValid) {
     res.status(400).json({ error: "Missing required fields." });
