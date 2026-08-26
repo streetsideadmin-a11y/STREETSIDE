@@ -334,7 +334,6 @@
 
               <rect x="0" y="0" width="760" height="560" fill="url(#map-grid)"></rect>
               <ellipse cx="179.2" cy="198.8" rx="230" ry="170" fill="url(#map-glow)"></ellipse>
-
               <g class="map-compass" transform="translate(695,40)">
                 <line x1="0" y1="14" x2="0" y2="-14" />
                 <path d="M0,-14 L-5,-4 L5,-4 Z" />
@@ -429,15 +428,9 @@
             </div>
           </div>
 
-          <div class="field-row cols-2">
-            <div class="field">
-              <label for="wl-email">Email</label>
-              <input id="wl-email" name="email" type="email" required autocomplete="email" />
-            </div>
-            <div class="field">
-              <label for="wl-phone">Phone</label>
-              <input id="wl-phone" name="phone" type="tel" required autocomplete="tel" />
-            </div>
+          <div class="field">
+            <label for="wl-contact">Email or Phone</label>
+            <input id="wl-contact" name="emailOrPhone" type="text" required placeholder="you@example.com or (555) 555-5555" autocomplete="email" />
           </div>
 
           <div class="field">

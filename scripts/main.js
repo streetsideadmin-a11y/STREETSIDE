@@ -234,11 +234,52 @@
     });
   }
 
+  // Shows real prices right in the plan dropdown — someone landing
+  // straight on the waitlist form (from an ad, a shared link, etc.)
+  // shouldn't have to go hunting for the pricing section to know what
+  // each option actually costs. Pulls from the same config as the
+  // pricing cards, so it can never drift out of sync with them.
+  function renderPackageOptions() {
+    var select = document.querySelector("#wl-package");
+    var config = window.STREETSIDE_CONFIG || {};
+    var tiers = config.pricingTiers || [];
+    var oneTime = config.oneTimeService;
+    var founding = config.foundingOffer;
+    if (!select) return;
+
+    function priceLabel(price) {
+      if (price === null || price === undefined) return "TBD";
+      if (founding && founding.enabled) {
+        var discounted = formatPrice(price * (1 - founding.discountPercent / 100));
+        return "$" + discounted + " first mo., then $" + formatPrice(price) + "/mo";
+      }
+      return "$" + formatPrice(price) + "/mo";
+    }
+
+    var options = ['<option value="" disabled selected>Select a plan</option>'];
+
+    tiers.forEach(function (tier) {
+      options.push(
+        '<option value="' + tier.id + '">' + tier.name + " — " + priceLabel(tier.price) + "</option>"
+      );
+    });
+
+    if (oneTime) {
+      var otPrice = oneTime.price != null ? "$" + formatPrice(oneTime.price) : "TBD";
+      options.push('<option value="one-time">' + oneTime.name + " — " + otPrice + "</option>");
+    }
+
+    options.push('<option value="not-sure">Not sure yet</option>');
+
+    select.innerHTML = options.join("");
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     renderPricing();
     renderFAQ();
     renderHearAboutUs();
     renderFooterContact();
+    renderPackageOptions();
     setYear();
     initPackagePreselect();
   });

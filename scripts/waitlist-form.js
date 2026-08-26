@@ -120,6 +120,20 @@
     payload.formType = formType; // "waitlist" or "address-check"
     payload.submittedAt = new Date().toISOString();
 
+    // The waitlist form has one combined "email or phone" field —
+    // split it back into the email/phone fields the backend, the
+    // Sheets sync, and the confirmation email all expect, based on
+    // whether it looks like an email address.
+    if (payload.emailOrPhone) {
+      var contact = String(payload.emailOrPhone).trim();
+      if (contact.indexOf("@") !== -1) {
+        payload.email = contact;
+      } else {
+        payload.phone = contact;
+      }
+      delete payload.emailOrPhone;
+    }
+
     if (!config.endpoint) {
       showStatus(
         statusEl,
