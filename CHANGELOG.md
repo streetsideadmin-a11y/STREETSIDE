@@ -4,7 +4,22 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v25.0 — current
+## v25.2 — current
+
+- Added a "Founding Members Save 50% — Claim Your Discount" badge
+  to the hero, linking to the pricing section — no numbers involved,
+  just a clear call-out for the discount now that the counters are
+  gone.
+
+## v25.1
+
+- Removed the Founder-spots counters from both the hero and the
+  "Built for Neighborhoods" section — no visible number for now.
+- Brought back the heatmap version of the service-area map (was
+  tried, reverted to pins, now restored) — soft colored glows sized
+  and colored by real per-town demand instead of growing pins.
+
+## v25.0
 
 - Fixed: waitlist submissions with only a phone number (no email)
   were being rejected by the server — a validation rule left over

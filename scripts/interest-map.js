@@ -2,12 +2,18 @@
  * Service-area interest map.
  * ---------------------------------------------------------------
  * This is a simple illustrated map, not a real interactive map
- * library — every town's dot is drawn directly in index.html's
+ * library — every town's position is drawn directly in index.html's
  * inline SVG, positioned from real coordinates but simplified into
  * a flat illustration. That's intentional: it has no external
  * dependency (no map tiles, no CDN, nothing that can silently fail
- * to load), so the one thing it does — light up and grow a town's
- * dot when real interest comes in — works reliably every time.
+ * to load), so the one thing it does — show real demand as a heat
+ * overlay — works reliably every time.
+ *
+ * Instead of a growing pin, each town has a soft "heat blob" behind
+ * it (a blurred circle) whose size and color scale with real signup
+ * count for that city — more interest reads as a bigger, hotter
+ * (more red) glow, same visual language as a real heatmap. A town
+ * with zero interest shows no glow at all, just its plain dot.
  *
  * Data comes from /api/interest-map (see api/interest-map.js),
  * which reports signups grouped by CITY ONLY — never an exact
@@ -32,12 +38,26 @@
       .trim();
   }
 
-  function baseRadius(tier) {
-    return tier === "city" ? 7 : 4;
+  // Heat blob radius grows with interest but caps out so one very
+  // popular town doesn't swallow its neighbors on the map.
+  function heatRadius(count) {
+    return Math.min(22 + count * 9, 85);
   }
 
-  function radiusForCount(tier, count) {
-    return Math.min(baseRadius(tier) + count * 2.5, 22);
+  // Cool yellow at low interest, ramping through orange to the
+  // brand's hot red at high interest — standard heatmap color
+  // language, using the site's own accent red as the "hottest" color
+  // so it still feels on-brand rather than a generic red/blue scale.
+  function heatColor(count) {
+    if (count <= 0) return null;
+    if (count === 1) return "rgba(255, 214, 92, 0.55)"; // soft yellow
+    if (count <= 3) return "rgba(255, 152, 51, 0.6)"; // orange
+    if (count <= 6) return "rgba(230, 74, 45, 0.65)"; // red-orange
+    return "rgba(200, 30, 44, 0.75)"; // hot — brand accent red
+  }
+
+  function baseRadius(tier) {
+    return tier === "city" ? 7 : 4;
   }
 
   async function init() {
@@ -54,16 +74,24 @@
 
       cities.forEach(function (entry) {
         var key = normalizeCityKey(entry.city);
-        var dot = svg.querySelector('[data-city="' + key + '"]');
-        if (!dot) return; // no dot on file yet for this town — skip silently
+        var blob = svg.querySelector('.map-heat-blob[data-city="' + key + '"]');
+        var dot = svg.querySelector('.map-town-dot[data-city="' + key + '"]');
+        if (!blob || !dot) return; // no dot on file yet for this town — skip silently
 
-        var tier = dot.getAttribute("data-tier");
-        dot.setAttribute("r", radiusForCount(tier, entry.count));
+        var color = heatColor(entry.count);
+        if (color) {
+          blob.setAttribute("r", heatRadius(entry.count));
+          blob.setAttribute("fill", color);
+          blob.setAttribute(
+            "aria-label",
+            entry.city + ": " + entry.count + (entry.count === 1 ? " neighbor interested" : " neighbors interested")
+          );
+        }
+
+        // The dot itself brightens slightly on top of the glow, but
+        // stays a fixed small size — the heat blob carries the "how
+        // much demand" signal now, not the dot growing.
         dot.classList.add("map-town-dot--active");
-        dot.setAttribute(
-          "aria-label",
-          entry.city + ": " + entry.count + (entry.count === 1 ? " neighbor interested" : " neighbors interested")
-        );
 
         // Reveal a label for any town with real interest, even ones
         // that don't get a permanent label by default.
@@ -76,7 +104,7 @@
       if (caption) {
         caption.textContent =
           plotted > 0
-            ? "Lit-up towns show real neighbor interest so far."
+            ? "Warmer colors show more neighbor interest so far."
             : "Be the first neighbor to light up your town — join the waitlist above.";
       }
     } catch (err) {
