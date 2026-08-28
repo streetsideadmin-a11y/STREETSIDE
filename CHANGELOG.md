@@ -4,7 +4,21 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v25.2 — current
+## v26.0 — current
+
+- Added a password-protected admin dashboard at `/admin.html` —
+  view every real signup (name, contact, address, plan interest)
+  plus summary counts, without needing to open Neon directly.
+- Real security, not just a password box: password lives only in a
+  Vercel environment variable (never in code), login issues a
+  signed session cookie (HMAC-SHA256, 12-hour expiry), every data
+  request re-verifies that signature server-side, and password
+  comparison uses a constant-time check to resist timing attacks.
+  See README.md → "Admin dashboard" for the 2-variable setup.
+- Page is marked noindex and excluded in robots.txt, and isn't
+  linked from anywhere on the public site.
+
+## v25.2
 
 - Added a "Founding Members Save 50% — Claim Your Discount" badge
   to the hero, linking to the pricing section — no numbers involved,

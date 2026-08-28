@@ -35,6 +35,7 @@ streetside-website/
 ├── privacy-policy.html     Privacy policy page
 ├── terms.html              Terms of service page
 ├── 404.html                Custom not-found page (Vercel serves this automatically)
+├── admin.html              Password-protected dashboard for viewing real signups
 ├── robots.txt              Tells search engines they can crawl the site
 ├── sitemap.xml             Lists real pages for search engines
 ├── package.json            Only needed if you use the optional /api functions below
@@ -42,7 +43,10 @@ streetside-website/
 ├── api/                     Optional Vercel serverless functions
 │   ├── waitlist.js           Saves form submissions to Postgres (+ optional Sheets/email)
 │   ├── neighbor-count.js     Returns the real signup count
-│   └── interest-map.js       Returns signups grouped by city, for the map
+│   ├── interest-map.js       Returns signups grouped by city, for the map
+│   ├── admin-login.js        Checks the admin password, issues a session cookie
+│   ├── admin-logout.js       Clears the admin session cookie
+│   └── admin-data.js         Returns all signups (requires a valid session cookie)
 ├── config/
 │   └── site-config.js      Editable business data — START HERE
 ├── styles/
@@ -245,6 +249,49 @@ A personal Gmail account can send about 100 emails/day through
 Apps Script (a Google Workspace account gets more) — plenty for a
 launching business, but worth knowing if signups ever spike hard in
 one day.
+
+## Admin dashboard — viewing your real signup data
+
+There's a password-protected admin page at `/admin.html` that shows
+every real signup: name, contact info, address, which plan they're
+interested in, and a few summary counts. It's not linked from
+anywhere on the public site — you just navigate to it directly
+(e.g. `https://streetsideoh.com/admin.html`).
+
+**How the security actually works, in plain terms:**
+- You set a password yourself (an environment variable, never
+  written into the code or stored in the database).
+- When you log in, the server checks it and — if correct — gives
+  your browser a signed, encrypted-looking cookie that proves you
+  logged in, good for 12 hours.
+- Every time the admin page asks for data, the server re-checks that
+  cookie's signature before returning anything. A cookie that's
+  missing, expired, or doesn't match is rejected with no data sent.
+- The page itself is marked so Google won't index it, and it's not
+  linked from your site's menus — but that's just extra privacy, not
+  the real protection. The password + signed cookie is what actually
+  keeps the data locked down.
+
+**Setup (two environment variables in Vercel, same place as
+`DATABASE_URL`):**
+
+1. In your Vercel project: **Settings → Environment Variables**.
+2. Add `ADMIN_PASSWORD` — pick a real password here, something you
+   wouldn't mind a customer's data being protected by. Not "password123".
+3. Add `SESSION_SECRET` — a long random string used to sign the
+   login cookie so it can't be forged. Any long random text works;
+   a quick way to generate one is running this in your browser's
+   JavaScript console: `crypto.randomUUID() + crypto.randomUUID()`
+4. Redeploy (upload the files the same way as always, or just
+   redeploy if only the environment variables changed).
+5. Visit `/admin.html` on your live site and log in with the
+   password you set in step 2.
+
+If you ever suspect the password has leaked, just change
+`ADMIN_PASSWORD` in Vercel and redeploy — that immediately
+invalidates it. Changing `SESSION_SECRET` also immediately logs
+out anyone with an existing session, including yourself (you'd
+just log back in with the current password).
 
 ## Launch checklist — what still needs real data
 
