@@ -4,7 +4,17 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v26.0 — current
+## v26.1 — current
+
+- Added an "Employee Login" link to the footer of every page,
+  pointing to `/admin.html` — no more typing the URL by hand.
+- Added real filtering to the admin dashboard: search box (name,
+  email, phone, address, city), plus dropdown filters for
+  submission type, interested plan, and city (auto-populated from
+  real data). Shows a live "Showing X of Y" count, with a one-click
+  Clear button.
+
+## v26.0
 
 - Added a password-protected admin dashboard at `/admin.html` —
   view every real signup (name, contact, address, plan interest)

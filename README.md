@@ -254,9 +254,8 @@ one day.
 
 There's a password-protected admin page at `/admin.html` that shows
 every real signup: name, contact info, address, which plan they're
-interested in, and a few summary counts. It's not linked from
-anywhere on the public site — you just navigate to it directly
-(e.g. `https://streetsideoh.com/admin.html`).
+interested in, and a few summary counts. There's a small "Employee
+Login" link in the footer of every page that goes there.
 
 **How the security actually works, in plain terms:**
 - You set a password yourself (an environment variable, never
@@ -267,10 +266,10 @@ anywhere on the public site — you just navigate to it directly
 - Every time the admin page asks for data, the server re-checks that
   cookie's signature before returning anything. A cookie that's
   missing, expired, or doesn't match is rejected with no data sent.
-- The page itself is marked so Google won't index it, and it's not
-  linked from your site's menus — but that's just extra privacy, not
-  the real protection. The password + signed cookie is what actually
-  keeps the data locked down.
+- The page itself is marked so Google won't index it — but that's
+  just extra privacy, not the real protection. The password + signed
+  cookie is what actually keeps the data locked down; anyone who
+  finds the link still has to get through that.
 
 **Setup (two environment variables in Vercel, same place as
 `DATABASE_URL`):**

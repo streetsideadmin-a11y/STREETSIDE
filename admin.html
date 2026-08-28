@@ -62,6 +62,35 @@
     border-radius: var(--radius-md);
     overflow-x: auto;
   }
+  .admin-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+  }
+  .admin-filter-search {
+    flex: 1 1 240px;
+    padding: 10px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+  }
+  .admin-filter-select {
+    padding: 10px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    background: var(--white);
+  }
+  .admin-filter-clear {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+  .admin-filter-count {
+    font-size: 0.85rem;
+    color: var(--color-ink-muted);
+    margin-bottom: var(--space-3);
+  }
   table.admin-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; white-space: nowrap; }
   table.admin-table th, table.admin-table td {
     text-align: left;
@@ -103,6 +132,28 @@
   </div>
 
   <div class="admin-summary" id="admin-summary"></div>
+
+  <div class="admin-filters" id="admin-filters">
+    <input type="text" id="admin-filter-search" placeholder="Search name, email, phone, address, city…" class="admin-filter-search" />
+    <select id="admin-filter-type" class="admin-filter-select">
+      <option value="">All types</option>
+      <option value="waitlist">Waitlist</option>
+      <option value="address-check">Address check</option>
+    </select>
+    <select id="admin-filter-package" class="admin-filter-select">
+      <option value="">All plans</option>
+      <option value="curb">Curb Service</option>
+      <option value="full">Full Service</option>
+      <option value="one-time">One-Time Service</option>
+      <option value="not-sure">Not sure yet</option>
+      <option value="__none__">Not specified</option>
+    </select>
+    <select id="admin-filter-city" class="admin-filter-select">
+      <option value="">All cities</option>
+    </select>
+    <button type="button" class="btn btn-outline-brand admin-filter-clear" id="admin-filter-clear">Clear</button>
+  </div>
+  <p class="admin-filter-count" id="admin-filter-count"></p>
 
   <div class="admin-table-wrap">
     <div class="admin-loading" id="admin-table-loading">Loading…</div>
@@ -160,6 +211,117 @@
     return div.innerHTML;
   }
 
+  var allSignups = []; // full dataset, fetched once; filters apply on top of this
+
+  function renderRows(rows) {
+    var tbody = document.getElementById("admin-table-body");
+    var loadingEl = document.getElementById("admin-table-loading");
+    var tableEl = document.getElementById("admin-table");
+    var countEl = document.getElementById("admin-filter-count");
+
+    countEl.textContent =
+      allSignups.length === 0
+        ? ""
+        : "Showing " + rows.length + " of " + allSignups.length + " signups";
+
+    if (rows.length === 0) {
+      tableEl.style.display = "none";
+      loadingEl.style.display = "block";
+      loadingEl.textContent = allSignups.length === 0 ? "No signups yet." : "No signups match those filters.";
+      return;
+    }
+
+    tbody.innerHTML = rows
+      .map(function (row) {
+        var name = [row.first_name, row.last_name].filter(Boolean).join(" ") || "—";
+        return (
+          "<tr>" +
+          "<td>" + formatDate(row.submitted_at) + "</td>" +
+          "<td>" + escapeHtml(row.form_type) + "</td>" +
+          "<td>" + escapeHtml(name) + "</td>" +
+          "<td>" + escapeHtml(row.email || "—") + "</td>" +
+          "<td>" + escapeHtml(row.phone || "—") + "</td>" +
+          "<td>" + escapeHtml(row.street_address || "—") + "</td>" +
+          "<td>" + escapeHtml(row.city || "—") + "</td>" +
+          "<td>" + escapeHtml(row.zip || "—") + "</td>" +
+          "<td>" + escapeHtml(packageLabel(row.interested_package)) + "</td>" +
+          "</tr>"
+        );
+      })
+      .join("");
+    loadingEl.style.display = "none";
+    tableEl.style.display = "table";
+  }
+
+  function applyFilters() {
+    var search = document.getElementById("admin-filter-search").value.trim().toLowerCase();
+    var type = document.getElementById("admin-filter-type").value;
+    var pkg = document.getElementById("admin-filter-package").value;
+    var city = document.getElementById("admin-filter-city").value;
+
+    var filtered = allSignups.filter(function (row) {
+      if (type && row.form_type !== type) return false;
+
+      if (pkg === "__none__") {
+        if (row.interested_package) return false;
+      } else if (pkg && row.interested_package !== pkg) {
+        return false;
+      }
+
+      if (city && row.city !== city) return false;
+
+      if (search) {
+        var haystack = [
+          row.first_name,
+          row.last_name,
+          row.email,
+          row.phone,
+          row.street_address,
+          row.city,
+          row.zip,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+        if (haystack.indexOf(search) === -1) return false;
+      }
+
+      return true;
+    });
+
+    renderRows(filtered);
+  }
+
+  function populateCityFilter() {
+    var citySelect = document.getElementById("admin-filter-city");
+    var cities = Array.from(
+      new Set(allSignups.map(function (r) { return r.city; }).filter(Boolean))
+    ).sort();
+    cities.forEach(function (city) {
+      var opt = document.createElement("option");
+      opt.value = city;
+      opt.textContent = city;
+      citySelect.appendChild(opt);
+    });
+  }
+
+  function initFilters() {
+    ["admin-filter-search", "admin-filter-type", "admin-filter-package", "admin-filter-city"].forEach(
+      function (id) {
+        var el = document.getElementById(id);
+        var evt = el.tagName === "SELECT" ? "change" : "input";
+        el.addEventListener(evt, applyFilters);
+      }
+    );
+    document.getElementById("admin-filter-clear").addEventListener("click", function () {
+      document.getElementById("admin-filter-search").value = "";
+      document.getElementById("admin-filter-type").value = "";
+      document.getElementById("admin-filter-package").value = "";
+      document.getElementById("admin-filter-city").value = "";
+      applyFilters();
+    });
+  }
+
   async function loadDashboard() {
     loginView.style.display = "none";
     dashboard.style.display = "block";
@@ -196,31 +358,10 @@
         })
         .join("");
 
-      var tbody = document.getElementById("admin-table-body");
-      if (data.signups.length === 0) {
-        document.getElementById("admin-table-loading").textContent = "No signups yet.";
-      } else {
-        tbody.innerHTML = data.signups
-          .map(function (row) {
-            var name = [row.first_name, row.last_name].filter(Boolean).join(" ") || "—";
-            return (
-              "<tr>" +
-              "<td>" + formatDate(row.submitted_at) + "</td>" +
-              "<td>" + escapeHtml(row.form_type) + "</td>" +
-              "<td>" + escapeHtml(name) + "</td>" +
-              "<td>" + escapeHtml(row.email || "—") + "</td>" +
-              "<td>" + escapeHtml(row.phone || "—") + "</td>" +
-              "<td>" + escapeHtml(row.street_address || "—") + "</td>" +
-              "<td>" + escapeHtml(row.city || "—") + "</td>" +
-              "<td>" + escapeHtml(row.zip || "—") + "</td>" +
-              "<td>" + escapeHtml(packageLabel(row.interested_package)) + "</td>" +
-              "</tr>"
-            );
-          })
-          .join("");
-        document.getElementById("admin-table-loading").style.display = "none";
-        document.getElementById("admin-table").style.display = "table";
-      }
+      allSignups = data.signups;
+      populateCityFilter();
+      initFilters();
+      renderRows(allSignups);
     } catch (err) {
       console.error("[streetside] Admin dashboard load failed:", err);
       document.getElementById("admin-table-loading").textContent =
