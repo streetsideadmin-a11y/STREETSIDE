@@ -4,7 +4,18 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v27.1 — current
+## v27.2 — current
+
+- Added Newark and Circleville to the service-area map as full
+  city-tier towns (same treatment as Columbus, Lancaster, etc.) —
+  always visible, labeled, and light up on the heatmap when real
+  interest comes in from either city.
+- Both fit within the map's existing bounds, so nothing else on the
+  map had to move. Circleville's real position sat right where the
+  caption text overlay covers the map, so it's nudged up slightly
+  for visibility — a small, honest trade-off, not a big distortion.
+
+## v27.1
 
 Four small additions, no business decisions needed for any of them:
 
