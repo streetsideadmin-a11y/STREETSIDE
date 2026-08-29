@@ -513,10 +513,14 @@ rect.map-landmark {
 }
 
 /* Smaller towns show dimmer than the main cities by default, so the
-   map reads as a full regional reference — real interest still
-   brightens a dot and gives it the red accent treatment below. */
+/* Smaller towns stay hidden until real interest lights them up via
+   the heatmap — keeps the map focused on the main cities instead of
+   cluttering it with every small town at once. Their heat blobs
+   (and the dot/label themselves, via the --active/--visible
+   overrides below) still work exactly the same either way — this
+   only changes what shows before there's any real interest. */
 .map-town-dot[data-tier="town"] {
-  opacity: 0.55;
+  opacity: 0;
 }
 
 
@@ -543,10 +547,11 @@ rect.map-landmark {
   transition: opacity 0.4s var(--ease-out);
 }
 
-/* Smaller-town labels show dimmer by default, brighten with real
-   interest (see .map-town-label--visible below). */
+/* Smaller-town labels stay hidden by default too, revealed only
+   once real interest lights up that town (see
+   .map-town-label--visible below). */
 .map-town-label[data-tier="town"] {
-  opacity: 0.5;
+  opacity: 0;
 }
 
 

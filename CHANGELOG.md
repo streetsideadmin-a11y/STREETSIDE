@@ -4,7 +4,40 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v27.3 — current
+## v28.1 — current
+
+- Smaller towns (everything except the 9 main cities) are hidden
+  from the map by default again — decluttered the at-rest view down
+  to just the main cities, roads, and landmarks.
+- Their positions and heat-glow behavior are untouched — the moment
+  real waitlist interest comes in from one of those towns, its dot,
+  label, and heat glow all appear exactly as before. Nothing about
+  the underlying data or matching logic changed, just what's shown
+  before there's any real interest to display.
+
+## v28.0
+
+Full map rebuild — recentered and expanded:
+
+- **Recentered on Lancaster** — the map used to be Columbus-heavy
+  with Lancaster off in a corner; every position was recalculated
+  so Lancaster now sits at the true center, with bounds expanded
+  equally in every direction from it.
+- **Added Grove City, Somerset, and New Lexington** as new towns
+  (Grove City as a full city-tier dot, the other two as smaller
+  towns) — all three light up on the heatmap the same as everywhere
+  else.
+- **Traced 4 new roads** from a fresh reference map, calibrated the
+  same way as before (known town positions as anchors): I-71, US-23,
+  SR-37, and an eastward extension of SR-256 out toward Somerset.
+- Every existing town, landmark, road, and the Buckeye Lake outline
+  were all recalculated for the new bounds — nothing kept its old
+  position, everything shifted together so relative distances stay
+  accurate.
+- Fixed a label collision this rebuild introduced (Etna was
+  overlapping Reynoldsburg's label at the new scale).
+
+## v27.3
 
 Real bug fix: address-check submissions were incorrectly counting
 as "interest" in two places.
