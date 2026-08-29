@@ -179,9 +179,10 @@
 
           var nearby = data.nearbyCount || 0;
           var intro =
-            nearby > 1
+            nearby > 0
               ? nearby +
-                " neighbors near you are already interested, but that's not quite enough yet to open a route."
+                (nearby === 1 ? " neighbor" : " neighbors") +
+                " near you already joined the waitlist, but that's not quite enough yet to open a route."
               : "There aren't any routes in your area yet.";
 
           statusEl.innerHTML =

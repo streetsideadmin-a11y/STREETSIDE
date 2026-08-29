@@ -4,7 +4,23 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v27.2 — current
+## v27.3 — current
+
+Real bug fix: address-check submissions were incorrectly counting
+as "interest" in two places.
+
+- **The public map's heat glow** now only lights up from real
+  waitlist signups — checking an address no longer nudges a town's
+  heat intensity up. Address-check is a lookup against data you've
+  already collected, not a new signal of demand.
+- **The "X neighbors are interested" message** shown after an
+  address-check now counts only real waitlist signups too (was
+  previously counting other address-checks, and even the person's
+  own check, as "interest"). Also fixed the message to correctly
+  show up starting at 1 real neighbor instead of requiring 2+, and
+  fixed "1 neighbors" → "1 neighbor" grammar.
+
+## v27.2
 
 - Added Newark and Circleville to the service-area map as full
   city-tier towns (same treatment as Columbus, Lancaster, etc.) —

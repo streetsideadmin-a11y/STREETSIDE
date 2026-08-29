@@ -182,15 +182,16 @@ module.exports = async (req, res) => {
     const available = formType === "address-check" ? isAddressInServiceArea(body.city, body.zip) : undefined;
 
     // For an address-check that isn't in an active area yet, tell the
-    // person how many neighbors (from EITHER form) have already shown
-    // interest in that same city — including this submission itself —
-    // so "no route yet" doesn't read as "no one else is interested."
+    // person how many real waitlist signups already exist in that same
+    // city — not address-check lookups (including this one), since
+    // checking an address isn't itself a signal of demand the way
+    // actually joining the waitlist is.
     let nearbyCount;
     if (formType === "address-check" && !available && body.city) {
       const rows = await sql`
         SELECT COUNT(*)::int AS count
         FROM signups
-        WHERE lower(btrim(city)) = lower(btrim(${body.city}))
+        WHERE form_type = 'waitlist' AND lower(btrim(city)) = lower(btrim(${body.city}))
       `;
       nearbyCount = rows[0].count;
     }
