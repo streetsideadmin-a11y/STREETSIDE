@@ -39,9 +39,16 @@
   }
 
   // Heat blob radius grows with interest but caps out so one very
-  // popular town doesn't swallow its neighbors on the map.
-  function heatRadius(count) {
-    return Math.min(22 + count * 9, 85);
+  // popular town doesn't swallow its neighbors on the map. Smaller
+  // towns get a smaller zone at every interest level, matching the
+  // smaller dot/text treatment they already get — keeps a cluster
+  // of small towns from reading as visually louder than the main
+  // cities even if several light up at once.
+  function heatRadius(count, tier) {
+    if (tier === "city") {
+      return Math.min(22 + count * 9, 85);
+    }
+    return Math.min(12 + count * 5, 50);
   }
 
   // Cool yellow at low interest, ramping through orange to the
@@ -80,7 +87,8 @@
 
         var color = heatColor(entry.count);
         if (color) {
-          blob.setAttribute("r", heatRadius(entry.count));
+          var tier = dot.getAttribute("data-tier");
+          blob.setAttribute("r", heatRadius(entry.count, tier));
           blob.setAttribute("fill", color);
           blob.setAttribute(
             "aria-label",

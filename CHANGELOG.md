@@ -4,7 +4,38 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v28.1 — current
+## v29.1 — current
+
+- Smaller towns now get a smaller heat zone too, at every interest
+  level — not just smaller dots and text. Same 5 signups gives
+  Lancaster a much bigger glow than Somerset, matching the same
+  "main cities are visually louder" idea from the last update.
+
+## v29.0
+
+Major map expansion — from 23 towns to 45:
+
+- **Re-added** Royalton, Walnut, North Berne, Pleasantville, and
+  Kirkersville (previously removed, brought back at your request).
+- **Added 17 new towns** from your latest reference map: Heath,
+  Alexandria, Granville, Welsh Hills, Hanover, Thornport, Thornville,
+  Glenford, Junction City, Wesley Chapel, Bremen, Sugar Grove,
+  Hideaway Hills, Stoutsville, Orient, Commercial Point, Shawnee.
+- **Recentered on the natural region**, not a specific town — the
+  map now centers on the real geographic middle of everywhere it
+  covers, rather than being anchored to Lancaster or Columbus.
+- **Smaller towns are visually lighter now** — smaller dots (3.2px
+  vs 7px) and smaller text (10px vs 13px) than the main cities, so
+  a big cluster of newly-lit-up towns doesn't overpower the map.
+- All 45 towns are fully wired into the heatmap system — every one
+  stays hidden until real interest lights it up, same as before.
+- Excluded the far-northwest Columbus suburbs visible in the
+  reference (Dublin, Worthington, Westerville, New Albany, Gahanna,
+  Upper Arlington) since they're in the opposite direction from
+  your stated Southeastern Columbus market — let me know if you
+  want those added too.
+
+## v28.1
 
 - Smaller towns (everything except the 9 main cities) are hidden
   from the map by default again — decluttered the at-rest view down

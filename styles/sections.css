@@ -547,6 +547,15 @@ rect.map-landmark {
   transition: opacity 0.4s var(--ease-out);
 }
 
+/* Smaller towns get smaller text too, on top of already being
+   hidden until real interest lights them up — keeps a big cluster
+   of newly-revealed towns from reading as visually heavier than
+   the main cities. */
+.map-town-label[data-tier="town"] {
+  font-size: 10px;
+  font-weight: 600;
+}
+
 /* Smaller-town labels stay hidden by default too, revealed only
    once real interest lights up that town (see
    .map-town-label--visible below). */
