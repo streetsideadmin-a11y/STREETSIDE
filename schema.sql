@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS signups (
   interested_package     TEXT,                    -- 'curb', 'full', 'one-time', or 'not-sure'
   hear_about_us          TEXT,
   consent                BOOLEAN DEFAULT FALSE,
+  contacted              BOOLEAN DEFAULT FALSE,   -- set from the admin dashboard
   submitted_at           TIMESTAMPTZ DEFAULT now()
 );
 
@@ -30,12 +31,13 @@ CREATE TABLE IF NOT EXISTS signups (
 CREATE INDEX IF NOT EXISTS idx_signups_form_type ON signups (form_type);
 
 -- ---------------------------------------------------------------
--- MIGRATION — if your database already exists (you set it up before
--- this column was added), run just this one line instead of the
--- CREATE TABLE above, in Neon's SQL Editor:
+-- MIGRATIONS — if your database already exists (you set it up before
+-- these columns were added), run whichever of these lines you're
+-- missing in Neon's SQL Editor:
 --
 --   ALTER TABLE signups ADD COLUMN IF NOT EXISTS interested_package TEXT;
+--   ALTER TABLE signups ADD COLUMN IF NOT EXISTS contacted BOOLEAN DEFAULT FALSE;
 --
 -- The CREATE TABLE above uses IF NOT EXISTS, so it's harmless to
--- re-run the whole file too — it just won't add the new column to an
--- already-existing table, which is what this ALTER TABLE line is for.
+-- re-run the whole file too — it just won't add new columns to an
+-- already-existing table, which is what these ALTER TABLE lines are for.

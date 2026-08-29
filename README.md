@@ -46,7 +46,10 @@ streetside-website/
 │   ├── interest-map.js       Returns signups grouped by city, for the map
 │   ├── admin-login.js        Checks the admin password, issues a session cookie
 │   ├── admin-logout.js       Clears the admin session cookie
-│   └── admin-data.js         Returns all signups (requires a valid session cookie)
+│   ├── admin-data.js         Returns all signups (requires a valid session cookie)
+│   ├── admin-update.js       Marks a signup contacted/not (requires a valid session)
+│   ├── admin-delete.js       Deletes a signup (requires a valid session)
+│   └── _admin-auth.js        Shared session-check helper (not its own route)
 ├── config/
 │   └── site-config.js      Editable business data — START HERE
 ├── styles/
@@ -257,6 +260,21 @@ every real signup: name, contact info, address, which plan they're
 interested in, and a few summary counts. There's a small "Employee
 Login" link in the footer of every page that goes there.
 
+The dashboard also includes:
+- **Interest by city** — a real-time breakdown showing how many
+  signups exist per city, sorted by count, so you can see at a
+  glance which town is closest to having enough interest for a route.
+- **Search + filters** — search by name/email/phone/address/city,
+  or filter by submission type, plan, or city.
+- **Export CSV** — downloads whatever's currently visible (respects
+  active filters) as a spreadsheet file.
+- **Mark as Contacted** — a checkbox per row; contacted rows are
+  highlighted green so you can track who you've already reached out
+  to.
+- **Delete** — permanently removes a row (with a confirmation
+  prompt first) — handy for clearing out test entries.
+- **Refresh** — reloads the data without leaving the page.
+
 **How the security actually works, in plain terms:**
 - You set a password yourself (an environment variable, never
   written into the code or stored in the database).
@@ -281,9 +299,14 @@ Login" link in the footer of every page that goes there.
    login cookie so it can't be forged. Any long random text works;
    a quick way to generate one is running this in your browser's
    JavaScript console: `crypto.randomUUID() + crypto.randomUUID()`
-4. Redeploy (upload the files the same way as always, or just
+4. Run this in Neon's SQL Editor if you haven't already (adds the
+   column the "Mark as Contacted" feature needs):
+   ```sql
+   ALTER TABLE signups ADD COLUMN IF NOT EXISTS contacted BOOLEAN DEFAULT FALSE;
+   ```
+5. Redeploy (upload the files the same way as always, or just
    redeploy if only the environment variables changed).
-5. Visit `/admin.html` on your live site and log in with the
+6. Visit `/admin.html` on your live site and log in with the
    password you set in step 2.
 
 If you ever suspect the password has leaked, just change

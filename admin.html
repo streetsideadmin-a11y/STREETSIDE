@@ -12,7 +12,7 @@
 <style>
   body { background: var(--color-bg); }
   .admin-wrap { max-width: 480px; margin: 0 auto; padding: var(--space-9) var(--space-5); }
-  .admin-wrap.is-wide { max-width: 1100px; }
+  .admin-wrap.is-wide { max-width: 1200px; }
   .admin-logo { display: flex; justify-content: center; margin-bottom: var(--space-6); }
   .admin-logo img { height: 40px; }
   .admin-card {
@@ -42,11 +42,13 @@
     gap: var(--space-3);
   }
   .admin-header h1 { font-size: 1.5rem; margin: 0; }
+  .admin-header__actions { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+  .admin-header__actions .btn { padding: 10px 18px; font-size: 0.85rem; }
   .admin-summary {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: var(--space-4);
-    margin-bottom: var(--space-7);
+    margin-bottom: var(--space-6);
   }
   .admin-summary__card {
     background: var(--white);
@@ -56,12 +58,37 @@
   }
   .admin-summary__card strong { display: block; font-size: 1.8rem; color: var(--color-brand-strong); }
   .admin-summary__card span { font-size: 0.82rem; color: var(--color-ink-muted); }
-  .admin-table-wrap {
+
+  .admin-panel {
     background: var(--white);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    overflow-x: auto;
+    padding: var(--space-5);
+    margin-bottom: var(--space-6);
   }
+  .admin-panel h2 {
+    font-family: var(--font-display);
+    font-stretch: condensed;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 1rem;
+    margin-bottom: var(--space-4);
+    color: var(--color-brand-strong);
+  }
+  .admin-city-list { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+  .admin-city-list__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--off-white);
+    border: 1px solid var(--color-border);
+    font-size: 0.85rem;
+  }
+  .admin-city-list__item strong { color: var(--color-accent); }
+  .admin-city-list__empty { color: var(--color-ink-muted); font-size: 0.9rem; }
+
   .admin-filters {
     display: flex;
     flex-wrap: wrap;
@@ -82,14 +109,14 @@
     font-size: 0.9rem;
     background: var(--white);
   }
-  .admin-filter-clear {
-    padding: 8px 16px;
-    font-size: 0.85rem;
-  }
-  .admin-filter-count {
-    font-size: 0.85rem;
-    color: var(--color-ink-muted);
-    margin-bottom: var(--space-3);
+  .admin-filter-clear { padding: 8px 16px; font-size: 0.85rem; }
+  .admin-filter-count { font-size: 0.85rem; color: var(--color-ink-muted); margin-bottom: var(--space-3); }
+
+  .admin-table-wrap {
+    background: var(--white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
   }
   table.admin-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; white-space: nowrap; }
   table.admin-table th, table.admin-table td {
@@ -99,7 +126,20 @@
   }
   table.admin-table th { background: var(--off-white); font-weight: 700; position: sticky; top: 0; }
   table.admin-table tr:last-child td { border-bottom: none; }
-  .admin-loading, .admin-empty { padding: var(--space-6); text-align: center; color: var(--color-ink-muted); }
+  table.admin-table tr.is-contacted { background: var(--green-tint); }
+  .admin-loading { padding: var(--space-6); text-align: center; color: var(--color-ink-muted); }
+  .admin-contacted-toggle { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .admin-delete-btn {
+    background: none;
+    border: 1px solid var(--red-600);
+    color: var(--red-700);
+    border-radius: var(--radius-sm);
+    padding: 4px 10px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .admin-delete-btn:hover { background: #fbeaea; }
   #admin-dashboard { display: none; }
 </style>
 </head>
@@ -128,10 +168,19 @@
 <div class="admin-wrap is-wide" id="admin-dashboard">
   <div class="admin-header">
     <h1>Signups</h1>
-    <button type="button" class="btn btn-outline-brand" id="admin-logout-btn">Log Out</button>
+    <div class="admin-header__actions">
+      <button type="button" class="btn btn-outline-brand" id="admin-refresh-btn">Refresh</button>
+      <button type="button" class="btn btn-outline-brand" id="admin-export-btn">Export CSV</button>
+      <button type="button" class="btn btn-outline-brand" id="admin-logout-btn">Log Out</button>
+    </div>
   </div>
 
   <div class="admin-summary" id="admin-summary"></div>
+
+  <div class="admin-panel">
+    <h2>Interest by City</h2>
+    <div class="admin-city-list" id="admin-city-list"></div>
+  </div>
 
   <div class="admin-filters" id="admin-filters">
     <input type="text" id="admin-filter-search" placeholder="Search name, email, phone, address, city…" class="admin-filter-search" />
@@ -169,6 +218,9 @@
           <th>City</th>
           <th>ZIP</th>
           <th>Package</th>
+          <th>Consent</th>
+          <th>Contacted</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody id="admin-table-body"></tbody>
@@ -183,6 +235,12 @@
   var loginForm = document.getElementById("admin-login-form");
   var loginError = document.getElementById("admin-login-error");
   var logoutBtn = document.getElementById("admin-logout-btn");
+  var refreshBtn = document.getElementById("admin-refresh-btn");
+  var exportBtn = document.getElementById("admin-export-btn");
+  var tableBody = document.getElementById("admin-table-body");
+
+  var allSignups = []; // full dataset, fetched once per load/refresh
+  var currentFiltered = []; // whatever's currently visible, for CSV export
 
   function showError(msg) {
     loginError.textContent = msg;
@@ -211,18 +269,49 @@
     return div.innerHTML;
   }
 
-  var allSignups = []; // full dataset, fetched once; filters apply on top of this
+  // --- City breakdown panel -------------------------------------
+  function renderCityBreakdown() {
+    var counts = {};
+    allSignups.forEach(function (row) {
+      if (!row.city) return;
+      var key = row.city.trim();
+      counts[key] = (counts[key] || 0) + 1;
+    });
+    var entries = Object.keys(counts)
+      .map(function (city) {
+        return { city: city, count: counts[city] };
+      })
+      .sort(function (a, b) {
+        return b.count - a.count;
+      });
 
+    var el = document.getElementById("admin-city-list");
+    if (entries.length === 0) {
+      el.innerHTML = '<span class="admin-city-list__empty">No signups yet.</span>';
+      return;
+    }
+    el.innerHTML = entries
+      .map(function (e) {
+        return (
+          '<span class="admin-city-list__item"><strong>' +
+          e.count +
+          "</strong> " +
+          escapeHtml(e.city) +
+          "</span>"
+        );
+      })
+      .join("");
+  }
+
+  // --- Table rendering + filtering --------------------------------
   function renderRows(rows) {
-    var tbody = document.getElementById("admin-table-body");
+    currentFiltered = rows;
     var loadingEl = document.getElementById("admin-table-loading");
     var tableEl = document.getElementById("admin-table");
     var countEl = document.getElementById("admin-filter-count");
 
     countEl.textContent =
-      allSignups.length === 0
-        ? ""
-        : "Showing " + rows.length + " of " + allSignups.length + " signups";
+      allSignups.length === 0 ? "" : "Showing " + rows.length + " of " + allSignups.length + " signups";
 
     if (rows.length === 0) {
       tableEl.style.display = "none";
@@ -231,11 +320,11 @@
       return;
     }
 
-    tbody.innerHTML = rows
+    tableBody.innerHTML = rows
       .map(function (row) {
         var name = [row.first_name, row.last_name].filter(Boolean).join(" ") || "—";
         return (
-          "<tr>" +
+          '<tr data-row-id="' + row.id + '"' + (row.contacted ? ' class="is-contacted"' : "") + ">" +
           "<td>" + formatDate(row.submitted_at) + "</td>" +
           "<td>" + escapeHtml(row.form_type) + "</td>" +
           "<td>" + escapeHtml(name) + "</td>" +
@@ -245,6 +334,9 @@
           "<td>" + escapeHtml(row.city || "—") + "</td>" +
           "<td>" + escapeHtml(row.zip || "—") + "</td>" +
           "<td>" + escapeHtml(packageLabel(row.interested_package)) + "</td>" +
+          "<td>" + (row.consent ? "Yes" : "No") + "</td>" +
+          "<td><label class=\"admin-contacted-toggle\"><input type=\"checkbox\" data-action=\"toggle-contacted\" data-id=\"" + row.id + "\"" + (row.contacted ? " checked" : "") + " /> " + (row.contacted ? "Yes" : "No") + "</label></td>" +
+          "<td><button type=\"button\" class=\"admin-delete-btn\" data-action=\"delete-row\" data-id=\"" + row.id + "\">Delete</button></td>" +
           "</tr>"
         );
       })
@@ -271,15 +363,7 @@
       if (city && row.city !== city) return false;
 
       if (search) {
-        var haystack = [
-          row.first_name,
-          row.last_name,
-          row.email,
-          row.phone,
-          row.street_address,
-          row.city,
-          row.zip,
-        ]
+        var haystack = [row.first_name, row.last_name, row.email, row.phone, row.street_address, row.city, row.zip]
           .filter(Boolean)
           .join(" ")
           .toLowerCase();
@@ -294,25 +378,24 @@
 
   function populateCityFilter() {
     var citySelect = document.getElementById("admin-filter-city");
-    var cities = Array.from(
-      new Set(allSignups.map(function (r) { return r.city; }).filter(Boolean))
-    ).sort();
+    var currentValue = citySelect.value;
+    citySelect.innerHTML = '<option value="">All cities</option>';
+    var cities = Array.from(new Set(allSignups.map(function (r) { return r.city; }).filter(Boolean))).sort();
     cities.forEach(function (city) {
       var opt = document.createElement("option");
       opt.value = city;
       opt.textContent = city;
       citySelect.appendChild(opt);
     });
+    citySelect.value = currentValue;
   }
 
   function initFilters() {
-    ["admin-filter-search", "admin-filter-type", "admin-filter-package", "admin-filter-city"].forEach(
-      function (id) {
-        var el = document.getElementById(id);
-        var evt = el.tagName === "SELECT" ? "change" : "input";
-        el.addEventListener(evt, applyFilters);
-      }
-    );
+    ["admin-filter-search", "admin-filter-type", "admin-filter-package", "admin-filter-city"].forEach(function (id) {
+      var el = document.getElementById(id);
+      var evt = el.tagName === "SELECT" ? "change" : "input";
+      el.addEventListener(evt, applyFilters);
+    });
     document.getElementById("admin-filter-clear").addEventListener("click", function () {
       document.getElementById("admin-filter-search").value = "";
       document.getElementById("admin-filter-type").value = "";
@@ -322,50 +405,162 @@
     });
   }
 
+  // --- CSV export --------------------------------------------------
+  function csvField(val) {
+    var str = val == null ? "" : String(val);
+    if (/[",\n]/.test(str)) {
+      str = '"' + str.replace(/"/g, '""') + '"';
+    }
+    return str;
+  }
+
+  function exportCsv() {
+    var headers = [
+      "Submitted", "Type", "First Name", "Last Name", "Email", "Phone",
+      "Street Address", "City", "ZIP", "Package", "Consent", "Contacted",
+    ];
+    var lines = [headers.join(",")];
+    currentFiltered.forEach(function (row) {
+      lines.push(
+        [
+          row.submitted_at || "",
+          row.form_type || "",
+          row.first_name || "",
+          row.last_name || "",
+          row.email || "",
+          row.phone || "",
+          row.street_address || "",
+          row.city || "",
+          row.zip || "",
+          packageLabel(row.interested_package),
+          row.consent ? "Yes" : "No",
+          row.contacted ? "Yes" : "No",
+        ]
+          .map(csvField)
+          .join(",")
+      );
+    });
+    var blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "streetside-signups-" + new Date().toISOString().slice(0, 10) + ".csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // --- Row actions: toggle contacted, delete ------------------------
+  function initRowActions() {
+    tableBody.addEventListener("change", async function (e) {
+      var checkbox = e.target.closest('[data-action="toggle-contacted"]');
+      if (!checkbox) return;
+      var id = parseInt(checkbox.getAttribute("data-id"), 10);
+      var contacted = checkbox.checked;
+
+      checkbox.disabled = true;
+      try {
+        var res = await fetch("/api/admin-update", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({ id: id, contacted: contacted }),
+        });
+        if (!res.ok) throw new Error("Update failed");
+
+        var row = allSignups.find(function (r) { return r.id === id; });
+        if (row) row.contacted = contacted;
+        applyFilters();
+        renderCityBreakdown();
+      } catch (err) {
+        console.error("[streetside] Failed to update contacted status:", err);
+        checkbox.checked = !contacted;
+        alert("Couldn't save that — check your connection and try again.");
+      } finally {
+        checkbox.disabled = false;
+      }
+    });
+
+    tableBody.addEventListener("click", async function (e) {
+      var btn = e.target.closest('[data-action="delete-row"]');
+      if (!btn) return;
+      var id = parseInt(btn.getAttribute("data-id"), 10);
+      var row = allSignups.find(function (r) { return r.id === id; });
+      var name = row ? [row.first_name, row.last_name].filter(Boolean).join(" ") || row.city || "this entry" : "this entry";
+
+      if (!confirm("Delete " + name + "? This can't be undone.")) return;
+
+      btn.disabled = true;
+      btn.textContent = "Deleting…";
+      try {
+        var res = await fetch("/api/admin-delete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "same-origin",
+          body: JSON.stringify({ id: id }),
+        });
+        if (!res.ok) throw new Error("Delete failed");
+
+        allSignups = allSignups.filter(function (r) { return r.id !== id; });
+        populateCityFilter();
+        applyFilters();
+        renderCityBreakdown();
+      } catch (err) {
+        console.error("[streetside] Failed to delete row:", err);
+        alert("Couldn't delete that — check your connection and try again.");
+        btn.disabled = false;
+        btn.textContent = "Delete";
+      }
+    });
+  }
+
+  // --- Loading the dashboard -----------------------------------------
+  async function fetchAndRender() {
+    var res = await fetch("/api/admin-data", { credentials: "same-origin" });
+    if (res.status === 401) {
+      dashboard.style.display = "none";
+      loginView.style.display = "block";
+      return false;
+    }
+    if (!res.ok) throw new Error("Failed to load (" + res.status + ")");
+    var data = await res.json();
+
+    var summaryEl = document.getElementById("admin-summary");
+    var s = data.summary;
+    var cards = [
+      { label: "Total signups", value: s.total },
+      { label: "Waitlist", value: s.waitlist },
+      { label: "Address checks", value: s.addressCheck },
+    ];
+    Object.keys(s.byPackage).forEach(function (pkg) {
+      cards.push({ label: packageLabel(pkg), value: s.byPackage[pkg] });
+    });
+    summaryEl.innerHTML = cards
+      .map(function (c) {
+        return '<div class="admin-summary__card"><strong>' + c.value + "</strong><span>" + escapeHtml(c.label) + "</span></div>";
+      })
+      .join("");
+
+    allSignups = data.signups;
+    populateCityFilter();
+    renderCityBreakdown();
+    applyFilters();
+    return true;
+  }
+
   async function loadDashboard() {
     loginView.style.display = "none";
     dashboard.style.display = "block";
-
     try {
-      var res = await fetch("/api/admin-data", { credentials: "same-origin" });
-      if (res.status === 401) {
-        dashboard.style.display = "none";
-        loginView.style.display = "block";
-        return;
+      var ok = await fetchAndRender();
+      if (ok) {
+        initFilters();
+        initRowActions();
       }
-      if (!res.ok) throw new Error("Failed to load (" + res.status + ")");
-      var data = await res.json();
-
-      var summaryEl = document.getElementById("admin-summary");
-      var s = data.summary;
-      var cards = [
-        { label: "Total signups", value: s.total },
-        { label: "Waitlist", value: s.waitlist },
-        { label: "Address checks", value: s.addressCheck },
-      ];
-      Object.keys(s.byPackage).forEach(function (pkg) {
-        cards.push({ label: packageLabel(pkg), value: s.byPackage[pkg] });
-      });
-      summaryEl.innerHTML = cards
-        .map(function (c) {
-          return (
-            '<div class="admin-summary__card"><strong>' +
-            c.value +
-            "</strong><span>" +
-            escapeHtml(c.label) +
-            "</span></div>"
-          );
-        })
-        .join("");
-
-      allSignups = data.signups;
-      populateCityFilter();
-      initFilters();
-      renderRows(allSignups);
     } catch (err) {
       console.error("[streetside] Admin dashboard load failed:", err);
-      document.getElementById("admin-table-loading").textContent =
-        "Couldn't load data — try refreshing the page.";
+      document.getElementById("admin-table-loading").textContent = "Couldn't load data — try refreshing the page.";
     }
   }
 
@@ -382,9 +577,7 @@
         body: JSON.stringify({ password: password }),
       });
       if (!res.ok) {
-        var data = await res.json().catch(function () {
-          return {};
-        });
+        var data = await res.json().catch(function () { return {}; });
         showError(data.error || "Sign in failed — try again.");
         return;
       }
@@ -405,10 +598,23 @@
     loginView.style.display = "block";
   });
 
-  // If a valid session cookie already exists (e.g. page refresh),
-  // this quietly loads the dashboard instead of showing the login
-  // form again. If it's expired or missing, admin-data.js returns
-  // 401 and loadDashboard() falls back to the login view.
+  refreshBtn.addEventListener("click", async function () {
+    refreshBtn.disabled = true;
+    refreshBtn.textContent = "Refreshing…";
+    try {
+      await fetchAndRender();
+    } catch (err) {
+      console.error("[streetside] Refresh failed:", err);
+    } finally {
+      refreshBtn.disabled = false;
+      refreshBtn.textContent = "Refresh";
+    }
+  });
+
+  exportBtn.addEventListener("click", exportCsv);
+
+  // If a valid session cookie already exists (e.g. page refresh), this
+  // quietly loads the dashboard instead of showing the login form again.
   (async function checkExistingSession() {
     try {
       var res = await fetch("/api/admin-data", { credentials: "same-origin" });

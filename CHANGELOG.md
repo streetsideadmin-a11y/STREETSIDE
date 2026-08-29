@@ -4,7 +4,28 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v26.1 — current
+## v27.0 — current
+
+Big round of admin dashboard additions:
+
+- **Interest by City** panel — real per-city signup counts, sorted
+  by count, so you can see which town is closest to route-ready
+  demand at a glance.
+- **Export CSV** — downloads whatever's currently visible (respects
+  active search/filters) as a spreadsheet file.
+- **Mark as Contacted** — a checkbox per row; contacted rows
+  highlight green in the table. Requires one new database column
+  (`contacted`) — migration line is in schema.sql and the README.
+- **Delete a row** — with a confirmation prompt, for clearing out
+  test/duplicate entries without needing to open Neon directly.
+- **Consent column** — now visible in the table (the data was
+  already being collected, just wasn't shown before).
+- **Refresh button** — reload the data without leaving the page.
+- Two new protected API endpoints (`admin-update.js`,
+  `admin-delete.js`) plus a shared `_admin-auth.js` helper so all
+  four admin endpoints check sessions identically.
+
+## v26.1
 
 - Added an "Employee Login" link to the footer of every page,
   pointing to `/admin.html` — no more typing the URL by hand.
