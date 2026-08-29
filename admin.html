@@ -127,6 +127,12 @@
   table.admin-table th { background: var(--off-white); font-weight: 700; position: sticky; top: 0; }
   table.admin-table tr:last-child td { border-bottom: none; }
   table.admin-table tr.is-contacted { background: var(--green-tint); }
+  table.admin-table tbody tr:hover { background: var(--off-white); }
+  table.admin-table tbody tr.is-contacted:hover { background: var(--green-tint); filter: brightness(0.97); }
+  table.admin-table td a { color: var(--color-brand); text-decoration: underline; }
+  table.admin-table th.is-sortable { cursor: pointer; user-select: none; }
+  table.admin-table th.is-sortable:hover { color: var(--color-accent); }
+  table.admin-table th .sort-arrow { font-size: 0.7rem; margin-left: 3px; opacity: 0.6; }
   .admin-loading { padding: var(--space-6); text-align: center; color: var(--color-ink-muted); }
   .admin-contacted-toggle { display: flex; align-items: center; gap: 6px; cursor: pointer; }
   .admin-delete-btn {
@@ -209,17 +215,17 @@
     <table class="admin-table" id="admin-table" style="display:none;">
       <thead>
         <tr>
-          <th>Submitted</th>
-          <th>Type</th>
-          <th>Name</th>
+          <th class="is-sortable" data-sort-key="submitted_at">Submitted</th>
+          <th class="is-sortable" data-sort-key="form_type">Type</th>
+          <th class="is-sortable" data-sort-key="last_name">Name</th>
           <th>Email</th>
           <th>Phone</th>
           <th>Address</th>
-          <th>City</th>
+          <th class="is-sortable" data-sort-key="city">City</th>
           <th>ZIP</th>
-          <th>Package</th>
+          <th class="is-sortable" data-sort-key="interested_package">Package</th>
           <th>Consent</th>
-          <th>Contacted</th>
+          <th class="is-sortable" data-sort-key="contacted">Contacted</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -241,6 +247,59 @@
 
   var allSignups = []; // full dataset, fetched once per load/refresh
   var currentFiltered = []; // whatever's currently visible, for CSV export
+  var sortKey = null;
+  var sortDir = 1; // 1 = ascending, -1 = descending
+
+  function sortRows(rows) {
+    if (!sortKey) return rows;
+    var sorted = rows.slice().sort(function (a, b) {
+      var av = a[sortKey];
+      var bv = b[sortKey];
+      if (av == null && bv == null) return 0;
+      if (av == null) return 1;
+      if (bv == null) return -1;
+      if (typeof av === "boolean") {
+        av = av ? 1 : 0;
+        bv = bv ? 1 : 0;
+      } else if (typeof av === "string") {
+        av = av.toLowerCase();
+        bv = String(bv).toLowerCase();
+      }
+      if (av < bv) return -1 * sortDir;
+      if (av > bv) return 1 * sortDir;
+      return 0;
+    });
+    return sorted;
+  }
+
+  function updateSortIndicators() {
+    document.querySelectorAll("th.is-sortable").forEach(function (th) {
+      var arrow = th.querySelector(".sort-arrow");
+      if (arrow) arrow.remove();
+      if (th.getAttribute("data-sort-key") === sortKey) {
+        var span = document.createElement("span");
+        span.className = "sort-arrow";
+        span.textContent = sortDir === 1 ? "▲" : "▼";
+        th.appendChild(span);
+      }
+    });
+  }
+
+  function initSorting() {
+    document.querySelectorAll("th.is-sortable").forEach(function (th) {
+      th.addEventListener("click", function () {
+        var key = th.getAttribute("data-sort-key");
+        if (sortKey === key) {
+          sortDir = sortDir * -1;
+        } else {
+          sortKey = key;
+          sortDir = 1;
+        }
+        updateSortIndicators();
+        applyFilters();
+      });
+    });
+  }
 
   function showError(msg) {
     loginError.textContent = msg;
@@ -328,8 +387,8 @@
           "<td>" + formatDate(row.submitted_at) + "</td>" +
           "<td>" + escapeHtml(row.form_type) + "</td>" +
           "<td>" + escapeHtml(name) + "</td>" +
-          "<td>" + escapeHtml(row.email || "—") + "</td>" +
-          "<td>" + escapeHtml(row.phone || "—") + "</td>" +
+          "<td>" + (row.email ? '<a href="mailto:' + escapeHtml(row.email) + '">' + escapeHtml(row.email) + "</a>" : "—") + "</td>" +
+          "<td>" + (row.phone ? '<a href="tel:' + escapeHtml(row.phone) + '">' + escapeHtml(row.phone) + "</a>" : "—") + "</td>" +
           "<td>" + escapeHtml(row.street_address || "—") + "</td>" +
           "<td>" + escapeHtml(row.city || "—") + "</td>" +
           "<td>" + escapeHtml(row.zip || "—") + "</td>" +
@@ -373,7 +432,7 @@
       return true;
     });
 
-    renderRows(filtered);
+    renderRows(sortRows(filtered));
   }
 
   function populateCityFilter() {
@@ -557,6 +616,7 @@
       if (ok) {
         initFilters();
         initRowActions();
+        initSorting();
       }
     } catch (err) {
       console.error("[streetside] Admin dashboard load failed:", err);

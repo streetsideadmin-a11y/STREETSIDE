@@ -708,3 +708,64 @@ rect.map-landmark {
   max-width: 640px;
   margin-bottom: var(--space-7);
 }
+
+/* ---- Sticky mobile CTA bar ---- */
+.sticky-cta {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+  padding: var(--space-4) var(--space-4) calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+  background: var(--white);
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.12);
+  transform: translateY(100%);
+  transition: transform var(--dur-med) var(--ease-out);
+  display: none;
+}
+
+.sticky-cta.is-visible {
+  transform: translateY(0);
+}
+
+@media (max-width: 860px) {
+  .sticky-cta { display: block; }
+}
+
+/* ---- Back-to-top button ---- */
+.back-to-top {
+  position: fixed;
+  right: var(--space-5);
+  bottom: var(--space-5);
+  z-index: 55;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-brand-strong);
+  color: var(--white);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: opacity var(--dur-med) var(--ease-out), transform var(--dur-med) var(--ease-out), background var(--dur-fast) var(--ease-out);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.back-to-top.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.back-to-top:hover {
+  background: var(--color-accent);
+}
+
+/* Keep the back-to-top button clear of the sticky CTA bar on mobile. */
+@media (max-width: 860px) {
+  .back-to-top { bottom: calc(88px + var(--space-4)); }
+}

@@ -63,6 +63,7 @@ streetside-website/
 │   ├── counter.js            Neighbor counter (manual today, API-ready)
 │   ├── waitlist-form.js      Waitlist + address-check form handling
 │   ├── interest-map.js       Draws the service-area map from real signups
+│   ├── scroll-ui.js          Sticky mobile CTA bar + back-to-top button
 │   └── main.js                Renders pricing/FAQ from config
 └── images/
     ├── streetside-logo-horizontal.png   Your real logo (header)

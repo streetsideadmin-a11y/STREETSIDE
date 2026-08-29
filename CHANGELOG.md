@@ -4,7 +4,23 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v27.0 — current
+## v27.1 — current
+
+Four small additions, no business decisions needed for any of them:
+
+- **Clickable phone/email in the admin table** — tap a phone number
+  to call, click an email to open your mail app, instead of copying
+  text manually.
+- **Click-to-sort admin table columns** — click "Submitted," "Type,"
+  "Name," "City," "Package," or "Contacted" to sort by it; click
+  again to reverse. A small arrow shows the active sort.
+- **Sticky "Join the Waitlist" bar on mobile** — appears once
+  someone scrolls past the hero's own button, hides again once they
+  reach the real waitlist form.
+- **Back-to-top button** — small floating arrow, appears after
+  scrolling down, smooth-scrolls back to the top on click.
+
+## v27.0
 
 Big round of admin dashboard additions:
 
