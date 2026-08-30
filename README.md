@@ -256,13 +256,21 @@ one day.
 
 ## Meta Pixel — ad conversion tracking
 
-The Meta Pixel (Facebook/Instagram ads tracking) is installed and
-live on the homepage — it's already tracking page views. More
-importantly, it fires a real "Lead" event the moment someone
-actually completes the waitlist form — not just visits the page.
-That's what lets Meta's ad algorithm learn which clicks turn into
-real signups, so it can spend your budget toward more of those,
-instead of just optimizing for clicks that don't convert.
+The Meta Pixel (Facebook/Instagram ads tracking) is installed on
+every real public page: the homepage, privacy policy, terms, and
+the 404 page — following Meta's own guidance to install it site-
+wide, not just the homepage, so tracking and any future ad
+retargeting stays consistent no matter which page someone lands on
+or navigates to. It's deliberately **not** on `/admin.html` — that's
+a password-protected internal tool nobody reaches from an ad, so
+ad-tracking code has no purpose there.
+
+It's already tracking page views. More importantly, it fires a real
+"Lead" event the moment someone actually completes the waitlist
+form — not just visits the page. That's what lets Meta's ad
+algorithm learn which clicks turn into real signups, so it can
+spend your budget toward more of those, instead of just optimizing
+for clicks that don't convert.
 
 A few things worth knowing:
 - It only fires on a **real waitlist signup**, not an address-check

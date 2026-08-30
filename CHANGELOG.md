@@ -4,7 +4,21 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v40.0 — current
+## v40.1 — current
+
+- Extended the Meta Pixel to every real public page — homepage,
+  privacy policy, terms, and the 404 page — matching Meta's own
+  documented guidance to install it site-wide, not just the
+  homepage. Was only on the homepage before.
+- Deliberately left off `/admin.html` — that's a password-protected
+  internal tool nobody ever reaches from an ad, so ad-tracking code
+  has no real purpose there, even though it's technically "a page
+  on the site."
+- Verified across all 5 pages with a real test: confirmed the
+  pixel loads correctly on all 4 public pages and confirmed it's
+  genuinely absent from the admin page — not just assumed.
+
+## v40.0
 
 - Installed the **Meta Pixel** on the homepage — the one thing
   flagged as the top priority back when ads were first running with
