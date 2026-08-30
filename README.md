@@ -316,6 +316,34 @@ invalidates it. Changing `SESSION_SECRET` also immediately logs
 out anyone with an existing session, including yourself (you'd
 just log back in with the current password).
 
+## Service area map (the public one, on the homepage)
+
+The map in the "Service Area" section is a real interactive map now
+(Leaflet + OpenStreetMap tiles, no API key needed) — actual roads
+and geography, darkened with a CSS filter to match the site's dark
+green look rather than a separate "dark mode" tile provider (the
+free dark-tile services now require signing up for an API key,
+which this deliberately avoids).
+
+This replaced an earlier version that was a hand-illustrated map
+with a custom-built lat/lng-to-pixel projection. That approach kept
+needing repositioning no matter how carefully it was recentered,
+because a hand-built projection is fundamentally an approximation —
+a real map doesn't have that problem, since positions come from an
+actual map projection instead. It also means real roads and the
+real Buckeye Lake shape now come from the map tiles themselves,
+instead of being hand-traced from reference screenshots.
+
+**The one real tradeoff, stated plainly:** this page now depends on
+OpenStreetMap's tile servers being reachable, which wasn't true of
+the old self-contained illustration. That's a deliberate choice — 
+the earlier version avoided any external map dependency specifically
+so this page could never break for a visitor, which mattered for a
+page whose whole job is converting visitors into signups. Real
+accuracy was worth that tradeoff once the hand-built version kept
+drifting wrong; if reachability ever becomes a real problem, this
+section can go back to something self-contained.
+
 ## Route Planner — planning your actual driving route
 
 Also on the admin dashboard: check the "Route" box on any rows in

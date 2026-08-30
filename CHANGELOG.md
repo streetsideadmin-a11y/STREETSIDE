@@ -4,7 +4,38 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v34.0 — current
+## v35.0 — current
+
+Replaced the public service-area map's whole approach:
+
+- **Now a real map** (Leaflet + OpenStreetMap, same setup as the
+  admin map) instead of a hand-illustrated one — fixes the position
+  drift that kept coming back no matter how carefully the old
+  custom projection was recentered, since positions now come from
+  a real map projection instead of an approximation.
+- Real roads and the real Buckeye Lake shape now come from the map
+  tiles automatically — no more hand-tracing from reference
+  screenshots, and no risk of that tracing being slightly off.
+- Darkened with a CSS filter to match the brand's dark green look,
+  rather than a separate dark-tile provider — CARTO's free dark
+  tiles now require an API key signup (a recent policy change), so
+  this avoids that account/key requirement entirely.
+- Removed a large amount of now-obsolete hand-traced SVG code (all
+  the road paths, the lake outline, the custom projection math).
+- **One tradeoff, stated directly in the README**: this page now
+  depends on OpenStreetMap's tiles being reachable, which the old
+  self-contained illustration didn't. That's a deliberate choice
+  given how much the old approach kept drifting — worth flagging
+  since it reverses an earlier documented decision to keep this
+  page dependency-free for reliability.
+- Verified the underlying logic directly (since my own sandbox
+  can't reach the external map tiles to see it visually): correct
+  tile URL and attribution, the dark-skin CSS class applied, and
+  the exact right number of city dots/heat circles/labels for a
+  test data set — all confirmed via a stubbed Leaflet API, same
+  method already used to verify the admin map.
+
+## v34.0
 
 - Clicking a town on the Waitlist Interest Map now filters the
   route-planning table below it down to just that town — works on

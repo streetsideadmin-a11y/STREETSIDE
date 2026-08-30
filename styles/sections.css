@@ -445,128 +445,37 @@
   background: var(--color-brand-strong);
   aspect-ratio: 4 / 3;
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
-.service-area__map .interest-map-svg {
+#interest-map-el {
   width: 100%;
   height: 100%;
-  display: block;
 }
 
-.map-road {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.22);
-  stroke-width: 2.5;
-  stroke-dasharray: 1 7;
-  stroke-linecap: round;
+/* Darkens the plain OpenStreetMap tiles to match the site's dark
+   green brand palette, via a CSS filter rather than a separate
+   "dark mode" tile provider -- keeps this dependency-free (no API
+   key, no account), consistent with the rest of the map setup. */
+.interest-map-tiles {
+  filter: invert(1) hue-rotate(140deg) brightness(0.85) contrast(0.9) saturate(0.7);
 }
 
-.map-road--beltway {
-  fill: none;
-  stroke-dasharray: 1 6;
-  stroke-width: 2;
-  opacity: 0.7;
-}
-
-.map-road--minor {
-  stroke-width: 1.5;
-  opacity: 0.55;
-}
-
-.map-landmark,
-rect.map-landmark {
-  fill: rgba(255, 255, 255, 0.32);
-  stroke: rgba(255, 255, 255, 0.5);
-  stroke-width: 0.75;
-}
-
-.map-landmark--water {
-  fill: rgba(120, 190, 220, 0.35);
-  stroke: rgba(120, 190, 220, 0.6);
-}
-
-.map-compass line {
-  stroke: rgba(255, 255, 255, 0.4);
-  stroke-width: 1.5;
-}
-
-.map-compass path {
-  fill: rgba(255, 255, 255, 0.4);
-}
-
-.map-compass text {
+.interest-map-city-label,
+.interest-map-town-label {
+  background: none;
+  border: none;
+  box-shadow: none;
   font-family: var(--font-display);
   font-stretch: condensed;
-  font-size: 12px;
   font-weight: 700;
-  fill: rgba(255, 255, 255, 0.55);
-}
-
-.map-town-dot {
-  fill: rgba(255, 255, 255, 0.28);
-  stroke: rgba(255, 255, 255, 0.5);
-  stroke-width: 1;
-  transition: r 0.4s var(--ease-out), fill 0.4s var(--ease-out), opacity 0.4s var(--ease-out);
-}
-
-/* Smaller towns show dimmer than the main cities by default, so the
-/* Smaller towns stay hidden until real interest lights them up via
-   the heatmap — keeps the map focused on the main cities instead of
-   cluttering it with every small town at once. Their heat blobs
-   (and the dot/label themselves, via the --active/--visible
-   overrides below) still work exactly the same either way — this
-   only changes what shows before there's any real interest. */
-.map-town-dot[data-tier="town"] {
-  opacity: 0;
-}
-
-
-.map-town-dot--active {
-  opacity: 1 !important;
-  fill: var(--white);
-  stroke: var(--color-accent);
-  stroke-width: 2;
-}
-
-.map-heat-blob {
-  transition: r 0.6s var(--ease-out), fill 0.6s var(--ease-out);
+  color: var(--off-white);
+  text-shadow: 0 0 3px rgba(0,0,0,0.8), 0 0 3px rgba(0,0,0,0.8);
+  white-space: nowrap;
   pointer-events: none;
 }
 
-.map-town-label {
-  font-family: var(--font-display);
-  font-stretch: condensed;
-  font-size: 13px;
-  font-weight: 700;
-  fill: var(--off-white);
-  opacity: 0.85;
-  pointer-events: none;
-  transition: opacity 0.4s var(--ease-out);
-}
-
-/* Smaller towns get smaller text too, on top of already being
-   hidden until real interest lights them up — keeps a big cluster
-   of newly-revealed towns from reading as visually heavier than
-   the main cities. */
-.map-town-label[data-tier="town"] {
-  font-size: 10px;
-  font-weight: 600;
-}
-
-/* Smaller-town labels stay hidden by default too, revealed only
-   once real interest lights up that town (see
-   .map-town-label--visible below). */
-.map-town-label[data-tier="town"] {
-  opacity: 0;
-}
-
-
-.map-town-label--visible {
-  opacity: 1 !important;
-}
+.interest-map-city-label { font-size: 13px; }
+.interest-map-town-label { font-size: 11px; }
 
 .service-area__map .map-caption {
   position: absolute;
@@ -578,6 +487,8 @@ rect.map-landmark {
   color: var(--off-white);
   font-size: 0.85rem;
   background: linear-gradient(to top, rgba(15, 32, 16, 0.92), rgba(15, 32, 16, 0));
+  z-index: 1000; /* stay above Leaflet's own layers */
+  pointer-events: none;
 }
 
 /* ---- FAQ ---- */
