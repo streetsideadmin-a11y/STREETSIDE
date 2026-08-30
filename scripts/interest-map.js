@@ -166,15 +166,27 @@
       var cities = data.cities || [];
       var plotted = 0;
 
+      // The API groups by the exact text someone typed as their
+      // city, so "Lancaster" and "Lancaster, OH" come back as two
+      // separate entries even though they're the same real town —
+      // re-combine them here by the town they actually match, so
+      // the count shown is the true total, not a partial number
+      // split across however many ways people spelled it.
+      var countsByTown = {};
       cities.forEach(function (entry) {
         var townKey = findTown(entry.city);
-        if (!townKey) return; // no known town matches — skip silently
+        if (!townKey) return;
+        countsByTown[townKey] = (countsByTown[townKey] || 0) + entry.count;
+      });
+
+      Object.keys(countsByTown).forEach(function (townKey) {
         var t = TOWNS[townKey];
-        var color = heatColor(entry.count);
+        var count = countsByTown[townKey];
+        var color = heatColor(count);
         if (!color) return;
 
         var label = townKey.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
-        var tooltipText = label + ": " + entry.count + (entry.count === 1 ? " neighbor interested" : " neighbors interested");
+        var tooltipText = label + ": " + count + (count === 1 ? " neighbor interested" : " neighbors interested");
 
         // Start with a plain circle right away — for an already-
         // cached town (the common case once the site's been up a
@@ -182,7 +194,7 @@
         // that this is barely visible; for a brand-new town it's a
         // reasonable placeholder while the one-time lookup happens.
         var placeholder = L.circleMarker([t[0], t[1]], {
-          radius: heatRadiusPx(t[2], entry.count),
+          radius: heatRadiusPx(t[2], count),
           color: color, weight: 1, fillColor: color, fillOpacity: 0.45,
           className: "interest-map-heat",
         })

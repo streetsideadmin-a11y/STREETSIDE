@@ -4,7 +4,29 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v38.0 — current
+## v38.1 — current
+
+Real bug fix: the public map's neighbor counts weren't combining
+correctly.
+
+- The API groups signups by the *exact* text someone typed as their
+  city, so "Lancaster" and "Lancaster, OH" came back as two separate
+  entries even though they're the same real town. The map then drew
+  each one separately instead of combining them — showing a partial,
+  incorrect count (and likely overlapping circles) rather than the
+  true total.
+- Fixed by re-combining entries by the actual town they match
+  *before* drawing anything, so every real spelling of a town's name
+  contributes to one correct total. Verified directly: fed in three
+  different spellings of "Lancaster" with counts of 3, 2, and 1, and
+  confirmed it now draws exactly one circle showing "6 neighbors
+  interested" — the true sum — instead of three separate partial
+  circles.
+- The admin dashboard was never affected by this — it already
+  counted from individual raw signups directly rather than from
+  pre-grouped data, so it didn't have this bug.
+
+## v38.0
 
 - Public map now shows **real municipal boundaries** for towns with
   interest (same idea as the admin map) instead of just circles,
