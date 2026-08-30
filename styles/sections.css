@@ -452,14 +452,6 @@
   height: 100%;
 }
 
-/* Darkens the plain OpenStreetMap tiles to match the site's dark
-   green brand palette, via a CSS filter rather than a separate
-   "dark mode" tile provider -- keeps this dependency-free (no API
-   key, no account) other than the tile server itself. */
-.interest-map-tiles {
-  filter: invert(1) hue-rotate(140deg) brightness(0.85) contrast(0.9) saturate(0.7);
-}
-
 .interest-map-city-label,
 .interest-map-town-label {
   background: none;

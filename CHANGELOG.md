@@ -4,7 +4,36 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v37.0 — current
+## v38.0 — current
+
+- Public map now shows **real municipal boundaries** for towns with
+  interest (same idea as the admin map) instead of just circles,
+  using **normal map colors** (removed the dark CSS filter), with
+  **scroll-wheel zoom enabled** so visitors can zoom into their own
+  neighborhood directly.
+- Built a proper **shared boundary cache** (`api/town-boundary.js` +
+  a new `town_boundaries` table) rather than having every visitor's
+  browser call the free Nominatim service directly — a real concern
+  once a page any number of people could load at once is involved.
+  Each town is looked up against the real service **at most once,
+  ever**, no matter how much traffic the site gets; every request
+  after that is served from the cache. Verified this guarantee
+  directly with a logic test simulating 7 requests across 2 towns
+  and confirming only 2 real lookups ever happened.
+- The admin dashboard's map was switched to use this same shared
+  cache too — same accuracy, but boundaries now load instantly for
+  any town someone's already looked up before, instead of the old
+  one-second-per-town rate limit that was only there because it was
+  calling the real service directly.
+- **New setup step**: one more line in the Neon SQL migration (the
+  new `town_boundaries` table) — see the README's admin setup
+  section.
+- Verified all three changes together with a stubbed test: scroll
+  zoom on, no dark-filter class applied, the dark-filter CSS rule
+  itself confirmed removed from the stylesheet, and a real boundary
+  correctly rendering through the new cache endpoint.
+
+## v37.0
 
 - Public map switched back to the real Leaflet/OpenStreetMap
   approach (same technical base as the admin map), read-only this

@@ -898,7 +898,7 @@
         .bindTooltip("Loading " + label + "'s boundary…")
         .addTo(heatLayerGroup);
 
-      queueBoundaryFetch(town, function (geojson) {
+      fetchTownBoundary(town).then(function (geojson) {
         heatLayerGroup.removeLayer(loadingMarker);
         if (geojson) {
           L.geoJSON(geojson, {
@@ -924,68 +924,39 @@
     });
   }
 
-  // --- Real municipal boundaries, fetched from OpenStreetMap's free
-  // Nominatim geocoding service (no API key needed). Rate-limited to
-  // roughly one request per second per Nominatim's usage policy —
-  // this is a low-traffic internal tool, so a queue with a small
-  // delay between requests is enough to stay well within that.
-  var boundaryCache = {};
-  var boundaryQueue = [];
-  var boundaryQueueRunning = false;
+  // --- Real municipal boundaries, from a shared server-side cache
+  // (see api/town-boundary.js) — not calling Nominatim directly. The
+  // cache means most towns resolve almost instantly once anyone
+  // (a public site visitor or another admin session) has already
+  // looked them up before; a brand-new town takes a moment for its
+  // one-time real lookup.
+  var boundaryFetchesInFlight = 0;
 
   function updateLoadingStatus() {
     var el = document.getElementById("admin-map-loading");
     if (!el) return;
-    var remaining = boundaryQueue.length + (boundaryQueueRunning ? 1 : 0);
-    if (remaining > 0) {
+    if (boundaryFetchesInFlight > 0) {
       el.style.display = "block";
-      el.textContent = "Loading real boundaries… (" + remaining + (remaining === 1 ? " town left" : " towns left") + ")";
+      el.textContent = "Loading real boundaries… (" + boundaryFetchesInFlight + (boundaryFetchesInFlight === 1 ? " town left" : " towns left") + ")";
     } else {
       el.style.display = "none";
     }
   }
 
-  function queueBoundaryFetch(town, onLoaded) {
-    if (boundaryCache[town] !== undefined) {
-      onLoaded(boundaryCache[town]);
-      return;
-    }
-    boundaryQueue.push({ town: town, onLoaded: onLoaded });
-    updateLoadingStatus();
-    if (!boundaryQueueRunning) runBoundaryQueue();
-  }
-
-  async function runBoundaryQueue() {
-    boundaryQueueRunning = true;
-    updateLoadingStatus();
-    while (boundaryQueue.length > 0) {
-      var item = boundaryQueue.shift();
-      var geojson = await fetchTownBoundary(item.town);
-      boundaryCache[item.town] = geojson;
-      item.onLoaded(geojson);
-      updateLoadingStatus();
-      await new Promise(function (resolve) { setTimeout(resolve, 1100); });
-    }
-    boundaryQueueRunning = false;
-    updateLoadingStatus();
-  }
-
   async function fetchTownBoundary(town) {
-    var query = town.replace(/\b\w/g, function (c) { return c.toUpperCase(); }) + ", Ohio, USA";
-    var url =
-      "https://nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&limit=1&q=" +
-      encodeURIComponent(query);
+    boundaryFetchesInFlight++;
+    updateLoadingStatus();
     try {
-      var res = await fetch(url, { headers: { Accept: "application/json" } });
-      if (!res.ok) throw new Error("Nominatim responded with " + res.status);
-      var results = await res.json();
-      if (!results.length || !results[0].geojson) return null;
-      var type = results[0].geojson.type;
-      if (type !== "Polygon" && type !== "MultiPolygon") return null; // skip points/lines — need an actual area
-      return results[0].geojson;
+      var res = await fetch("/api/town-boundary?town=" + encodeURIComponent(town));
+      if (!res.ok) return null;
+      var data = await res.json();
+      return data.geojson || null;
     } catch (err) {
-      console.warn("[streetside] Could not load a real boundary for " + town + " — using a circle instead:", err);
+      console.warn("[streetside] Could not load a boundary for " + town + ":", err);
       return null;
+    } finally {
+      boundaryFetchesInFlight--;
+      updateLoadingStatus();
     }
   }
 

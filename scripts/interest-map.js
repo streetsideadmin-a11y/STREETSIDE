@@ -102,6 +102,27 @@
     return Math.min(base + count * step, cap);
   }
 
+  // Real municipal boundaries, from a shared server-side cache (see
+  // api/town-boundary.js) — NOT a direct call to Nominatim. Each
+  // town only ever gets looked up against the real service once,
+  // ever, across every visitor combined; every request after that
+  // (including this one, most of the time) is served from that
+  // cache. Calling Nominatim directly from here, once per visitor,
+  // would multiply real requests to that free service far past what
+  // its usage policy allows for a page any number of people could
+  // load at once.
+  async function fetchTownBoundary(town) {
+    try {
+      var res = await fetch("/api/town-boundary?town=" + encodeURIComponent(town));
+      if (!res.ok) return null;
+      var data = await res.json();
+      return data.geojson || null;
+    } catch (err) {
+      console.warn("[streetside] Could not load a boundary for " + town + ":", err);
+      return null;
+    }
+  }
+
   async function init() {
     var mapEl = document.getElementById("interest-map-el");
     var caption = document.querySelector("[data-interest-map] .map-caption");
@@ -114,11 +135,10 @@
       [Math.max.apply(null, lats), Math.max.apply(null, lngs)]
     );
 
-    var map = L.map(mapEl, { scrollWheelZoom: false }).fitBounds(bounds, { padding: [24, 24] });
+    var map = L.map(mapEl, { scrollWheelZoom: true }).fitBounds(bounds, { padding: [24, 24] });
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      className: "interest-map-tiles",
     }).addTo(map);
 
     var layerGroup = L.layerGroup().addTo(map);
@@ -156,13 +176,31 @@
         var label = townKey.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
         var tooltipText = label + ": " + entry.count + (entry.count === 1 ? " neighbor interested" : " neighbors interested");
 
-        L.circleMarker([t[0], t[1]], {
+        // Start with a plain circle right away — for an already-
+        // cached town (the common case once the site's been up a
+        // while) the real boundary below usually arrives fast enough
+        // that this is barely visible; for a brand-new town it's a
+        // reasonable placeholder while the one-time lookup happens.
+        var placeholder = L.circleMarker([t[0], t[1]], {
           radius: heatRadiusPx(t[2], entry.count),
           color: color, weight: 1, fillColor: color, fillOpacity: 0.45,
           className: "interest-map-heat",
         })
           .bindTooltip(tooltipText)
           .addTo(layerGroup);
+
+        fetchTownBoundary(townKey).then(function (geojson) {
+          if (geojson) {
+            layerGroup.removeLayer(placeholder);
+            L.geoJSON(geojson, {
+              style: { color: color, weight: 2, fillColor: color, fillOpacity: 0.4 },
+            })
+              .bindTooltip(tooltipText)
+              .addTo(layerGroup);
+          }
+          // If no boundary was found, the placeholder circle just
+          // stays as-is — already added above, nothing more to do.
+        });
 
         // Reveal a label for any town with real interest, even ones
         // that don't get a permanent label by default.

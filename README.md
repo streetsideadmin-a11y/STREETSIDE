@@ -301,9 +301,14 @@ The dashboard also includes:
    a quick way to generate one is running this in your browser's
    JavaScript console: `crypto.randomUUID() + crypto.randomUUID()`
 4. Run this in Neon's SQL Editor if you haven't already (adds the
-   column the "Mark as Contacted" feature needs):
+   column the "Mark as Contacted" feature needs, plus the table
+   that caches real map boundaries so they're only ever looked up
+   once — see "Service area map" above):
    ```sql
    ALTER TABLE signups ADD COLUMN IF NOT EXISTS contacted BOOLEAN DEFAULT FALSE;
+   CREATE TABLE IF NOT EXISTS town_boundaries (
+     town TEXT PRIMARY KEY, geojson JSONB, fetched_at TIMESTAMPTZ DEFAULT now()
+   );
    ```
 5. Redeploy (upload the files the same way as always, or just
    redeploy if only the environment variables changed).
@@ -328,10 +333,27 @@ page). This map just shows real interest, using real accurate
 positions from real lat/lng — not a hand-built pixel projection
 that has to be manually kept correct.
 
-Darkened with a CSS filter to match the brand's dark green look,
-rather than a separate "dark mode" tile provider (CARTO's free
-dark tiles now require signing up for an API key, a recent policy
-change — this avoids that entirely, same approach as the admin map).
+Shows real municipal boundaries where OpenStreetMap has one on
+file for a town with real interest — not a generic circle — using
+normal map colors (no dark-tile filter), with scroll-wheel zoom
+enabled so visitors can zoom in on their own area directly.
+
+**How the boundaries stay safe to show on a public page:** unlike
+the admin map (which looks up boundaries live, rate-limited, for
+one person's occasional use), this page could be viewed by any
+number of visitors at once — calling the free Nominatim service
+directly for every one of them would be a real problem. Instead,
+every boundary request goes through `/api/town-boundary.js`, a
+small shared cache backed by the database: the very first time
+*anyone* — a visitor here, or an admin session — asks for a given
+town's boundary, it's looked up once and saved; every request after
+that, forever, is served from that cache instead of hitting
+Nominatim again. Total real usage of that free service stays at
+"once per town, ever," regardless of site traffic. The admin
+dashboard's map was updated to use this same shared cache too, so
+it also benefits — boundaries there now load instantly once
+they've been fetched by anyone, instead of the old one-second-per-
+town rate limit.
 
 **The one real tradeoff, stated directly:** this page now depends
 on OpenStreetMap's tile servers being reachable, which an earlier,
