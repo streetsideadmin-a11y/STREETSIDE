@@ -197,6 +197,16 @@
           "success"
         );
         showNeighborShare(form);
+
+        // Tells Meta this visitor became a real lead, not just a page
+        // view — this is what actually lets ad campaigns optimize
+        // toward people who convert, not just people who click.
+        // Guarded because fbq won't exist if the Pixel script is
+        // blocked (ad blockers, browser privacy settings, etc.) —
+        // that should never break the signup itself.
+        if (typeof fbq === "function") {
+          fbq("track", "Lead");
+        }
       }
 
       form.reset();

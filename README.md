@@ -254,6 +254,29 @@ Apps Script (a Google Workspace account gets more) — plenty for a
 launching business, but worth knowing if signups ever spike hard in
 one day.
 
+## Meta Pixel — ad conversion tracking
+
+The Meta Pixel (Facebook/Instagram ads tracking) is installed and
+live on the homepage — it's already tracking page views. More
+importantly, it fires a real "Lead" event the moment someone
+actually completes the waitlist form — not just visits the page.
+That's what lets Meta's ad algorithm learn which clicks turn into
+real signups, so it can spend your budget toward more of those,
+instead of just optimizing for clicks that don't convert.
+
+A few things worth knowing:
+- It only fires on a **real waitlist signup**, not an address-check
+  lookup — address-check isn't a real conversion, so it doesn't
+  count as one here either, same rule as everywhere else on the
+  site that distinguishes the two.
+- If someone has an ad blocker or browser privacy setting that
+  blocks Meta's tracking script, the signup itself still works
+  completely normally — the Pixel code is written so a blocked
+  script can never break the actual form.
+- To see this data, go to Events Manager in Meta Ads Manager — you
+  should see PageView events immediately, and Lead events start
+  appearing as real signups come in.
+
 ## Admin dashboard — viewing your real signup data
 
 There's a password-protected admin page at `/admin.html` that shows

@@ -4,7 +4,26 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v39.0 — current
+## v40.0 — current
+
+- Installed the **Meta Pixel** on the homepage — the one thing
+  flagged as the top priority back when ads were first running with
+  zero visibility into what was actually converting.
+- Fires a real **Lead** event specifically when someone completes
+  the waitlist form — not just on page view. This is what actually
+  lets Meta's ad algorithm optimize your spend toward people who
+  convert, instead of just people who click.
+- Correctly scoped to real conversions only: address-check
+  submissions don't fire a Lead event, same "that's not a real
+  conversion" rule already used everywhere else the site
+  distinguishes waitlist signups from address lookups. Verified
+  directly — simulated both a real signup (fires exactly one Lead
+  event) and an address-check (fires nothing).
+- Safely guarded: if the Pixel script is blocked by an ad blocker
+  or browser privacy setting, the actual signup still completes
+  normally — tracking can fail without ever breaking the form.
+
+## v39.0
 
 - Full bug check across the site — syntax on every JS file, HTML/CSS
   structure balance, all standalone pages (privacy policy, terms,
