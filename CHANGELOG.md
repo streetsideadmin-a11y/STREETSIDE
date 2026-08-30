@@ -4,7 +4,24 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v29.1 — current
+## v30.0 — current
+
+- Added a **Route Planner** to the admin dashboard — check the
+  "Route" box on any signup to add it as a stop, reorder with
+  ↑/↓ buttons, optionally set a starting address, then "Open Route
+  in Google Maps" for real turn-by-turn directions in that order.
+- No geocoding or route-optimization infrastructure needed — it
+  builds a standard Google Maps directions link and lets Google's
+  own engine handle the actual routing.
+- Capped at 9 stops per route (Google's own link limit) — the 10th
+  checkbox is rejected with a clear message instead of silently
+  breaking the link.
+- Tested the full flow: selecting stops, reordering, removing,
+  syncing with the table checkboxes, the 9-stop cap, and the
+  generated Google Maps URL itself (confirmed it matches Google's
+  documented format exactly).
+
+## v29.1
 
 - Smaller towns now get a smaller heat zone too, at every interest
   level — not just smaller dots and text. Same 5 signups gives

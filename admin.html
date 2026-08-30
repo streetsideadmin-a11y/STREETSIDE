@@ -89,6 +89,47 @@
   .admin-city-list__item strong { color: var(--color-accent); }
   .admin-city-list__empty { color: var(--color-ink-muted); font-size: 0.9rem; }
 
+  .admin-route-hint { font-size: 0.85rem; color: var(--color-ink-muted); margin-bottom: var(--space-4); }
+  .admin-route-list { list-style: none; padding: 0; margin: 0 0 var(--space-4); display: flex; flex-direction: column; gap: 8px; }
+  .admin-route-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: var(--off-white);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    font-size: 0.88rem;
+  }
+  .admin-route-list .route-stop-num {
+    flex: 0 0 auto;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--color-brand-strong);
+    color: var(--white);
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .admin-route-list .route-stop-address { flex: 1 1 auto; }
+  .admin-route-list .route-stop-btns { display: flex; gap: 4px; flex: 0 0 auto; }
+  .admin-route-list button {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 3px 8px;
+    font-size: 0.78rem;
+    cursor: pointer;
+  }
+  .admin-route-list button:hover { background: var(--white); }
+  .admin-route-list button.remove-stop { color: var(--red-700); border-color: var(--red-600); }
+  .admin-route-empty { color: var(--color-ink-muted); font-size: 0.9rem; margin-bottom: var(--space-4); }
+  .admin-route-actions { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+  .admin-route-actions .btn { padding: 10px 18px; font-size: 0.85rem; }
+
   .admin-filters {
     display: flex;
     flex-wrap: wrap;
@@ -188,6 +229,21 @@
     <div class="admin-city-list" id="admin-city-list"></div>
   </div>
 
+  <div class="admin-panel">
+    <h2>Plan Today's Route</h2>
+    <p class="admin-route-hint">Check the "Route" box on rows in the table below to add them here — up to 9 stops per trip (Google Maps' own limit; split into more than one trip for larger routes).</p>
+    <div class="field" style="max-width: 420px;">
+      <label for="admin-route-origin">Starting Address <span class="optional">(optional)</span></label>
+      <input type="text" id="admin-route-origin" placeholder="e.g. your home base or warehouse" />
+    </div>
+    <ol class="admin-route-list" id="admin-route-list"></ol>
+    <p class="admin-route-empty" id="admin-route-empty">No stops selected yet.</p>
+    <div class="admin-route-actions">
+      <button type="button" class="btn btn-primary" id="admin-route-open">Open Route in Google Maps</button>
+      <button type="button" class="btn btn-outline-brand" id="admin-route-clear">Clear Route</button>
+    </div>
+  </div>
+
   <div class="admin-filters" id="admin-filters">
     <input type="text" id="admin-filter-search" placeholder="Search name, email, phone, address, city…" class="admin-filter-search" />
     <select id="admin-filter-type" class="admin-filter-select">
@@ -227,6 +283,7 @@
           <th>Consent</th>
           <th class="is-sortable" data-sort-key="contacted">Contacted</th>
           <th>Actions</th>
+          <th>Route</th>
         </tr>
       </thead>
       <tbody id="admin-table-body"></tbody>
@@ -249,6 +306,8 @@
   var currentFiltered = []; // whatever's currently visible, for CSV export
   var sortKey = null;
   var sortDir = 1; // 1 = ascending, -1 = descending
+  var routeStopOrder = []; // ordered array of signup ids, in visit order
+  var routeStopIds = new Set(); // same data as a Set, for fast lookup in the table
 
   function sortRows(rows) {
     if (!sortKey) return rows;
@@ -396,6 +455,7 @@
           "<td>" + (row.consent ? "Yes" : "No") + "</td>" +
           "<td><label class=\"admin-contacted-toggle\"><input type=\"checkbox\" data-action=\"toggle-contacted\" data-id=\"" + row.id + "\"" + (row.contacted ? " checked" : "") + " /> " + (row.contacted ? "Yes" : "No") + "</label></td>" +
           "<td><button type=\"button\" class=\"admin-delete-btn\" data-action=\"delete-row\" data-id=\"" + row.id + "\">Delete</button></td>" +
+          "<td><input type=\"checkbox\" data-action=\"route-select\" data-id=\"" + row.id + "\"" + (routeStopIds.has(row.id) ? " checked" : "") + " /></td>" +
           "</tr>"
         );
       })
@@ -511,8 +571,103 @@
   }
 
   // --- Row actions: toggle contacted, delete ------------------------
+  // --- Route planner ---------------------------------------------
+  function stopAddress(row) {
+    return [row.street_address, row.city, row.zip].filter(Boolean).join(", ");
+  }
+
+  function renderRouteList() {
+    var listEl = document.getElementById("admin-route-list");
+    var emptyEl = document.getElementById("admin-route-empty");
+
+    if (routeStopOrder.length === 0) {
+      listEl.innerHTML = "";
+      emptyEl.style.display = "block";
+      return;
+    }
+    emptyEl.style.display = "none";
+
+    listEl.innerHTML = routeStopOrder
+      .map(function (id, i) {
+        var row = allSignups.find(function (r) { return r.id === id; });
+        if (!row) return "";
+        var name = [row.first_name, row.last_name].filter(Boolean).join(" ") || "—";
+        return (
+          "<li data-stop-id=\"" + id + "\">" +
+          "<span class=\"route-stop-num\">" + (i + 1) + "</span>" +
+          "<span class=\"route-stop-address\"><strong>" + escapeHtml(name) + "</strong> — " + escapeHtml(stopAddress(row)) + "</span>" +
+          "<span class=\"route-stop-btns\">" +
+          (i > 0 ? '<button type="button" data-action="stop-up" data-id="' + id + '">↑</button>' : "") +
+          (i < routeStopOrder.length - 1 ? '<button type="button" data-action="stop-down" data-id="' + id + '">↓</button>' : "") +
+          '<button type="button" class="remove-stop" data-action="stop-remove" data-id="' + id + '">Remove</button>' +
+          "</span></li>"
+        );
+      })
+      .join("");
+  }
+
+  function toggleRouteStop(id, include) {
+    if (include) {
+      if (!routeStopIds.has(id)) {
+        if (routeStopOrder.length >= 9) {
+          alert("Google Maps only supports 9 stops per route link — remove one first, or plan a second trip for the rest.");
+          return false;
+        }
+        routeStopOrder.push(id);
+        routeStopIds.add(id);
+      }
+    } else {
+      routeStopOrder = routeStopOrder.filter(function (sid) { return sid !== id; });
+      routeStopIds.delete(id);
+    }
+    renderRouteList();
+    return true;
+  }
+
+  function openRouteInGoogleMaps() {
+    if (routeStopOrder.length === 0) {
+      alert("Select at least one stop first.");
+      return;
+    }
+    var addresses = routeStopOrder
+      .map(function (id) {
+        var row = allSignups.find(function (r) { return r.id === id; });
+        return row ? stopAddress(row) : null;
+      })
+      .filter(Boolean);
+
+    var origin = document.getElementById("admin-route-origin").value.trim();
+    var destination = addresses[addresses.length - 1];
+    var waypoints = addresses.slice(0, -1);
+
+    var params = ["api=1", "destination=" + encodeURIComponent(destination), "travelmode=driving"];
+    if (origin) params.push("origin=" + encodeURIComponent(origin));
+    if (waypoints.length > 0) {
+      params.push("waypoints=" + waypoints.map(encodeURIComponent).join("|"));
+    }
+    window.open("https://www.google.com/maps/dir/?" + params.join("&"), "_blank");
+  }
+
+  function initRouteControls() {
+    document.getElementById("admin-route-open").addEventListener("click", openRouteInGoogleMaps);
+    document.getElementById("admin-route-clear").addEventListener("click", function () {
+      routeStopOrder = [];
+      routeStopIds = new Set();
+      renderRouteList();
+      applyFilters(); // uncheck any visible route checkboxes
+    });
+  }
+
   function initRowActions() {
     tableBody.addEventListener("change", async function (e) {
+      var routeCheckbox = e.target.closest('[data-action="route-select"]');
+      if (routeCheckbox) {
+        var stopId = parseInt(routeCheckbox.getAttribute("data-id"), 10);
+        var ok = toggleRouteStop(stopId, routeCheckbox.checked);
+        if (!ok) routeCheckbox.checked = false;
+        return;
+      }
+
       var checkbox = e.target.closest('[data-action="toggle-contacted"]');
       if (!checkbox) return;
       var id = parseInt(checkbox.getAttribute("data-id"), 10);
@@ -541,6 +696,28 @@
       }
     });
 
+    document.getElementById("admin-route-list").addEventListener("click", function (e) {
+      var btn = e.target.closest("button[data-action]");
+      if (!btn) return;
+      var id = parseInt(btn.getAttribute("data-id"), 10);
+      var action = btn.getAttribute("data-action");
+      var idx = routeStopOrder.indexOf(id);
+      if (idx === -1) return;
+
+      if (action === "stop-remove") {
+        toggleRouteStop(id, false);
+        applyFilters(); // sync the checkbox in the table if it's visible
+      } else if (action === "stop-up" && idx > 0) {
+        routeStopOrder.splice(idx, 1);
+        routeStopOrder.splice(idx - 1, 0, id);
+        renderRouteList();
+      } else if (action === "stop-down" && idx < routeStopOrder.length - 1) {
+        routeStopOrder.splice(idx, 1);
+        routeStopOrder.splice(idx + 1, 0, id);
+        renderRouteList();
+      }
+    });
+
     tableBody.addEventListener("click", async function (e) {
       var btn = e.target.closest('[data-action="delete-row"]');
       if (!btn) return;
@@ -562,6 +739,7 @@
         if (!res.ok) throw new Error("Delete failed");
 
         allSignups = allSignups.filter(function (r) { return r.id !== id; });
+        if (routeStopIds.has(id)) toggleRouteStop(id, false);
         populateCityFilter();
         applyFilters();
         renderCityBreakdown();
@@ -617,6 +795,7 @@
         initFilters();
         initRowActions();
         initSorting();
+        initRouteControls();
       }
     } catch (err) {
       console.error("[streetside] Admin dashboard load failed:", err);

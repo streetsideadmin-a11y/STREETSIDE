@@ -316,6 +316,22 @@ invalidates it. Changing `SESSION_SECRET` also immediately logs
 out anyone with an existing session, including yourself (you'd
 just log back in with the current password).
 
+## Route Planner — planning your actual driving route
+
+Also on the admin dashboard: check the "Route" box on any rows in
+the table to build today's driving route. Reorder stops with the
+↑/↓ buttons, optionally set a starting address (your home base),
+then click "Open Route in Google Maps" — it opens a real turn-by-
+turn Google Maps route with your stops in that order.
+
+This doesn't do its own route optimization or geocoding — it hands
+your addresses straight to Google Maps and lets Google's own
+directions engine do the actual routing, which is both simpler and
+more reliable than trying to rebuild that from scratch. Google Maps
+links support at most 9 stops per trip; the checkbox stops you at 9
+with a message rather than silently dropping stops past that —
+split a bigger day into two trips.
+
 ## Launch checklist — what still needs real data
 
 Nothing fake is shown anywhere on the site. Instead, these are clearly
