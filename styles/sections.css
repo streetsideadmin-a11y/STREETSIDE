@@ -422,6 +422,63 @@
   max-width: 70ch;
 }
 
+/* ---- ADDITIONAL SERVICES (COMING SOON) ---- */
+.additional-services {
+  padding: var(--space-9) 0;
+  background: var(--color-bg);
+}
+
+.additional-services__head {
+  max-width: 640px;
+  margin: 0 auto var(--space-7);
+  text-align: center;
+}
+
+.additional-services__head .lede {
+  margin-top: var(--space-3);
+}
+
+.additional-services__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-5);
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.service-card {
+  position: relative;
+  background: var(--white);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+}
+
+.service-card h3 {
+  font-size: 1.15rem;
+  margin-bottom: var(--space-2);
+}
+
+.service-card__desc {
+  color: var(--color-ink-muted);
+  font-size: 0.95rem;
+}
+
+.service-card__badge {
+  display: inline-block;
+  background: var(--color-accent);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-stretch: condensed;
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: var(--space-3);
+}
+
 /* ---- SERVICE AREA ---- */
 .service-area {
   padding: var(--space-9) 0;

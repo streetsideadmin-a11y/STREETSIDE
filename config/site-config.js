@@ -134,6 +134,21 @@ window.STREETSIDE_CONFIG = {
     ],
   },
 
+  additionalServices: [
+    {
+      id: "bin-cleaning",
+      name: "Bin Cleaning",
+      description: "Pressure-washed and deodorized right at the curb — no more grime, no more smell.",
+      comingSoon: true,
+    },
+    {
+      id: "snow-removal",
+      name: "Snow Removal",
+      description: "Can't get your bins out because of snow? We'll clear a path and handle it for you, even in winter weather.",
+      comingSoon: true,
+    },
+  ],
+
   foundingOffer: {
     enabled: true,
     name: "Founding 250",

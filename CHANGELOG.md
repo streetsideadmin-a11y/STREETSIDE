@@ -4,7 +4,25 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v38.1 — current
+## v39.0 — current
+
+- Full bug check across the site — syntax on every JS file, HTML/CSS
+  structure balance, all standalone pages (privacy policy, terms,
+  404, admin) load cleanly, full visual regression on desktop/
+  tablet/mobile. Nothing broken found.
+- Added a new "More Ways We Can Help" section with two Coming Soon
+  cards: **Bin Cleaning** and **Snow Removal**. Config-driven, same
+  pattern as pricing/FAQ — add, edit, or remove entries in
+  `config/site-config.js` under `additionalServices` and the page
+  updates automatically, no HTML editing needed.
+- Minor known cosmetic note found while testing on mobile: the
+  floating "back to top" button briefly overlaps this new section's
+  text at one specific scroll position. Not a functional issue —
+  the text is still there and it clears as you keep scrolling — so
+  left as-is rather than restructure an unrelated existing feature
+  for a momentary visual overlap.
+
+## v38.1
 
 Real bug fix: the public map's neighbor counts weren't combining
 correctly.

@@ -124,6 +124,28 @@
     }
   }
 
+  function renderAdditionalServices() {
+    var mount = document.querySelector("[data-additional-services]");
+    var services = ((window.STREETSIDE_CONFIG || {}).additionalServices) || [];
+    var section = document.getElementById("additional-services");
+    if (!mount || !section) return;
+
+    if (!services.length) {
+      section.style.display = "none";
+      return;
+    }
+
+    services.forEach(function (service) {
+      var card = el("div", "service-card reveal-item" + (service.comingSoon ? " service-card--coming-soon" : ""));
+      if (service.comingSoon) {
+        card.appendChild(el("span", "service-card__badge", "Coming Soon"));
+      }
+      card.appendChild(el("h3", null, service.name));
+      card.appendChild(el("p", "service-card__desc", service.description));
+      mount.appendChild(card);
+    });
+  }
+
   function renderFAQ() {
     var mount = document.querySelector("[data-faq-list]");
     var items = ((window.STREETSIDE_CONFIG || {}).faq) || [];
@@ -276,6 +298,7 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     renderPricing();
+    renderAdditionalServices();
     renderFAQ();
     renderHearAboutUs();
     renderFooterContact();
