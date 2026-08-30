@@ -200,6 +200,27 @@
   }
   .admin-filter-clear { padding: 8px 16px; font-size: 0.85rem; }
   .admin-filter-count { font-size: 0.85rem; color: var(--color-ink-muted); margin-bottom: var(--space-3); }
+  .admin-map-filter-active {
+    background: var(--green-tint);
+    border: 1px solid var(--green-600);
+    border-radius: var(--radius-sm);
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-3);
+    font-size: 0.9rem;
+    color: var(--color-brand-strong);
+  }
+  .admin-map-filter-active button {
+    margin-left: var(--space-3);
+    background: none;
+    border: 1px solid var(--color-brand-strong);
+    border-radius: var(--radius-sm);
+    padding: 3px 10px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--color-brand-strong);
+    cursor: pointer;
+  }
+  .admin-map-filter-active button:hover { background: var(--white); }
 
   .admin-table-wrap {
     background: var(--white);
@@ -309,6 +330,11 @@
     </div>
   </div>
 
+  <p class="admin-map-filter-active" id="admin-map-filter-active" style="display: none;">
+    Filtered by map: <strong id="admin-map-filter-town"></strong>
+    <button type="button" id="admin-map-filter-clear-btn">Clear</button>
+  </p>
+
   <div class="admin-filters" id="admin-filters">
     <input type="text" id="admin-filter-search" placeholder="Search name, email, phone, address, city…" class="admin-filter-search" />
     <select id="admin-filter-type" class="admin-filter-select">
@@ -373,6 +399,7 @@
   var sortDir = 1; // 1 = ascending, -1 = descending
   var routeStopOrder = []; // ordered array of signup ids, in visit order
   var routeStopIds = new Set(); // same data as a Set, for fast lookup in the table
+  var mapTownFilter = null; // set by clicking a boundary/circle on the map
 
   function sortRows(rows) {
     if (!sortKey) return rows;
@@ -546,6 +573,12 @@
 
       if (city && row.city !== city) return false;
 
+      // Set by clicking a boundary/circle on the Waitlist Interest
+      // Map — matches the same way the map itself groups signups
+      // into towns, so it correctly catches every spelling of a
+      // town's name, not just an exact string match.
+      if (mapTownFilter && matchedTownFor(row) !== mapTownFilter) return false;
+
       if (search) {
         var haystack = [row.first_name, row.last_name, row.email, row.phone, row.street_address, row.city, row.zip]
           .filter(Boolean)
@@ -574,18 +607,23 @@
     citySelect.value = currentValue;
   }
 
+  function clearAllFilters() {
+    document.getElementById("admin-filter-search").value = "";
+    document.getElementById("admin-filter-type").value = "";
+    document.getElementById("admin-filter-package").value = "";
+    document.getElementById("admin-filter-city").value = "";
+    setMapTownFilter(null);
+  }
+
   function initFilters() {
     ["admin-filter-search", "admin-filter-type", "admin-filter-package", "admin-filter-city"].forEach(function (id) {
       var el = document.getElementById(id);
       var evt = el.tagName === "SELECT" ? "change" : "input";
       el.addEventListener(evt, applyFilters);
     });
-    document.getElementById("admin-filter-clear").addEventListener("click", function () {
-      document.getElementById("admin-filter-search").value = "";
-      document.getElementById("admin-filter-type").value = "";
-      document.getElementById("admin-filter-package").value = "";
-      document.getElementById("admin-filter-city").value = "";
-      applyFilters();
+    document.getElementById("admin-filter-clear").addEventListener("click", clearAllFilters);
+    document.getElementById("admin-map-filter-clear-btn").addEventListener("click", function () {
+      setMapTownFilter(null);
     });
   }
 
@@ -693,6 +731,33 @@
       return normalized.indexOf(town) !== -1;
     });
     return found ? TOWN_COORDS[found] : null;
+  }
+
+  // Same matching used above, but returns the town's KEY (e.g.
+  // "canal winchester") rather than its coordinates — used to group
+  // signups by town (for the map's heat data) and to filter the
+  // table when a town is clicked on the map, so both use exactly
+  // the same definition of "which town is this signup in."
+  function matchedTownFor(row) {
+    var key = normalizeCityKey(row.city);
+    if (!key) return null;
+    return Object.keys(TOWN_COORDS).find(function (t) { return key.indexOf(t) !== -1; }) || null;
+  }
+
+  function setMapTownFilter(town) {
+    mapTownFilter = town;
+    var indicator = document.getElementById("admin-map-filter-active");
+    var label = document.getElementById("admin-map-filter-town");
+    if (town) {
+      label.textContent = town.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+      indicator.style.display = "block";
+    } else {
+      indicator.style.display = "none";
+    }
+    applyFilters();
+    if (town) {
+      document.getElementById("admin-filters").scrollIntoView({ behavior: "smooth", block: "center" });
+    }
   }
 
   // Haversine distance in miles — accurate enough for sorting stops
@@ -808,9 +873,7 @@
     var countsByTown = {};
     allSignups.forEach(function (row) {
       if (row.form_type !== "waitlist") return;
-      var key = normalizeCityKey(row.city);
-      if (!key) return;
-      var match = Object.keys(TOWN_COORDS).find(function (t) { return key.indexOf(t) !== -1; });
+      var match = matchedTownFor(row);
       if (!match) return;
       countsByTown[match] = (countsByTown[match] || 0) + 1;
     });
@@ -820,7 +883,7 @@
       if (!color) return;
       var label = town.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
       var n = countsByTown[town];
-      var tooltipText = label + ": " + n + (n === 1 ? " waitlist signup" : " waitlist signups");
+      var tooltipText = label + ": " + n + (n === 1 ? " waitlist signup" : " waitlist signups") + " — click to filter the route list below";
 
       // Show a pulsing loading marker while the real boundary is
       // being fetched, instead of guessing with a circle up front.
@@ -842,15 +905,19 @@
             style: { color: color, weight: 2, fillColor: color, fillOpacity: 0.4 },
           })
             .bindTooltip(tooltipText)
+            .on("click", function () { setMapTownFilter(town); })
             .addTo(heatLayerGroup);
         } else {
           // No real boundary found for this specific town — fall
-          // back to a circle so it's still shown on the map.
+          // back to a circle so it's still shown on the map. Still
+          // clickable the same way, since it's still that town's
+          // marker, just drawn as a circle instead of its real shape.
           L.circle(TOWN_COORDS[town], {
             radius: heatRadiusMeters(n),
             color: color, weight: 1, fillColor: color, fillOpacity: 0.4,
           })
             .bindTooltip(tooltipText)
+            .on("click", function () { setMapTownFilter(town); })
             .addTo(heatLayerGroup);
         }
       });

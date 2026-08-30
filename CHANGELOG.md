@@ -4,7 +4,25 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v33.1 — current
+## v34.0 — current
+
+- Clicking a town on the Waitlist Interest Map now filters the
+  route-planning table below it down to just that town — works on
+  both a real boundary shape and the circle fallback.
+- Uses the same town-matching the map already uses to count
+  signups, not a plain exact-text match — so it correctly catches
+  every way a customer's city got typed for the same real town
+  (e.g. "Lancaster" and "Lancaster, OH" both count), rather than
+  only filtering one specific spelling and missing the rest.
+- Added a clear "Filtered by map: [Town]" banner with its own Clear
+  button when a map filter is active; the main filter row's Clear
+  button resets this too, so there's no way to get stuck in a
+  filtered state without an obvious way out.
+- Verified directly: clicking a town filters correctly, clicking
+  Lancaster specifically catches both spelling variants in the test
+  data, and the indicator/count both update and reset correctly.
+
+## v33.1
 
 - Replaced the "show a circle immediately" placeholder with a real
   loading state: each town with interest now shows a small pulsing

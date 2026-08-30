@@ -366,6 +366,15 @@ shape (or a colored circle, if that specific town's boundary
 couldn't be found) once the lookup finishes. A "Loading real
 boundaries…" note above the map shows how many are still pending.
 
+**Click a town on the map to filter the route list below it** to
+just that town — works whether it loaded as a real boundary or
+fell back to a circle. This uses the same matching the map itself
+uses to count signups per town, so it correctly catches every way a
+customer's city got typed (e.g. "Lancaster" and "Lancaster, OH"
+both count as the same town), not just one exact spelling. A green
+banner shows which town you're filtered to, with a Clear button —
+the main filter row's own Clear button resets this too.
+
 A note on why this differs from the public map: the public map
 deliberately avoids any external map service, so it can never
 break for a visitor if a third-party map provider has an outage —
