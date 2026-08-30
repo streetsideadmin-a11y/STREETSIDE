@@ -4,7 +4,50 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v35.0 — current
+## v37.0 — current
+
+- Public map switched back to the real Leaflet/OpenStreetMap
+  approach (same technical base as the admin map), read-only this
+  time — no click-to-filter, no live boundary lookups, just heat
+  circles at real, accurate positions.
+- Verified directly that it's genuinely read-only: confirmed with a
+  stubbed test that no click handler gets registered on the public
+  map's circles at all, unlike the admin map's.
+- Updated the README's map documentation to reflect the current
+  setup and stop pointing at outdated reasoning from a version that
+  no longer exists — the full back-and-forth (illustrated → real
+  map → illustrated with a fixed projection bug → real map again)
+  is preserved in this changelog's history below if useful context.
+- Same tradeoff as before, worth restating since it flip-flopped
+  twice: this page now depends on OpenStreetMap's tiles being
+  reachable, unlike a fully self-contained illustration.
+
+## v36.0
+
+Reverted the public map back to a self-contained illustration —
+this time with the actual root cause of the position drift fixed:
+
+- **Found and fixed the real bug**: the projection math never
+  accounted for the fact that a degree of longitude covers fewer
+  real-world miles than a degree of latitude at this latitude
+  (~23% less) — every previous "recentering" was working around a
+  map that was fundamentally squeezed into the wrong aspect ratio,
+  not actually broken town data. This version computes the correct
+  real-world aspect ratio first, then projects everything through
+  that — the actual fix, not another recenter.
+- Back to zero external dependencies on the public page — the
+  Leaflet/OpenStreetMap version from the last two updates is gone;
+  this page can't break for a visitor if a map provider has an
+  outage, same as the original design intent.
+- All 45 towns, all 7 traced roads, the real Buckeye Lake outline,
+  and the heatmap behavior are unchanged apart from being
+  reprojected through the corrected math — verified the heatmap
+  still activates and scales correctly with test data.
+- The admin dashboard's map is unaffected by any of this — it still
+  uses Leaflet/OpenStreetMap intentionally, since that tradeoff
+  makes sense for an internal tool in a way it didn't for this page.
+
+## v35.0
 
 Replaced the public service-area map's whole approach:
 

@@ -318,31 +318,29 @@ just log back in with the current password).
 
 ## Service area map (the public one, on the homepage)
 
-The map in the "Service Area" section is a real interactive map now
-(Leaflet + OpenStreetMap tiles, no API key needed) — actual roads
-and geography, darkened with a CSS filter to match the site's dark
-green look rather than a separate "dark mode" tile provider (the
-free dark-tile services now require signing up for an API key,
-which this deliberately avoids).
+The map in the "Service Area" section is a real interactive map
+(Leaflet + OpenStreetMap tiles, no API key needed) — the same
+technical approach as the admin dashboard's map, but read-only: no
+click-to-filter, no live municipal-boundary lookups (that admin
+feature calls a rate-limited free service meant for one person's
+occasional use, not something to run for every visitor on a public
+page). This map just shows real interest, using real accurate
+positions from real lat/lng — not a hand-built pixel projection
+that has to be manually kept correct.
 
-This replaced an earlier version that was a hand-illustrated map
-with a custom-built lat/lng-to-pixel projection. That approach kept
-needing repositioning no matter how carefully it was recentered,
-because a hand-built projection is fundamentally an approximation —
-a real map doesn't have that problem, since positions come from an
-actual map projection instead. It also means real roads and the
-real Buckeye Lake shape now come from the map tiles themselves,
-instead of being hand-traced from reference screenshots.
+Darkened with a CSS filter to match the brand's dark green look,
+rather than a separate "dark mode" tile provider (CARTO's free
+dark tiles now require signing up for an API key, a recent policy
+change — this avoids that entirely, same approach as the admin map).
 
-**The one real tradeoff, stated plainly:** this page now depends on
-OpenStreetMap's tile servers being reachable, which wasn't true of
-the old self-contained illustration. That's a deliberate choice — 
-the earlier version avoided any external map dependency specifically
-so this page could never break for a visitor, which mattered for a
-page whose whole job is converting visitors into signups. Real
-accuracy was worth that tradeoff once the hand-built version kept
-drifting wrong; if reachability ever becomes a real problem, this
-section can go back to something self-contained.
+**The one real tradeoff, stated directly:** this page now depends
+on OpenStreetMap's tile servers being reachable, which an earlier,
+fully self-contained illustrated version of this map didn't. That
+illustrated version is still fully documented in this project's
+history if reliability ever needs to take priority over live
+accuracy again — see the CHANGELOG for v25.0 through v36.0 for that
+whole story, including a real projection bug that was found and
+fixed along the way.
 
 ## Route Planner — planning your actual driving route
 
@@ -403,13 +401,13 @@ both count as the same town), not just one exact spelling. A green
 banner shows which town you're filtered to, with a Clear button —
 the main filter row's own Clear button resets this too.
 
-A note on why this differs from the public map: the public map
-deliberately avoids any external map service, so it can never
-break for a visitor if a third-party map provider has an outage —
-that's worth protecting on a page meant to convert visitors into
-signups. This admin page is different: it's just for you, so a real
-map with real roads and real boundaries is more useful here than
-that tradeoff matters.
+Both the public map and this admin map now use the same real
+Leaflet/OpenStreetMap base — the difference is just what's built on
+top of it: the public map is read-only (heat circles, no clicking),
+while this admin map adds the real municipal boundary tracing and
+click-to-filter, since those are genuinely useful for you but would
+be inappropriate to run against a free rate-limited service for
+every public visitor.
 
 ## Launch checklist — what still needs real data
 

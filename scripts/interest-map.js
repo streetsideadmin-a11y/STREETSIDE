@@ -2,29 +2,26 @@
  * Service-area interest map.
  * ---------------------------------------------------------------
  * A real interactive map (Leaflet + OpenStreetMap tiles, no API key
- * needed), not a hand-drawn illustration. Earlier versions of this
- * map used a custom lat/lng-to-pixel projection built by hand, which
- * never quite matched true geography no matter how carefully it was
- * recentered — a real map doesn't have that problem, since every
- * position comes from an actual map projection instead of an
- * approximation. Real roads and the real Buckeye Lake shape come
- * from the map tiles themselves now, so there's no need to hand-trace
- * them separately anymore.
+ * needed) — same technical approach as the admin dashboard's map,
+ * but read-only: no click-to-filter, no municipal boundary tracing
+ * (that admin feature fetches real boundaries live from a rate-
+ * limited free service, which is fine for one admin's occasional
+ * use but wouldn't be appropriate to run for every visitor to this
+ * page). This map just shows where real interest is, for anyone
+ * checking whether their area is already on the radar.
  *
- * One deliberate tradeoff worth knowing: loading real map tiles from
- * OpenStreetMap means this page now depends on an external service
- * being reachable, which wasn't true of the old illustrated map. If
- * that's ever a problem, the whole interest-map section can revert to
- * something self-contained again — but the accuracy this buys is
- * worth that tradeoff for now.
+ * Every town's position comes from real lat/lng plotted on a real
+ * map projection, so it's inherently accurate — no custom pixel
+ * projection to get subtly wrong.
+ *
+ * One tradeoff worth knowing: this page now depends on OpenStreetMap's
+ * tile servers being reachable, unlike a self-contained illustration.
  *
  * Data comes from /api/interest-map (see api/interest-map.js), which
  * reports signups grouped by CITY ONLY — never an exact street
  * address — matched against the list of known towns below by name.
  */
 (function () {
-  // Real coordinates for every town in the service area, same list
-  // used by the admin dashboard's map and route planner.
   var TOWNS = {
     "columbus": [39.9612, -82.9988, "city"],
     "canal winchester": [39.8395, -82.8010, "city"],

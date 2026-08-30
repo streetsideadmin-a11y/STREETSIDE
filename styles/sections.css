@@ -455,7 +455,7 @@
 /* Darkens the plain OpenStreetMap tiles to match the site's dark
    green brand palette, via a CSS filter rather than a separate
    "dark mode" tile provider -- keeps this dependency-free (no API
-   key, no account), consistent with the rest of the map setup. */
+   key, no account) other than the tile server itself. */
 .interest-map-tiles {
   filter: invert(1) hue-rotate(140deg) brightness(0.85) contrast(0.9) saturate(0.7);
 }
@@ -487,7 +487,7 @@
   color: var(--off-white);
   font-size: 0.85rem;
   background: linear-gradient(to top, rgba(15, 32, 16, 0.92), rgba(15, 32, 16, 0));
-  z-index: 1000; /* stay above Leaflet's own layers */
+  z-index: 1000;
   pointer-events: none;
 }
 
