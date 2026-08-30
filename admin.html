@@ -9,6 +9,8 @@
 <link rel="stylesheet" href="styles/tokens.css" />
 <link rel="stylesheet" href="styles/base.css" />
 <link rel="stylesheet" href="styles/components.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <style>
   body { background: var(--color-bg); }
   .admin-wrap { max-width: 480px; margin: 0 auto; padding: var(--space-9) var(--space-5); }
@@ -139,36 +141,20 @@
   .admin-map-wrap {
     border-radius: var(--radius-sm);
     overflow: hidden;
-    background: #16241b;
     border: 1px solid var(--color-border);
   }
-  .admin-map-svg { width: 100%; height: auto; display: block; cursor: crosshair; user-select: none; }
-  .admin-map-town-dot { fill: rgba(255,255,255,0.35); }
+  #admin-map-el { height: 550px; width: 100%; background: #dde5e0; }
   .admin-map-town-label {
+    background: none;
+    border: none;
+    box-shadow: none;
     font-family: var(--font-display);
     font-stretch: condensed;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
-    fill: rgba(255,255,255,0.55);
-    pointer-events: none;
-  }
-  .admin-map-pin {
-    fill: var(--off-white);
-    stroke: var(--color-brand-strong);
-    stroke-width: 1.5;
-    cursor: pointer;
-    transition: fill 0.15s, r 0.15s;
-  }
-  .admin-map-pin:hover { r: 7; }
-  .admin-map-pin.is-selected {
-    fill: var(--color-accent);
-    stroke: var(--white);
-  }
-  .admin-map-lasso {
-    fill: rgba(200,30,44,0.15);
-    stroke: var(--color-accent);
-    stroke-width: 1.5;
-    stroke-dasharray: 4 3;
+    color: var(--color-ink);
+    text-shadow: 0 0 3px var(--white), 0 0 3px var(--white), 0 0 3px var(--white);
+    white-space: nowrap;
   }
 
   .admin-filters {
@@ -271,10 +257,10 @@
   </div>
 
   <div class="admin-panel">
-    <h2>Select Customers on Map</h2>
-    <p class="admin-route-hint">Click and drag to draw around a group of pins — they'll be added to the route below. Pins are grouped by town (we don't have exact street coordinates yet, so nearby pins in the same town are spread out a little for visibility, not placed at their real address).</p>
+    <h2>Waitlist Interest Map</h2>
+    <p class="admin-route-hint">Warmer, bigger circles mean more real waitlist signups in that town — same idea as the public map, but for your own reference, on a real map with actual roads and geography. Address-check lookups aren't counted here, only actual waitlist signups.</p>
     <div class="admin-map-wrap">
-      <svg viewBox="0 0 700 460" class="admin-map-svg" id="admin-map-svg"></svg>
+      <div id="admin-map-el"></div>
     </div>
   </div>
 
@@ -729,174 +715,96 @@
     renderRouteList();
   }
 
-  // --- Selection map -----------------------------------------------
-  var MAP_W = 700, MAP_H = 460, MAP_PAD = 40;
-  var mapBounds = null; // computed once from TOWN_COORDS
+  // --- Waitlist interest map (real map via Leaflet + OpenStreetMap) ---
+  // Uses an actual map with real roads/geography rather than the
+  // stylized illustrated map on the public site -- this is an
+  // internal admin tool, so a real external map tile dependency is
+  // a reasonable tradeoff here in a way it wasn't for the
+  // customer-facing site (see README for why the public map avoids
+  // this). OpenStreetMap's tiles are free and don't need an API key.
+  var leafletMap = null;
+  var heatLayerGroup = null;
 
-  function computeMapBounds() {
+  function heatColor(count) {
+    if (count <= 0) return null;
+    if (count === 1) return "#ffd65c";
+    if (count <= 3) return "#ff9833";
+    if (count <= 6) return "#e64a2d";
+    return "#c81e2c";
+  }
+
+  // Real-world radius in meters so the circle scales correctly as
+  // you zoom in/out -- a reasonable "interest zone" size, not a
+  // literal precise boundary.
+  function heatRadiusMeters(count) {
+    return Math.min(1200 + count * 700, 6000);
+  }
+
+  function initAdminMap() {
+    if (leafletMap) return; // only set up the map once
+    var el = document.getElementById("admin-map-el");
+    if (!el || typeof L === "undefined") return;
+
     var lats = Object.values(TOWN_COORDS).map(function (c) { return c[0]; });
     var lngs = Object.values(TOWN_COORDS).map(function (c) { return c[1]; });
-    return {
-      minLat: Math.min.apply(null, lats),
-      maxLat: Math.max.apply(null, lats),
-      minLng: Math.min.apply(null, lngs),
-      maxLng: Math.max.apply(null, lngs),
-    };
-  }
+    var bounds = L.latLngBounds(
+      [Math.min.apply(null, lats), Math.min.apply(null, lngs)],
+      [Math.max.apply(null, lats), Math.max.apply(null, lngs)]
+    );
 
-  function projectToMap(lat, lng) {
-    if (!mapBounds) mapBounds = computeMapBounds();
-    var innerW = MAP_W - MAP_PAD * 2;
-    var innerH = MAP_H - MAP_PAD * 2;
-    var x = MAP_PAD + ((lng - mapBounds.minLng) / (mapBounds.maxLng - mapBounds.minLng)) * innerW;
-    var y = MAP_PAD + ((mapBounds.maxLat - lat) / (mapBounds.maxLat - mapBounds.minLat)) * innerH;
-    return [x, y];
-  }
+    leafletMap = L.map(el).fitBounds(bounds, { padding: [20, 20] });
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(leafletMap);
 
-  // Deterministic per-signup offset so pins in the same town spread
-  // out for visibility instead of stacking exactly on top of each
-  // other — stable across reloads (based on the signup's own id),
-  // not random each time, and NOT a real address position.
-  function jitterOffset(id) {
-    var angle = (id * 137.508) % 360; // golden angle — spreads points evenly
-    var radius = 6 + ((id * 53) % 100) / 100 * 16; // 6-22px from town center
-    var rad = (angle * Math.PI) / 180;
-    return [Math.cos(rad) * radius, Math.sin(rad) * radius];
-  }
-
-  function svgEl(tag, attrs) {
-    var el = document.createElementNS("http://www.w3.org/2000/svg", tag);
-    Object.keys(attrs || {}).forEach(function (k) { el.setAttribute(k, attrs[k]); });
-    return el;
+    heatLayerGroup = L.layerGroup().addTo(leafletMap);
   }
 
   function renderAdminMap() {
-    var svg = document.getElementById("admin-map-svg");
-    if (!svg) return;
-    svg.innerHTML = "";
+    initAdminMap();
+    if (!leafletMap || !heatLayerGroup) return;
+    heatLayerGroup.clearLayers();
 
-    // Reference towns — dim dots + small labels for orientation.
+    // Reference towns — small dots + labels for orientation, shown
+    // regardless of interest level, so the map is useful even before
+    // any real signups exist yet.
     Object.keys(TOWN_COORDS).forEach(function (name) {
-      var pos = projectToMap(TOWN_COORDS[name][0], TOWN_COORDS[name][1]);
-      svg.appendChild(svgEl("circle", { class: "admin-map-town-dot", cx: pos[0], cy: pos[1], r: 2 }));
-      svg.appendChild(
-        svgEl("text", { class: "admin-map-town-label", x: pos[0] + 5, y: pos[1] + 3 })
-      ).textContent = name.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+      var coords = TOWN_COORDS[name];
+      var label = name.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+      L.circleMarker(coords, {
+        radius: 3, color: "#2f4a37", weight: 1, fillColor: "#2f4a37", fillOpacity: 0.7,
+      }).addTo(heatLayerGroup);
+      L.marker(coords, {
+        icon: L.divIcon({ className: "admin-map-town-label", html: label, iconSize: null, iconAnchor: [-6, 4] }),
+        interactive: false,
+      }).addTo(heatLayerGroup);
     });
 
-    // One pin per signup with a recognized town, jittered so nearby
-    // pins in the same town are visible as separate points.
+    // Real waitlist signups only — address-check lookups aren't
+    // counted here, same rule as the public map's heat data.
+    var countsByTown = {};
     allSignups.forEach(function (row) {
-      var town = findTownInText(row.city);
-      if (!town) return;
-      var base = projectToMap(town[0], town[1]);
-      var offset = jitterOffset(row.id);
-      var x = base[0] + offset[0];
-      var y = base[1] + offset[1];
-      var selected = routeStopIds.has(row.id);
-      var pin = svgEl("circle", {
-        class: "admin-map-pin" + (selected ? " is-selected" : ""),
-        cx: x, cy: y, r: 5,
-        "data-id": row.id, "data-mx": x, "data-my": y,
-      });
-      var name = [row.first_name, row.last_name].filter(Boolean).join(" ") || row.city || "Signup";
-      pin.appendChild(svgEl("title")).textContent = name + " — " + (row.city || "");
-      pin.addEventListener("click", function (e) {
-        e.stopPropagation();
-        toggleRouteStop(row.id, !routeStopIds.has(row.id));
-      });
-      svg.appendChild(pin);
+      if (row.form_type !== "waitlist") return;
+      var key = normalizeCityKey(row.city);
+      if (!key) return;
+      var match = Object.keys(TOWN_COORDS).find(function (t) { return key.indexOf(t) !== -1; });
+      if (!match) return;
+      countsByTown[match] = (countsByTown[match] || 0) + 1;
     });
 
-    initLasso(svg);
-  }
-
-  function syncRouteCheckboxes() {
-    document.querySelectorAll('[data-action="route-select"]').forEach(function (cb) {
-      cb.checked = routeStopIds.has(parseInt(cb.getAttribute("data-id"), 10));
+    Object.keys(countsByTown).forEach(function (town) {
+      var color = heatColor(countsByTown[town]);
+      if (!color) return;
+      var label = town.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+      var n = countsByTown[town];
+      L.circle(TOWN_COORDS[town], {
+        radius: heatRadiusMeters(n),
+        color: color, weight: 1, fillColor: color, fillOpacity: 0.4,
+      })
+        .bindTooltip(label + ": " + n + (n === 1 ? " waitlist signup" : " waitlist signups"))
+        .addTo(heatLayerGroup);
     });
-  }
-
-  function pointInPolygon(x, y, polygon) {
-    var inside = false;
-    for (var i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-      var xi = polygon[i][0], yi = polygon[i][1];
-      var xj = polygon[j][0], yj = polygon[j][1];
-      var intersect = yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
-      if (intersect) inside = !inside;
-    }
-    return inside;
-  }
-
-  function getSvgPoint(svg, clientX, clientY) {
-    var rect = svg.getBoundingClientRect();
-    var vb = svg.viewBox.baseVal;
-    return [
-      ((clientX - rect.left) / rect.width) * vb.width + vb.x,
-      ((clientY - rect.top) / rect.height) * vb.height + vb.y,
-    ];
-  }
-
-  function initLasso(svg) {
-    var drawing = false;
-    var path = [];
-    var lassoPath = null;
-
-    function pointerPos(e) {
-      var t = e.touches && e.touches[0] ? e.touches[0] : e;
-      return getSvgPoint(svg, t.clientX, t.clientY);
-    }
-
-    function start(e) {
-      if (e.target.closest(".admin-map-pin")) return; // let pin clicks work normally
-      drawing = true;
-      path = [pointerPos(e)];
-      lassoPath = svgEl("polyline", { class: "admin-map-lasso", points: "" });
-      svg.appendChild(lassoPath);
-      e.preventDefault();
-    }
-
-    function move(e) {
-      if (!drawing) return;
-      path.push(pointerPos(e));
-      lassoPath.setAttribute("points", path.map(function (p) { return p[0] + "," + p[1]; }).join(" "));
-      e.preventDefault();
-    }
-
-    function end() {
-      if (!drawing) return;
-      drawing = false;
-      if (lassoPath) {
-        svg.removeChild(lassoPath);
-        lassoPath = null;
-      }
-      if (path.length < 3) return;
-
-      var addedAny = false;
-      var hitLimit = false;
-      svg.querySelectorAll(".admin-map-pin").forEach(function (pin) {
-        var x = parseFloat(pin.getAttribute("data-mx"));
-        var y = parseFloat(pin.getAttribute("data-my"));
-        if (!pointInPolygon(x, y, path)) return;
-        var id = parseInt(pin.getAttribute("data-id"), 10);
-        if (routeStopIds.has(id)) return;
-        if (routeStopOrder.length >= 9) {
-          hitLimit = true;
-          return;
-        }
-        toggleRouteStop(id, true);
-      });
-      if (hitLimit) {
-        alert("Google Maps only supports 9 stops per route link — remove one first, or plan a second trip for the rest.");
-      }
-    }
-
-    svg.addEventListener("mousedown", start);
-    svg.addEventListener("mousemove", move);
-    window.addEventListener("mouseup", end);
-    svg.addEventListener("touchstart", start, { passive: false });
-    svg.addEventListener("touchmove", move, { passive: false });
-    svg.addEventListener("touchend", end);
   }
 
   function stopAddress(row) {
@@ -933,6 +841,12 @@
       .join("");
   }
 
+  function syncRouteCheckboxes() {
+    document.querySelectorAll('[data-action="route-select"]').forEach(function (cb) {
+      cb.checked = routeStopIds.has(parseInt(cb.getAttribute("data-id"), 10));
+    });
+  }
+
   function toggleRouteStop(id, include) {
     if (include) {
       if (!routeStopIds.has(id)) {
@@ -949,8 +863,6 @@
     }
     renderRouteList();
     syncRouteCheckboxes();
-    var pin = document.querySelector('.admin-map-pin[data-id="' + id + '"]');
-    if (pin) pin.classList.toggle("is-selected", routeStopIds.has(id));
     return true;
   }
 

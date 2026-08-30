@@ -4,7 +4,50 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v31.0 — current
+## v32.0 — current
+
+- Waitlist Interest Map now uses a real interactive map (Leaflet +
+  OpenStreetMap) instead of the stylized illustrated map — actual
+  roads and geography, real pan/zoom, no API key needed. Deliberate
+  difference from the public map, which avoids any external map
+  dependency on purpose (see README for why); that tradeoff doesn't
+  apply the same way to an internal admin-only tool.
+- Heat circles use real-world meter radius, so they scale correctly
+  as you zoom in or out rather than staying a fixed pixel size.
+- Caught and fixed a real syntax bug from the previous rewrite (a
+  stray extra closing brace) that would have broken the entire
+  admin page's JavaScript — found it by syntax-checking the
+  extracted script directly, not just visually.
+- Verified all the underlying logic is correct by stubbing
+  Leaflet's API and confirming: exactly 45 town reference markers,
+  the OSM tile layer initialized once with correct attribution, and
+  heat circles that correctly exclude address-check submissions
+  (confirmed via the exact radius and tooltip text produced).
+- Note: couldn't visually confirm the real map tiles rendering in
+  this sandbox specifically, since it blocks the external CDN/tile
+  requests — that's a restriction of my working environment, not
+  something wrong with the code. Worth a quick look once this is
+  live to confirm the tiles load as expected.
+
+## v31.1
+
+Simplified the admin map based on feedback — dropped the lasso/pin
+selection idea, made it a bigger reference heatmap instead:
+
+- Removed the click-to-select and drag-a-lasso interaction entirely
+  — the map is now purely a visual reference, not a selection tool.
+  Selecting stops for the route still works the same as before, via
+  the checkboxes in the table.
+- Map is bigger (900×600 viewBox, up from 700×460) and now renders
+  as a heatmap — same color/size scale as the public map (warmer,
+  bigger glow = more interest) — instead of individual pins.
+- **Only counts real waitlist signups, not address-check lookups**
+  — verified directly: a town with 2 address-checks and 1 real
+  waitlist signup correctly shows the same small/light glow as a
+  town with only 1 real signup, not inflated by the address-checks.
+- Cleaned up now-dead code from the removed lasso feature.
+
+## v31.0
 
 - Added a **Select Customers on Map** panel to the admin dashboard —
   a small map with a pin for every signup, plus real drag-a-lasso
