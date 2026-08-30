@@ -156,6 +156,27 @@
     text-shadow: 0 0 3px var(--white), 0 0 3px var(--white), 0 0 3px var(--white);
     white-space: nowrap;
   }
+  .admin-map-loading {
+    font-size: 0.85rem;
+    color: var(--color-brand);
+    font-weight: 700;
+    margin-bottom: var(--space-3);
+  }
+  .admin-map-loading-pulse {
+    background: none;
+    border: none;
+  }
+  .admin-map-loading-pulse__dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: rgba(200, 30, 44, 0.55);
+    animation: admin-map-pulse 1.3s ease-in-out infinite;
+  }
+  @keyframes admin-map-pulse {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.7); opacity: 0.15; }
+  }
 
   .admin-filters {
     display: flex;
@@ -258,7 +279,8 @@
 
   <div class="admin-panel">
     <h2>Waitlist Interest Map</h2>
-    <p class="admin-route-hint">Warmer colors mean more real waitlist signups in that town, traced to that town's actual municipal boundary where OpenStreetMap has one on file (falls back to a circle if not). Address-check lookups aren't counted, only actual waitlist signups.</p>
+    <p class="admin-route-hint">Warmer colors mean more real waitlist signups in that town, traced to that town's actual municipal boundary where OpenStreetMap has one on file (falls back to a circle if a specific town doesn't have one). Address-check lookups aren't counted, only actual waitlist signups.</p>
+    <p class="admin-map-loading" id="admin-map-loading" style="display: none;">Loading real boundaries…</p>
     <div class="admin-map-wrap">
       <div id="admin-map-el"></div>
     </div>
@@ -800,27 +822,37 @@
       var n = countsByTown[town];
       var tooltipText = label + ": " + n + (n === 1 ? " waitlist signup" : " waitlist signups");
 
-      // Start with a plain circle immediately, so the map is useful
-      // right away — then swap it for the real municipal boundary
-      // once it's loaded, if one can be found. Only towns with real
-      // interest get a boundary fetched at all (not all 45 towns
-      // preemptively), to stay well within Nominatim's free-tier
-      // usage policy for a low-traffic internal tool like this.
-      var placeholderCircle = L.circle(TOWN_COORDS[town], {
-        radius: heatRadiusMeters(n),
-        color: color, weight: 1, fillColor: color, fillOpacity: 0.4,
+      // Show a pulsing loading marker while the real boundary is
+      // being fetched, instead of guessing with a circle up front.
+      // Only towns with real interest get a boundary fetched at all
+      // (not all 45 towns preemptively), to stay well within
+      // Nominatim's free-tier usage policy for a low-traffic
+      // internal tool like this.
+      var loadingMarker = L.marker(TOWN_COORDS[town], {
+        icon: L.divIcon({ className: "admin-map-loading-pulse", html: '<div class="admin-map-loading-pulse__dot"></div>', iconSize: [14, 14], iconAnchor: [7, 7] }),
+        interactive: false,
       })
-        .bindTooltip(tooltipText)
+        .bindTooltip("Loading " + label + "'s boundary…")
         .addTo(heatLayerGroup);
 
       queueBoundaryFetch(town, function (geojson) {
-        if (!geojson) return; // couldn't find a real boundary — keep the circle as-is
-        heatLayerGroup.removeLayer(placeholderCircle);
-        L.geoJSON(geojson, {
-          style: { color: color, weight: 2, fillColor: color, fillOpacity: 0.4 },
-        })
-          .bindTooltip(tooltipText)
-          .addTo(heatLayerGroup);
+        heatLayerGroup.removeLayer(loadingMarker);
+        if (geojson) {
+          L.geoJSON(geojson, {
+            style: { color: color, weight: 2, fillColor: color, fillOpacity: 0.4 },
+          })
+            .bindTooltip(tooltipText)
+            .addTo(heatLayerGroup);
+        } else {
+          // No real boundary found for this specific town — fall
+          // back to a circle so it's still shown on the map.
+          L.circle(TOWN_COORDS[town], {
+            radius: heatRadiusMeters(n),
+            color: color, weight: 1, fillColor: color, fillOpacity: 0.4,
+          })
+            .bindTooltip(tooltipText)
+            .addTo(heatLayerGroup);
+        }
       });
     });
   }
@@ -834,25 +866,41 @@
   var boundaryQueue = [];
   var boundaryQueueRunning = false;
 
+  function updateLoadingStatus() {
+    var el = document.getElementById("admin-map-loading");
+    if (!el) return;
+    var remaining = boundaryQueue.length + (boundaryQueueRunning ? 1 : 0);
+    if (remaining > 0) {
+      el.style.display = "block";
+      el.textContent = "Loading real boundaries… (" + remaining + (remaining === 1 ? " town left" : " towns left") + ")";
+    } else {
+      el.style.display = "none";
+    }
+  }
+
   function queueBoundaryFetch(town, onLoaded) {
     if (boundaryCache[town] !== undefined) {
       onLoaded(boundaryCache[town]);
       return;
     }
     boundaryQueue.push({ town: town, onLoaded: onLoaded });
+    updateLoadingStatus();
     if (!boundaryQueueRunning) runBoundaryQueue();
   }
 
   async function runBoundaryQueue() {
     boundaryQueueRunning = true;
+    updateLoadingStatus();
     while (boundaryQueue.length > 0) {
       var item = boundaryQueue.shift();
       var geojson = await fetchTownBoundary(item.town);
       boundaryCache[item.town] = geojson;
       item.onLoaded(geojson);
+      updateLoadingStatus();
       await new Promise(function (resolve) { setTimeout(resolve, 1100); });
     }
     boundaryQueueRunning = false;
+    updateLoadingStatus();
   }
 
   async function fetchTownBoundary(town) {

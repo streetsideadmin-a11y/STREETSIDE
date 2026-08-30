@@ -359,9 +359,12 @@ route from the checkboxes in the table below it instead.
 
 Boundaries load in gradually, one town at a time, about a second
 apart — that's deliberate, not a bug: it respects the usage limits
-of the free service providing this data. You'll see a circle for
-each town immediately, then it gets replaced by the real boundary
-shape once it loads a moment later.
+of the free service providing this data. Each town with real
+interest shows a small pulsing loading marker while its boundary is
+being looked up, then that gets replaced with the real boundary
+shape (or a colored circle, if that specific town's boundary
+couldn't be found) once the lookup finishes. A "Loading real
+boundaries…" note above the map shows how many are still pending.
 
 A note on why this differs from the public map: the public map
 deliberately avoids any external map service, so it can never

@@ -4,7 +4,24 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v33.0 — current
+## v33.1 — current
+
+- Replaced the "show a circle immediately" placeholder with a real
+  loading state: each town with interest now shows a small pulsing
+  marker while its boundary is being looked up, swapped for the
+  real boundary shape (or a fallback circle, only if that specific
+  town's boundary genuinely can't be found) once the lookup
+  resolves — no more guessing with a circle before we even know if
+  a real boundary exists.
+- Added a "Loading real boundaries… (X left)" status line above the
+  map that tracks progress and disappears once everything's loaded.
+- Verified the full sequence with simulated data: loading markers
+  appear immediately with zero premature circles, the status text
+  updates as requests resolve, a found boundary and a not-found
+  fallback circle both land correctly, and every loading marker
+  gets cleanly removed once its town resolves either way.
+
+## v33.0
 
 - Waitlist Interest Map now highlights each town's **real municipal
   boundary** (traced from OpenStreetMap's own boundary data via
