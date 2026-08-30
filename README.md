@@ -346,20 +346,30 @@ already account for actual roads once you're using the link.
 **Waitlist Interest Map:** a real interactive map above the route
 planner — actual roads and geography (via OpenStreetMap, a free,
 open map service — no API key needed), not the stylized illustrated
-map on the public site. Same color idea as the public map (warmer
-means more interest), but circles are sized in real-world scale so
-they stay accurate as you zoom in or out, and it's private to you,
-filtered to real waitlist signups only — address-check lookups
-aren't counted. It's for your own reference when deciding where to
-plan routes, not a selection tool — select stops for the route from
-the checkboxes in the table below it instead.
+map on the public site. Towns with real waitlist interest are
+highlighted using their **actual municipal boundary** where
+OpenStreetMap has one on file — not a generic circle — colored
+using the same warmer-means-more-interest scale as the public map.
+If a specific town's real boundary can't be found, it falls back to
+a colored circle instead, so nothing ever looks broken. It's
+private to you, filtered to real waitlist signups only — address-
+check lookups aren't counted. For your own reference when deciding
+where to plan routes, not a selection tool — select stops for the
+route from the checkboxes in the table below it instead.
+
+Boundaries load in gradually, one town at a time, about a second
+apart — that's deliberate, not a bug: it respects the usage limits
+of the free service providing this data. You'll see a circle for
+each town immediately, then it gets replaced by the real boundary
+shape once it loads a moment later.
 
 A note on why this differs from the public map: the public map
 deliberately avoids any external map service, so it can never
 break for a visitor if a third-party map provider has an outage —
 that's worth protecting on a page meant to convert visitors into
 signups. This admin page is different: it's just for you, so a real
-map with real roads is more useful here than that tradeoff matters.
+map with real roads and real boundaries is more useful here than
+that tradeoff matters.
 
 ## Launch checklist — what still needs real data
 

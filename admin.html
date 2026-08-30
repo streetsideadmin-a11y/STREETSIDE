@@ -258,7 +258,7 @@
 
   <div class="admin-panel">
     <h2>Waitlist Interest Map</h2>
-    <p class="admin-route-hint">Warmer, bigger circles mean more real waitlist signups in that town — same idea as the public map, but for your own reference, on a real map with actual roads and geography. Address-check lookups aren't counted here, only actual waitlist signups.</p>
+    <p class="admin-route-hint">Warmer colors mean more real waitlist signups in that town, traced to that town's actual municipal boundary where OpenStreetMap has one on file (falls back to a circle if not). Address-check lookups aren't counted, only actual waitlist signups.</p>
     <div class="admin-map-wrap">
       <div id="admin-map-el"></div>
     </div>
@@ -798,13 +798,80 @@
       if (!color) return;
       var label = town.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
       var n = countsByTown[town];
-      L.circle(TOWN_COORDS[town], {
+      var tooltipText = label + ": " + n + (n === 1 ? " waitlist signup" : " waitlist signups");
+
+      // Start with a plain circle immediately, so the map is useful
+      // right away — then swap it for the real municipal boundary
+      // once it's loaded, if one can be found. Only towns with real
+      // interest get a boundary fetched at all (not all 45 towns
+      // preemptively), to stay well within Nominatim's free-tier
+      // usage policy for a low-traffic internal tool like this.
+      var placeholderCircle = L.circle(TOWN_COORDS[town], {
         radius: heatRadiusMeters(n),
         color: color, weight: 1, fillColor: color, fillOpacity: 0.4,
       })
-        .bindTooltip(label + ": " + n + (n === 1 ? " waitlist signup" : " waitlist signups"))
+        .bindTooltip(tooltipText)
         .addTo(heatLayerGroup);
+
+      queueBoundaryFetch(town, function (geojson) {
+        if (!geojson) return; // couldn't find a real boundary — keep the circle as-is
+        heatLayerGroup.removeLayer(placeholderCircle);
+        L.geoJSON(geojson, {
+          style: { color: color, weight: 2, fillColor: color, fillOpacity: 0.4 },
+        })
+          .bindTooltip(tooltipText)
+          .addTo(heatLayerGroup);
+      });
     });
+  }
+
+  // --- Real municipal boundaries, fetched from OpenStreetMap's free
+  // Nominatim geocoding service (no API key needed). Rate-limited to
+  // roughly one request per second per Nominatim's usage policy —
+  // this is a low-traffic internal tool, so a queue with a small
+  // delay between requests is enough to stay well within that.
+  var boundaryCache = {};
+  var boundaryQueue = [];
+  var boundaryQueueRunning = false;
+
+  function queueBoundaryFetch(town, onLoaded) {
+    if (boundaryCache[town] !== undefined) {
+      onLoaded(boundaryCache[town]);
+      return;
+    }
+    boundaryQueue.push({ town: town, onLoaded: onLoaded });
+    if (!boundaryQueueRunning) runBoundaryQueue();
+  }
+
+  async function runBoundaryQueue() {
+    boundaryQueueRunning = true;
+    while (boundaryQueue.length > 0) {
+      var item = boundaryQueue.shift();
+      var geojson = await fetchTownBoundary(item.town);
+      boundaryCache[item.town] = geojson;
+      item.onLoaded(geojson);
+      await new Promise(function (resolve) { setTimeout(resolve, 1100); });
+    }
+    boundaryQueueRunning = false;
+  }
+
+  async function fetchTownBoundary(town) {
+    var query = town.replace(/\b\w/g, function (c) { return c.toUpperCase(); }) + ", Ohio, USA";
+    var url =
+      "https://nominatim.openstreetmap.org/search?format=json&polygon_geojson=1&limit=1&q=" +
+      encodeURIComponent(query);
+    try {
+      var res = await fetch(url, { headers: { Accept: "application/json" } });
+      if (!res.ok) throw new Error("Nominatim responded with " + res.status);
+      var results = await res.json();
+      if (!results.length || !results[0].geojson) return null;
+      var type = results[0].geojson.type;
+      if (type !== "Polygon" && type !== "MultiPolygon") return null; // skip points/lines — need an actual area
+      return results[0].geojson;
+    } catch (err) {
+      console.warn("[streetside] Could not load a real boundary for " + town + " — using a circle instead:", err);
+      return null;
+    }
   }
 
   function stopAddress(row) {

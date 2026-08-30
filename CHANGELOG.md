@@ -4,7 +4,36 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v32.0 — current
+## v33.0 — current
+
+- Waitlist Interest Map now highlights each town's **real municipal
+  boundary** (traced from OpenStreetMap's own boundary data via
+  Nominatim, their free geocoding service) instead of a generic
+  circle, wherever a real boundary exists to find.
+- Only fetches boundaries for towns that currently have real
+  waitlist interest — not all 45 towns preemptively — and loads
+  them one at a time, about a second apart, to respect Nominatim's
+  free-tier usage policy rather than hammering it with a burst of
+  parallel requests.
+- Shows a circle immediately for every interested town, then swaps
+  in the real boundary shape once it loads — so the map is useful
+  right away instead of sitting blank while boundaries load.
+- Graceful fallback: any town whose real boundary can't be found
+  (or if the request fails) just keeps its circle — nothing breaks
+  or looks empty.
+- Verified the whole flow directly: circles appear instantly for
+  every town with interest, a found boundary correctly swaps in
+  and removes its placeholder circle, a not-found town correctly
+  keeps its circle, and the delay between requests lands right at
+  the intended ~1.1 seconds.
+- I couldn't pre-fetch and bundle this data myself ahead of time
+  (my own tools require a URL to come from a search result before
+  I can fetch it, so I can't hit a geocoding API directly) — that's
+  why this fetches live in the browser instead of using baked-in
+  data, which is also more honest anyway: boundaries stay live and
+  current rather than a snapshot from whenever I fetched them.
+
+## v32.0
 
 - Waitlist Interest Map now uses a real interactive map (Leaflet +
   OpenStreetMap) instead of the stylized illustrated map — actual
