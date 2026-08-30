@@ -332,6 +332,28 @@ links support at most 9 stops per trip; the checkbox stops you at 9
 with a message rather than silently dropping stops past that —
 split a bigger day into two trips.
 
+**Sorting stops by distance:** once you've typed a starting address
+that includes a recognized nearby town, two buttons appear —
+"Closest → Furthest" and "Furthest → Closest" — that reorder your
+selected stops by straight-line distance from that starting point.
+This uses the same real town coordinates behind the public map, not
+a routing API, so it's town-center-to-town-center distance in a
+straight line, not actual road distance. It's a genuinely useful
+starting order for a route, not true turn-by-turn optimization —
+Google Maps' own directions (which you open right after) will
+already account for actual roads once you're using the link.
+
+**Selecting stops on a map:** above the route planner is a small
+map with a pin for every signup. Click and drag to draw a lasso
+around a group of pins — everything inside gets added to the route.
+Click a single pin to add or remove just that one. A real limit
+worth knowing: we don't geocode down to the exact street address,
+only the town — so pins for two signups in the same town are spread
+apart a little just so they're both visible and separately
+selectable, not placed at their real address. If you want pins at
+real street-level accuracy later, that needs a geocoding
+service/API key set up — ask any time and I can wire it in.
+
 ## Launch checklist — what still needs real data
 
 Nothing fake is shown anywhere on the site. Instead, these are clearly

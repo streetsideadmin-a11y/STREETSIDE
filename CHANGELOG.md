@@ -4,7 +4,45 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v30.0 — current
+## v31.0 — current
+
+- Added a **Select Customers on Map** panel to the admin dashboard —
+  a small map with a pin for every signup, plus real drag-a-lasso
+  selection: draw a shape around a group of pins to add them all to
+  the route at once, or click a single pin to toggle just that one.
+- Reuses the same real town coordinates already powering the route
+  sort feature and the public map — no new dependency.
+- Honest about the real limit: pins are placed at the town level,
+  not the exact street address (we don't geocode that precisely
+  yet) — two signups in the same town get spread apart a little so
+  both are visible and separately selectable, not placed at their
+  real address. Stated plainly in the panel itself, not buried.
+- Fully wired into the existing route system — selecting on the map,
+  checking a box in the table, and removing a stop from the route
+  list all stay in sync with each other automatically.
+- Tested map rendering (pins skip unrecognized towns rather than
+  guessing), click-to-toggle, and lasso selection precisely
+  targeting a subset of pins while leaving others untouched.
+
+## v30.1
+
+- Added distance-based sorting to the Route Planner: "Closest →
+  Furthest" and "Furthest → Closest" buttons reorder your selected
+  stops using straight-line distance from a typed starting address.
+- Uses the same real town coordinates that already power the public
+  map — no new API or geocoding service needed. Buttons stay
+  disabled until the starting address includes a town the map
+  actually recognizes, so it never silently sorts against a wrong
+  guess.
+- Tested against real known distances from Columbus (Groveport
+  ~10mi, Circleville ~26mi, Lancaster ~29mi, Newark ~33mi) — sorted
+  in exactly the right order both directions.
+- Honest about its limits, in the UI itself: this is straight-line
+  town-center distance, not real road distance or true route
+  optimization — a solid starting order, with Google Maps' own
+  directions (opened right after) handling the actual roads.
+
+## v30.0
 
 - Added a **Route Planner** to the admin dashboard — check the
   "Route" box on any signup to add it as a stop, reorder with
