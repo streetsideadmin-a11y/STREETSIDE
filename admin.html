@@ -77,6 +77,38 @@
     margin-bottom: var(--space-4);
     color: var(--color-brand-strong);
   }
+  .admin-panel__header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+  }
+  .admin-panel__header-row h2 { margin-bottom: 0; }
+  .admin-toggle-group {
+    display: inline-flex;
+    border: 1px solid var(--color-border);
+    border-radius: 999px;
+    padding: 3px;
+    background: var(--off-white);
+  }
+  .admin-toggle-btn {
+    border: none;
+    background: transparent;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--color-ink-muted);
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .admin-toggle-btn:hover { color: var(--color-brand-strong); }
+  .admin-toggle-btn.is-active {
+    background: var(--color-brand-strong);
+    color: #fff;
+  }
   .admin-city-list { display: flex; flex-wrap: wrap; gap: var(--space-3); }
   .admin-city-list__item {
     display: flex;
@@ -294,7 +326,13 @@
   <div class="admin-summary" id="admin-summary"></div>
 
   <div class="admin-panel">
-    <h2>Interest by City</h2>
+    <div class="admin-panel__header-row">
+      <h2>Interest by City</h2>
+      <div class="admin-toggle-group" id="admin-city-breakdown-toggle" role="group" aria-label="City breakdown source">
+        <button type="button" class="admin-toggle-btn is-active" data-breakdown-type="waitlist">Signups</button>
+        <button type="button" class="admin-toggle-btn" data-breakdown-type="address-check">Address Checks</button>
+      </div>
+    </div>
     <div class="admin-city-list" id="admin-city-list"></div>
   </div>
 
@@ -353,6 +391,13 @@
     <select id="admin-filter-city" class="admin-filter-select">
       <option value="">All cities</option>
     </select>
+    <select id="admin-filter-discount" class="admin-filter-select">
+      <option value="">All discounts</option>
+      <option value="founder">Founder Discount</option>
+      <option value="friends-family">Friends &amp; Family</option>
+      <option value="free-service">Free Service</option>
+      <option value="__none__">No discount</option>
+    </select>
     <button type="button" class="btn btn-outline-brand admin-filter-clear" id="admin-filter-clear">Clear</button>
   </div>
   <p class="admin-filter-count" id="admin-filter-count"></p>
@@ -371,6 +416,7 @@
           <th class="is-sortable" data-sort-key="city">City</th>
           <th>ZIP</th>
           <th class="is-sortable" data-sort-key="interested_package">Package</th>
+          <th class="is-sortable" data-sort-key="discount_type">Discount</th>
           <th>Consent</th>
           <th class="is-sortable" data-sort-key="contacted">Contacted</th>
           <th>Actions</th>
@@ -467,6 +513,15 @@
     return labels[id] || id || "—";
   }
 
+  function discountLabel(id) {
+    var labels = {
+      founder: "Founder Discount",
+      "friends-family": "Friends & Family",
+      "free-service": "Free Service",
+    };
+    return labels[id] || "—";
+  }
+
   function formatDate(iso) {
     if (!iso) return "—";
     var d = new Date(iso);
@@ -480,9 +535,12 @@
   }
 
   // --- City breakdown panel -------------------------------------
+  var cityBreakdownType = "waitlist"; // "waitlist" | "address-check"
+
   function renderCityBreakdown() {
     var counts = {};
     allSignups.forEach(function (row) {
+      if (row.form_type !== cityBreakdownType) return;
       if (!row.city) return;
       var key = row.city.trim();
       counts[key] = (counts[key] || 0) + 1;
@@ -497,7 +555,10 @@
 
     var el = document.getElementById("admin-city-list");
     if (entries.length === 0) {
-      el.innerHTML = '<span class="admin-city-list__empty">No signups yet.</span>';
+      el.innerHTML =
+        '<span class="admin-city-list__empty">No ' +
+        (cityBreakdownType === "waitlist" ? "signups" : "address checks") +
+        " yet.</span>";
       return;
     }
     el.innerHTML = entries
@@ -511,6 +572,19 @@
         );
       })
       .join("");
+  }
+
+  var cityBreakdownToggleEl = document.getElementById("admin-city-breakdown-toggle");
+  if (cityBreakdownToggleEl) {
+    cityBreakdownToggleEl.addEventListener("click", function (ev) {
+      var btn = ev.target.closest("[data-breakdown-type]");
+      if (!btn) return;
+      cityBreakdownType = btn.getAttribute("data-breakdown-type");
+      cityBreakdownToggleEl.querySelectorAll(".admin-toggle-btn").forEach(function (b) {
+        b.classList.toggle("is-active", b === btn);
+      });
+      renderCityBreakdown();
+    });
   }
 
   // --- Table rendering + filtering --------------------------------
@@ -544,6 +618,7 @@
           "<td>" + escapeHtml(row.city || "—") + "</td>" +
           "<td>" + escapeHtml(row.zip || "—") + "</td>" +
           "<td>" + escapeHtml(packageLabel(row.interested_package)) + "</td>" +
+          "<td>" + escapeHtml(discountLabel(row.discount_type)) + "</td>" +
           "<td>" + (row.consent ? "Yes" : "No") + "</td>" +
           "<td><label class=\"admin-contacted-toggle\"><input type=\"checkbox\" data-action=\"toggle-contacted\" data-id=\"" + row.id + "\"" + (row.contacted ? " checked" : "") + " /> " + (row.contacted ? "Yes" : "No") + "</label></td>" +
           "<td><button type=\"button\" class=\"admin-delete-btn\" data-action=\"delete-row\" data-id=\"" + row.id + "\">Delete</button></td>" +
@@ -561,6 +636,7 @@
     var type = document.getElementById("admin-filter-type").value;
     var pkg = document.getElementById("admin-filter-package").value;
     var city = document.getElementById("admin-filter-city").value;
+    var discount = document.getElementById("admin-filter-discount").value;
 
     var filtered = allSignups.filter(function (row) {
       if (type && row.form_type !== type) return false;
@@ -568,6 +644,12 @@
       if (pkg === "__none__") {
         if (row.interested_package) return false;
       } else if (pkg && row.interested_package !== pkg) {
+        return false;
+      }
+
+      if (discount === "__none__") {
+        if (row.discount_type) return false;
+      } else if (discount && row.discount_type !== discount) {
         return false;
       }
 
@@ -612,11 +694,12 @@
     document.getElementById("admin-filter-type").value = "";
     document.getElementById("admin-filter-package").value = "";
     document.getElementById("admin-filter-city").value = "";
+    document.getElementById("admin-filter-discount").value = "";
     setMapTownFilter(null);
   }
 
   function initFilters() {
-    ["admin-filter-search", "admin-filter-type", "admin-filter-package", "admin-filter-city"].forEach(function (id) {
+    ["admin-filter-search", "admin-filter-type", "admin-filter-package", "admin-filter-city", "admin-filter-discount"].forEach(function (id) {
       var el = document.getElementById(id);
       var evt = el.tagName === "SELECT" ? "change" : "input";
       el.addEventListener(evt, applyFilters);
@@ -639,7 +722,7 @@
   function exportCsv() {
     var headers = [
       "Submitted", "Type", "First Name", "Last Name", "Email", "Phone",
-      "Street Address", "City", "ZIP", "Package", "Consent", "Contacted",
+      "Street Address", "City", "ZIP", "Package", "Discount", "Consent", "Contacted",
     ];
     var lines = [headers.join(",")];
     currentFiltered.forEach(function (row) {
@@ -655,6 +738,7 @@
           row.city || "",
           row.zip || "",
           packageLabel(row.interested_package),
+          discountLabel(row.discount_type),
           row.consent ? "Yes" : "No",
           row.contacted ? "Yes" : "No",
         ]

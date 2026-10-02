@@ -4,7 +4,46 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v40.1 — current
+## v41.0 — current
+
+- **Interest by City now has a Signups / Address Checks toggle.** It
+  defaulted to lumping both form types together with no way to see
+  them separately. Added two buttons above the panel — clicking
+  "Address Checks" re-counts the same city list using only
+  `address-check` rows, "Signups" switches back to real waitlist
+  rows (still the default on load).
+- **Added a Discount / Offer dropdown to the waitlist signup form**
+  (`index.html`) with three options — Founder Discount, Friends &
+  Family, and Free Service — plus "None" as the default. It's
+  optional, not required, since most signups won't have a code.
+- Wired the new field all the way through:
+  - `api/waitlist.js` now saves it to a new `discount_type` column,
+    with the same graceful fallback the `interested_package` column
+    already had — if the column doesn't exist yet in your database
+    (you haven't run the migration below), the submission still
+    saves everything else instead of failing outright, and a clear
+    warning shows up in the Vercel logs.
+  - `schema.sql` documents the new column and adds it to the
+    migration block at the bottom.
+  - The admin dashboard table has a new **Discount** column, a new
+    **All discounts / Founder / Friends & Family / Free Service /
+    No discount** filter dropdown, and CSV export now includes it.
+- **New Neon migration needed before this takes effect on real
+  submissions:**
+  ```sql
+  ALTER TABLE signups ADD COLUMN IF NOT EXISTS discount_type TEXT;
+  ```
+  Run that in the Neon SQL Editor (same place you'd have run the
+  `interested_package`/`contacted` migrations earlier). Until you
+  do, discount selections are silently dropped (logged, not lost
+  data elsewhere) rather than breaking signups.
+- Verified: simulated mixed waitlist/address-check city data and
+  confirmed the toggle produces two genuinely different counts per
+  city (not just the same list re-labeled); confirmed the discount
+  filter's "No discount" option correctly isolates rows with no
+  `discount_type` set, separate from `""` meaning "all."
+
+## v40.1
 
 - Extended the Meta Pixel to every real public page — homepage,
   privacy policy, terms, and the 404 page — matching Meta's own

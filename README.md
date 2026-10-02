@@ -296,8 +296,13 @@ The dashboard also includes:
 - **Interest by city** — a real-time breakdown showing how many
   signups exist per city, sorted by count, so you can see at a
   glance which town is closest to having enough interest for a route.
+  A **Signups / Address Checks toggle** above it switches between
+  counting real waitlist signups (the default) and address-check
+  lookups per city — the two numbers can tell very different
+  stories (e.g. lots of lookups but few actual signups in a town).
 - **Search + filters** — search by name/email/phone/address/city,
-  or filter by submission type, plan, or city.
+  plan, or discount type, or filter by submission type, plan, city,
+  or discount.
 - **Export CSV** — downloads whatever's currently visible (respects
   active filters) as a spreadsheet file.
 - **Mark as Contacted** — a checkbox per row; contacted rows are
@@ -331,16 +336,23 @@ The dashboard also includes:
    login cookie so it can't be forged. Any long random text works;
    a quick way to generate one is running this in your browser's
    JavaScript console: `crypto.randomUUID() + crypto.randomUUID()`
-4. Run this in Neon's SQL Editor if you haven't already (adds the
-   column the "Mark as Contacted" feature needs, plus the table
-   that caches real map boundaries so they're only ever looked up
-   once — see "Service area map" above):
+4. Run this in Neon's SQL Editor if you haven't already (adds every
+   column/table added since the original launch schema — the
+   "Which Plan" and "Discount" dropdowns, the "Mark as Contacted"
+   feature, and the table that caches real map boundaries so
+   they're only ever looked up once — see "Service area map"
+   above). Safe to re-run any time; `IF NOT EXISTS` means it skips
+   anything you already have:
    ```sql
+   ALTER TABLE signups ADD COLUMN IF NOT EXISTS interested_package TEXT;
    ALTER TABLE signups ADD COLUMN IF NOT EXISTS contacted BOOLEAN DEFAULT FALSE;
+   ALTER TABLE signups ADD COLUMN IF NOT EXISTS discount_type TEXT;
    CREATE TABLE IF NOT EXISTS town_boundaries (
      town TEXT PRIMARY KEY, geojson JSONB, fetched_at TIMESTAMPTZ DEFAULT now()
    );
    ```
+   This same block lives at the bottom of `schema.sql` too, so
+   either copy works.
 5. Redeploy (upload the files the same way as always, or just
    redeploy if only the environment variables changed).
 6. Visit `/admin.html` on your live site and log in with the
