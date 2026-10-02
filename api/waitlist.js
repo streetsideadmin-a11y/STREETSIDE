@@ -113,71 +113,51 @@ module.exports = async (req, res) => {
       body.hearAboutUs || null,
       !!body.consent,
       body.submittedAt || new Date().toISOString(),
-      body.discountType || null,
     ];
 
+    // Discount type isn't collected on the public form — it's assigned
+    // later by Streetside staff from the admin dashboard (see
+    // api/admin-update.js) — so new rows always start with it NULL.
     try {
       await sql`
         INSERT INTO signups (
           form_type, first_name, last_name, email, phone,
           street_address, city, zip, collection_day, waste_provider,
           trash_bin_count, recycling_bin_count, bin_storage_location,
-          interested_package, hear_about_us, consent, submitted_at, discount_type
+          interested_package, hear_about_us, consent, submitted_at
         ) VALUES (
           ${values[0]}, ${values[1]}, ${values[2]}, ${values[3]}, ${values[4]},
           ${values[5]}, ${values[6]}, ${values[7]}, ${values[8]}, ${values[9]},
           ${values[10]}, ${values[11]}, ${values[12]}, ${values[13]}, ${values[14]},
-          ${values[15]}, ${values[16]}, ${values[17]}
+          ${values[15]}, ${values[16]}
         )
       `;
     } catch (insertErr) {
-      // If interested_package and/or discount_type haven't been added
-      // to the database yet (migration steps documented in
-      // schema.sql), don't let that break every single submission —
-      // save everything else and log a clear warning instead, so the
-      // fix is a config problem you can find in the logs, never a
-      // lost signup. Falls back column-by-column, newest first.
-      const message = String((insertErr && insertErr.message) || "");
-      const isMissingColumn = insertErr && insertErr.code === "42703";
-      if (!isMissingColumn) throw insertErr;
+      // If interested_package hasn't been added to the database yet
+      // (a migration step documented in schema.sql), don't let that
+      // break every single submission — save everything else and log
+      // a clear warning instead, so the fix is a config problem you
+      // can find in the logs, never a lost signup.
+      const missingColumn =
+        insertErr && (insertErr.code === "42703" || /interested_package/i.test(String(insertErr.message)));
+      if (!missingColumn) throw insertErr;
 
-      if (/discount_type/i.test(message)) {
-        console.warn(
-          "[streetside] 'discount_type' column not found — run the migration in schema.sql. Saving this submission without it for now."
-        );
-        await sql`
-          INSERT INTO signups (
-            form_type, first_name, last_name, email, phone,
-            street_address, city, zip, collection_day, waste_provider,
-            trash_bin_count, recycling_bin_count, bin_storage_location,
-            interested_package, hear_about_us, consent, submitted_at
-          ) VALUES (
-            ${values[0]}, ${values[1]}, ${values[2]}, ${values[3]}, ${values[4]},
-            ${values[5]}, ${values[6]}, ${values[7]}, ${values[8]}, ${values[9]},
-            ${values[10]}, ${values[11]}, ${values[12]}, ${values[13]}, ${values[14]},
-            ${values[15]}, ${values[16]}
-          )
-        `;
-      } else if (/interested_package/i.test(message)) {
-        console.warn(
-          "[streetside] 'interested_package' column not found — run the migration in schema.sql. Saving this submission without it for now."
-        );
-        await sql`
-          INSERT INTO signups (
-            form_type, first_name, last_name, email, phone,
-            street_address, city, zip, collection_day, waste_provider,
-            trash_bin_count, recycling_bin_count, bin_storage_location,
-            hear_about_us, consent, submitted_at
-          ) VALUES (
-            ${values[0]}, ${values[1]}, ${values[2]}, ${values[3]}, ${values[4]},
-            ${values[5]}, ${values[6]}, ${values[7]}, ${values[8]}, ${values[9]},
-            ${values[10]}, ${values[11]}, ${values[12]}, ${values[14]},
-            ${values[15]}, ${values[16]}
-          )
-        `;
-      } else {
-        throw insertErr;
-      }
+      console.warn(
+        "[streetside] 'interested_package' column not found — run the migration in schema.sql. Saving this submission without it for now."
+      );
+      await sql`
+        INSERT INTO signups (
+          form_type, first_name, last_name, email, phone,
+          street_address, city, zip, collection_day, waste_provider,
+          trash_bin_count, recycling_bin_count, bin_storage_location,
+          hear_about_us, consent, submitted_at
+        ) VALUES (
+          ${values[0]}, ${values[1]}, ${values[2]}, ${values[3]}, ${values[4]},
+          ${values[5]}, ${values[6]}, ${values[7]}, ${values[8]}, ${values[9]},
+          ${values[10]}, ${values[11]}, ${values[12]}, ${values[14]},
+          ${values[15]}, ${values[16]}
+        )
+      `;
     }
 
     // Best-effort mirror to Google Sheets — never blocks or breaks
@@ -197,7 +177,6 @@ module.exports = async (req, res) => {
       recyclingBinCount: body.recyclingBinCount || "",
       binStorageLocation: body.binStorageLocation || "",
       interestedPackage: body.interestedPackage || "",
-      discountType: body.discountType || "",
       hearAboutUs: body.hearAboutUs || "",
       consent: !!body.consent,
       submittedAt: body.submittedAt || new Date().toISOString(),

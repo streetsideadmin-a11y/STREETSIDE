@@ -277,6 +277,17 @@
   table.admin-table th .sort-arrow { font-size: 0.7rem; margin-left: 3px; opacity: 0.6; }
   .admin-loading { padding: var(--space-6); text-align: center; color: var(--color-ink-muted); }
   .admin-contacted-toggle { display: flex; align-items: center; gap: 6px; cursor: pointer; }
+  .admin-discount-select {
+    font: inherit;
+    font-size: 0.82rem;
+    padding: 4px 6px;
+    border-radius: 6px;
+    border: 1px solid var(--color-border);
+    background: #fff;
+    color: var(--color-ink);
+    max-width: 150px;
+  }
+  .admin-discount-select:disabled { opacity: 0.6; }
   .admin-delete-btn {
     background: none;
     border: 1px solid var(--red-600);
@@ -513,6 +524,13 @@
     return labels[id] || id || "—";
   }
 
+  var DISCOUNT_OPTIONS = [
+    { value: "", label: "— None —" },
+    { value: "founder", label: "Founder Discount" },
+    { value: "friends-family", label: "Friends & Family" },
+    { value: "free-service", label: "Free Service" },
+  ];
+
   function discountLabel(id) {
     var labels = {
       founder: "Founder Discount",
@@ -520,6 +538,35 @@
       "free-service": "Free Service",
     };
     return labels[id] || "—";
+  }
+
+  // The discount a signup gets isn't something the customer picks on
+  // the public form — staff assign it here from the admin dashboard
+  // (e.g. after confirming someone qualifies as a founding member or
+  // a referral). Renders as a select, right in the table row, that
+  // saves on change the same way the "Contacted" checkbox does.
+  function discountSelectHtml(row) {
+    var current = row.discount_type || "";
+    var optionsHtml = DISCOUNT_OPTIONS.map(function (opt) {
+      return (
+        '<option value="' +
+        escapeHtml(opt.value) +
+        '"' +
+        (opt.value === current ? " selected" : "") +
+        ">" +
+        escapeHtml(opt.label) +
+        "</option>"
+      );
+    }).join("");
+    return (
+      '<select class="admin-discount-select" data-action="set-discount" data-id="' +
+      row.id +
+      '" data-previous="' +
+      escapeHtml(current) +
+      '">' +
+      optionsHtml +
+      "</select>"
+    );
   }
 
   function formatDate(iso) {
@@ -532,6 +579,31 @@
     var div = document.createElement("div");
     div.textContent = str == null ? "" : String(str);
     return div.innerHTML;
+  }
+
+  // Display-only formatting — never rewrites what's actually stored,
+  // just how it's shown here, so older rows saved before the public
+  // form auto-formatted phone/city (or rows imported from elsewhere)
+  // still look clean in the dashboard.
+  function titleCaseCity(str) {
+    if (!str) return str;
+    return String(str)
+      .toLowerCase()
+      .replace(/\b[a-z]/g, function (c) {
+        return c.toUpperCase();
+      });
+  }
+
+  function formatPhoneDisplay(str) {
+    if (!str) return str;
+    var digits = String(str).replace(/\D/g, "");
+    if (digits.length === 10) {
+      return "(" + digits.slice(0, 3) + ") " + digits.slice(3, 6) + "-" + digits.slice(6);
+    }
+    if (digits.length === 11 && digits[0] === "1") {
+      return "+1 (" + digits.slice(1, 4) + ") " + digits.slice(4, 7) + "-" + digits.slice(7);
+    }
+    return str; // not a recognizable 10/11-digit US number — show as-entered rather than mangle it
   }
 
   // --- City breakdown panel -------------------------------------
@@ -567,7 +639,7 @@
           '<span class="admin-city-list__item"><strong>' +
           e.count +
           "</strong> " +
-          escapeHtml(e.city) +
+          escapeHtml(titleCaseCity(e.city)) +
           "</span>"
         );
       })
@@ -613,12 +685,12 @@
           "<td>" + escapeHtml(row.form_type) + "</td>" +
           "<td>" + escapeHtml(name) + "</td>" +
           "<td>" + (row.email ? '<a href="mailto:' + escapeHtml(row.email) + '">' + escapeHtml(row.email) + "</a>" : "—") + "</td>" +
-          "<td>" + (row.phone ? '<a href="tel:' + escapeHtml(row.phone) + '">' + escapeHtml(row.phone) + "</a>" : "—") + "</td>" +
+          "<td>" + (row.phone ? '<a href="tel:' + escapeHtml(row.phone) + '">' + escapeHtml(formatPhoneDisplay(row.phone)) + "</a>" : "—") + "</td>" +
           "<td>" + escapeHtml(row.street_address || "—") + "</td>" +
-          "<td>" + escapeHtml(row.city || "—") + "</td>" +
+          "<td>" + escapeHtml(titleCaseCity(row.city) || "—") + "</td>" +
           "<td>" + escapeHtml(row.zip || "—") + "</td>" +
           "<td>" + escapeHtml(packageLabel(row.interested_package)) + "</td>" +
-          "<td>" + escapeHtml(discountLabel(row.discount_type)) + "</td>" +
+          "<td>" + discountSelectHtml(row) + "</td>" +
           "<td>" + (row.consent ? "Yes" : "No") + "</td>" +
           "<td><label class=\"admin-contacted-toggle\"><input type=\"checkbox\" data-action=\"toggle-contacted\" data-id=\"" + row.id + "\"" + (row.contacted ? " checked" : "") + " /> " + (row.contacted ? "Yes" : "No") + "</label></td>" +
           "<td><button type=\"button\" class=\"admin-delete-btn\" data-action=\"delete-row\" data-id=\"" + row.id + "\">Delete</button></td>" +
@@ -682,8 +754,8 @@
     var cities = Array.from(new Set(allSignups.map(function (r) { return r.city; }).filter(Boolean))).sort();
     cities.forEach(function (city) {
       var opt = document.createElement("option");
-      opt.value = city;
-      opt.textContent = city;
+      opt.value = city; // raw value, so filtering still matches the stored text exactly
+      opt.textContent = titleCaseCity(city); // display only
       citySelect.appendChild(opt);
     });
     citySelect.value = currentValue;
@@ -733,9 +805,9 @@
           row.first_name || "",
           row.last_name || "",
           row.email || "",
-          row.phone || "",
+          row.phone ? formatPhoneDisplay(row.phone) : "",
           row.street_address || "",
-          row.city || "",
+          row.city ? titleCaseCity(row.city) : "",
           row.zip || "",
           packageLabel(row.interested_package),
           discountLabel(row.discount_type),
@@ -1152,6 +1224,35 @@
         var stopId = parseInt(routeCheckbox.getAttribute("data-id"), 10);
         var ok = toggleRouteStop(stopId, routeCheckbox.checked);
         if (!ok) routeCheckbox.checked = false;
+        return;
+      }
+
+      var discountSelect = e.target.closest('[data-action="set-discount"]');
+      if (discountSelect) {
+        var discountId = parseInt(discountSelect.getAttribute("data-id"), 10);
+        var newDiscount = discountSelect.value; // "" means no discount
+        var previousDiscount = discountSelect.getAttribute("data-previous") || "";
+
+        discountSelect.disabled = true;
+        try {
+          var discountRes = await fetch("/api/admin-update", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify({ id: discountId, discountType: newDiscount }),
+          });
+          if (!discountRes.ok) throw new Error("Update failed");
+
+          var discountRow = allSignups.find(function (r) { return r.id === discountId; });
+          if (discountRow) discountRow.discount_type = newDiscount || null;
+          discountSelect.setAttribute("data-previous", newDiscount);
+        } catch (err) {
+          console.error("[streetside] Failed to update discount type:", err);
+          discountSelect.value = previousDiscount;
+          alert("Couldn't save that — check your connection and try again.");
+        } finally {
+          discountSelect.disabled = false;
+        }
         return;
       }
 

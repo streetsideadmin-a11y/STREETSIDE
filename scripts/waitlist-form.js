@@ -222,6 +222,65 @@
     }
   }
 
+  // --- Live input formatting ---------------------------------------
+  // Cleans up the two fields people most often type inconsistently —
+  // phone numbers and city names — as they go, so what actually gets
+  // saved already looks right instead of needing cleanup later.
+
+  // Turns raw typed digits into a standard "(614) 555-1234" shape as
+  // the person types. Caps at 10 digits (US numbers); anything typed
+  // past that is ignored rather than silently truncating what's
+  // already there.
+  function formatPhoneDigits(digits) {
+    digits = digits.slice(0, 10);
+    var len = digits.length;
+    if (len === 0) return "";
+    if (len < 4) return "(" + digits;
+    if (len < 7) return "(" + digits.slice(0, 3) + ") " + digits.slice(3);
+    return "(" + digits.slice(0, 3) + ") " + digits.slice(3, 6) + "-" + digits.slice(6);
+  }
+
+  // The waitlist form has one combined "Email or Phone" field, so
+  // this only kicks in once it's clear the person is typing a phone
+  // number rather than an email address — specifically, once the
+  // field has no letters or "@" in it yet and starts with a digit.
+  // The moment an "@" or a letter shows up, formatting backs off
+  // completely and leaves the field alone, so typing an email never
+  // fights the phone formatter.
+  function looksLikePhoneInProgress(value) {
+    return value.length > 0 && !/[a-zA-Z@]/.test(value);
+  }
+
+  function initPhoneFormatting(inputId) {
+    var input = document.getElementById(inputId);
+    if (!input) return;
+    input.addEventListener("input", function () {
+      var value = input.value;
+      if (!looksLikePhoneInProgress(value)) return; // let email typing through untouched
+      var digits = value.replace(/\D/g, "");
+      input.value = formatPhoneDigits(digits);
+    });
+  }
+
+  // Capitalizes each word of a city name ("new lexington" ->
+  // "New Lexington", "o'fallon" -> "O'Fallon") without needing the
+  // person to remember to do it themselves. Runs on blur rather than
+  // every keystroke so it never fights mid-word typing or moves the
+  // cursor while they're still typing.
+  function titleCaseCity(value) {
+    return value.toLowerCase().replace(/\b[a-z]/g, function (c) {
+      return c.toUpperCase();
+    });
+  }
+
+  function initCityCapitalization(inputId) {
+    var input = document.getElementById(inputId);
+    if (!input) return;
+    input.addEventListener("blur", function () {
+      if (input.value.trim()) input.value = titleCaseCity(input.value);
+    });
+  }
+
   function initForm(formSelector, statusSelector, formType) {
     var form = document.querySelector(formSelector);
     if (!form) return;
@@ -240,5 +299,9 @@
   document.addEventListener("DOMContentLoaded", function () {
     initForm("#waitlist-form", "#waitlist-form-status", "waitlist");
     initForm("#address-check-form", "#address-check-status", "address-check");
+
+    initPhoneFormatting("wl-contact");
+    initCityCapitalization("wl-city");
+    initCityCapitalization("ac-city");
   });
 })();

@@ -308,6 +308,11 @@ The dashboard also includes:
 - **Mark as Contacted** — a checkbox per row; contacted rows are
   highlighted green so you can track who you've already reached out
   to.
+- **Discount** — a dropdown per row (Founder Discount / Friends &
+  Family / Free Service / none) that you set yourself from here —
+  it's never something the customer picks on the public form, only
+  something staff assign after confirming someone qualifies. Saves
+  immediately when you change it, same as Mark as Contacted.
 - **Delete** — permanently removes a row (with a confirmation
   prompt first) — handy for clearing out test entries.
 - **Refresh** — reloads the data without leaving the page.

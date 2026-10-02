@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS signups (
   recycling_bin_count    INTEGER,
   bin_storage_location   TEXT,
   interested_package     TEXT,                    -- 'curb', 'full', 'one-time', or 'not-sure'
-  discount_type          TEXT,                    -- 'founder', 'friends-family', 'free-service', or NULL
+  discount_type          TEXT,                    -- 'founder', 'friends-family', 'free-service', or NULL — set from the admin dashboard, never by the public form
   hear_about_us          TEXT,
   consent                BOOLEAN DEFAULT FALSE,
   contacted              BOOLEAN DEFAULT FALSE,   -- set from the admin dashboard

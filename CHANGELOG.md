@@ -4,7 +4,48 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v41.0 — current
+## v41.2 — current
+
+- **Phone numbers now auto-format as you type** on the waitlist
+  form's combined "Email or Phone" field — typing `6145551234`
+  becomes `(614) 555-1234` live, the same shape as a real phone
+  number. It only kicks in once it's clear you're typing a phone
+  number (no letters or `@` yet) — the instant either shows up, it
+  backs off completely so email typing is never interrupted.
+- **City names now auto-capitalize** on both forms (waitlist and
+  "Check Your Address") — `new lexington` becomes `New Lexington`,
+  `o'fallon` becomes `O'Fallon`, when you leave the field. Known
+  limitation: it capitalizes every word, so a two-letter state
+  tacked onto the end like `Lancaster, OH` becomes `Lancaster, Oh`
+  — the City field is meant for the city name alone, so this
+  shouldn't come up in normal use, but worth knowing about.
+- **Applied the same formatting to the admin dashboard's display**
+  (table, CSV export, Interest by City panel, city filter dropdown)
+  so older rows saved before this — or anything imported from
+  elsewhere — show up clean too. This is display-only: the actual
+  stored value in the database is never rewritten, so nothing about
+  filtering, the map, or existing data changes, only how it looks
+  on screen.
+
+## v41.1
+
+- **Discount is now staff-assigned from the admin dashboard, not a
+  public form field.** v41.0 (superseded, see below) put the
+  dropdown on the public waitlist form — corrected per your note
+  that it needs to be something you select, not the customer.
+  Removed it from `index.html` entirely. Each row in the admin
+  table's **Discount** column is now its own dropdown (Founder
+  Discount / Friends & Family / Free Service / — None —) that saves
+  immediately when you change it, the same way "Contacted" does —
+  no page reload, no separate save button.
+- `api/admin-update.js` now handles two independently-updatable
+  fields (`contacted` and `discountType`) instead of just one, and
+  validates the discount value server-side against the real list of
+  codes rather than trusting whatever the client sends.
+- `api/waitlist.js` no longer touches `discount_type` at all — new
+  signups always start with no discount until staff assign one.
+
+## v41.0 — superseded by v41.1, see above
 
 - **Interest by City now has a Signups / Address Checks toggle.** It
   defaulted to lumping both form types together with no way to see
@@ -12,31 +53,22 @@ of which round of changes you're looking at.
   "Address Checks" re-counts the same city list using only
   `address-check` rows, "Signups" switches back to real waitlist
   rows (still the default on load).
-- **Added a Discount / Offer dropdown to the waitlist signup form**
-  (`index.html`) with three options — Founder Discount, Friends &
-  Family, and Free Service — plus "None" as the default. It's
-  optional, not required, since most signups won't have a code.
-- Wired the new field all the way through:
-  - `api/waitlist.js` now saves it to a new `discount_type` column,
-    with the same graceful fallback the `interested_package` column
-    already had — if the column doesn't exist yet in your database
-    (you haven't run the migration below), the submission still
-    saves everything else instead of failing outright, and a clear
-    warning shows up in the Vercel logs.
-  - `schema.sql` documents the new column and adds it to the
-    migration block at the bottom.
-  - The admin dashboard table has a new **Discount** column, a new
-    **All discounts / Founder / Friends & Family / Free Service /
-    No discount** filter dropdown, and CSV export now includes it.
-- **New Neon migration needed before this takes effect on real
-  submissions:**
+- Added a Discount / Offer dropdown to the waitlist signup form —
+  **corrected in v41.1 above**, this belonged in the admin dashboard
+  instead.
+- The admin dashboard table gained a **Discount** column, a new
+  **All discounts / Founder / Friends & Family / Free Service /
+  No discount** filter dropdown, and CSV export now includes it —
+  all still true in v41.1.
+- **New Neon migration needed before discounts can be saved at
+  all:**
   ```sql
   ALTER TABLE signups ADD COLUMN IF NOT EXISTS discount_type TEXT;
   ```
   Run that in the Neon SQL Editor (same place you'd have run the
   `interested_package`/`contacted` migrations earlier). Until you
-  do, discount selections are silently dropped (logged, not lost
-  data elsewhere) rather than breaking signups.
+  do, trying to set a discount from the admin dashboard shows a
+  clear error instead of silently failing.
 - Verified: simulated mixed waitlist/address-check city data and
   confirmed the toggle produces two genuinely different counts per
   city (not just the same list re-labeled); confirmed the discount
