@@ -1144,20 +1144,8 @@
     if (!leafletMap || !heatLayerGroup) return;
     heatLayerGroup.clearLayers();
 
-    // Reference towns — small dots + labels for orientation, shown
-    // regardless of interest level, so the map is useful even before
-    // any real signups exist yet.
-    Object.keys(TOWN_COORDS).forEach(function (name) {
-      var coords = TOWN_COORDS[name];
-      var label = name.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
-      L.circleMarker(coords, {
-        radius: 3, color: "#2f4a37", weight: 1, fillColor: "#2f4a37", fillOpacity: 0.7,
-      }).addTo(heatLayerGroup);
-      L.marker(coords, {
-        icon: L.divIcon({ className: "admin-map-town-label", html: label, iconSize: null, iconAnchor: [-6, 4] }),
-        interactive: false,
-      }).addTo(heatLayerGroup);
-    });
+    // No reference dots or labels of our own — the map tiles already
+    // label every town, so only the heat shapes are drawn on top.
 
     // Real waitlist signups only — address-check lookups aren't
     // counted here, same rule as the public map's heat data.
@@ -1234,21 +1222,35 @@
     }
   }
 
-  async function fetchTownBoundary(town) {
+  // One lookup at a time, so a town nobody has looked up yet doesn't
+  // make several simultaneous requests to the free OpenStreetMap
+  // service (it asks for about one request a second). Cached towns
+  // answer almost instantly, so the line moves quickly.
+  var boundaryQueue = Promise.resolve();
+
+  function fetchTownBoundary(town) {
     boundaryFetchesInFlight++;
     updateLoadingStatus();
-    try {
-      var res = await fetch("/api/town-boundary?town=" + encodeURIComponent(town));
-      if (!res.ok) return null;
-      var data = await res.json();
-      return data.geojson || null;
-    } catch (err) {
-      console.warn("[streetside] Could not load a boundary for " + town + ":", err);
-      return null;
-    } finally {
-      boundaryFetchesInFlight--;
-      updateLoadingStatus();
-    }
+    var job = boundaryQueue.then(async function () {
+      try {
+        // The town's known coordinates let the server pick the RIGHT
+        // place when several share a name (e.g. same-named townships).
+        var c = TOWN_COORDS[town];
+        var hint = c ? "&lat=" + c[0] + "&lng=" + c[1] : "";
+        var res = await fetch("/api/town-boundary?town=" + encodeURIComponent(town) + hint);
+        if (!res.ok) return null;
+        var data = await res.json();
+        return data.geojson || null;
+      } catch (err) {
+        console.warn("[streetside] Could not load a boundary for " + town + ":", err);
+        return null;
+      } finally {
+        boundaryFetchesInFlight--;
+        updateLoadingStatus();
+      }
+    });
+    boundaryQueue = job.catch(function () {});
+    return job;
   }
 
   function stopAddress(row) {

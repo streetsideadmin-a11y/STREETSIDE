@@ -112,16 +112,31 @@
   // would multiply real requests to that free service far past what
   // its usage policy allows for a page any number of people could
   // load at once.
-  async function fetchTownBoundary(town) {
-    try {
-      var res = await fetch("/api/town-boundary?town=" + encodeURIComponent(town));
-      if (!res.ok) return null;
-      var data = await res.json();
-      return data.geojson || null;
-    } catch (err) {
-      console.warn("[streetside] Could not load a boundary for " + town + ":", err);
-      return null;
-    }
+  // Lookups run one at a time (not all at once): a town nobody has
+  // looked up yet makes the server ask the free OpenStreetMap
+  // service, which asks callers to stay around one request a second.
+  // Already-cached towns answer almost instantly, so the line moves fast.
+  var boundaryQueue = Promise.resolve();
+
+  function fetchTownBoundary(town) {
+    var job = boundaryQueue.then(async function () {
+      try {
+        // Sending the town's known coordinates lets the server pick
+        // the RIGHT place when several share a name (e.g. townships
+        // with the same name elsewhere in Ohio).
+        var t = TOWNS[town];
+        var hint = t ? "&lat=" + t[0] + "&lng=" + t[1] : "";
+        var res = await fetch("/api/town-boundary?town=" + encodeURIComponent(town) + hint);
+        if (!res.ok) return null;
+        var data = await res.json();
+        return data.geojson || null;
+      } catch (err) {
+        console.warn("[streetside] Could not load a boundary for " + town + ":", err);
+        return null;
+      }
+    });
+    boundaryQueue = job.catch(function () {});
+    return job;
   }
 
   async function init() {
@@ -144,21 +159,8 @@
 
     var layerGroup = L.layerGroup().addTo(map);
 
-    // Main cities always show; smaller towns stay hidden until real
-    // interest lights them up, same behavior as before.
-    Object.keys(TOWNS).forEach(function (name) {
-      var t = TOWNS[name];
-      if (t[2] !== "city") return;
-      var label = name.replace(/\b\w/g, function (c) { return c.toUpperCase(); });
-      L.circleMarker([t[0], t[1]], {
-        radius: 6, color: "#fff", weight: 2, fillColor: "#1a2e21", fillOpacity: 1,
-        className: "interest-map-city-dot",
-      }).addTo(layerGroup);
-      L.marker([t[0], t[1]], {
-        icon: L.divIcon({ className: "interest-map-city-label", html: label, iconSize: null, iconAnchor: [-8, 4] }),
-        interactive: false,
-      }).addTo(layerGroup);
-    });
+    // No dots or labels of our own: the map tiles already label every
+    // town, so only the heat shapes below are drawn on top.
 
     try {
       var res = await fetch("/api/interest-map", { headers: { Accept: "application/json" } });
@@ -214,15 +216,6 @@
           // If no boundary was found, the placeholder circle just
           // stays as-is — already added above, nothing more to do.
         });
-
-        // Reveal a label for any town with real interest, even ones
-        // that don't get a permanent label by default.
-        if (t[2] !== "city") {
-          L.marker([t[0], t[1]], {
-            icon: L.divIcon({ className: "interest-map-town-label", html: label, iconSize: null, iconAnchor: [-8, 4] }),
-            interactive: false,
-          }).addTo(layerGroup);
-        }
 
         plotted += 1;
       });

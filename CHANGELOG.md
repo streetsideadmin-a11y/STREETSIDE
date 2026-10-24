@@ -4,7 +4,29 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v43.1 — current
+## v43.2 — current
+
+- **Removed our own dots and town labels from both maps** (public and
+  admin). The map underneath already labels every town, so only the heat
+  shapes are drawn on top now.
+- **Fixed Amanda (and any town) showing up wrong or not at all.** Likely
+  cause: the boundary lookup took whatever OpenStreetMap ranked first, and
+  several Ohio townships share names with towns here, so it could grab the
+  wrong place or a huge area; and one temporary lookup failure was saved
+  forever as "no boundary." Now the lookup sends the town's known
+  coordinates, only accepts a shape around that spot and of town size,
+  falls back to a circle at the right spot if none fits, and never saves a
+  "not found" caused by a failed connection.
+- Every previously saved boundary is re-checked once automatically (no
+  database step needed), then saved again.
+- Boundary lookups now run one at a time to stay within OpenStreetMap's
+  free-use limits.
+- Tested the shape-picking logic with a simulated wrong-county Amanda and
+  Amanda text matching. Could not test against live OpenStreetMap or the
+  tiles from this sandbox, so Amanda's actual shape needs a look after
+  deploying.
+
+## v43.1
 
 - Added **Amanda, OH** to both heatmaps (public and admin), so signups
   with Amanda as the city now light up there, show its real boundary,
