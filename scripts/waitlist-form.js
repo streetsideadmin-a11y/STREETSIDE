@@ -281,6 +281,27 @@
     });
   }
 
+  // Promo / referral code: uppercased as typed so "spring25" and
+  // "SPRING25" always count as the same code, and pre-filled from a
+  // ?ref= or ?promo= link (e.g. streetsideoh.com/?ref=SMITH) so a
+  // shared link tracks where signups came from with zero typing.
+  function initPromoCode(inputId) {
+    var input = document.getElementById(inputId);
+    if (!input) return;
+    input.addEventListener("input", function () {
+      var pos = input.selectionStart;
+      input.value = input.value.toUpperCase().replace(/[^A-Z0-9_-]/g, "");
+      try { input.setSelectionRange(pos, pos); } catch (e) { /* not supported on some inputs */ }
+    });
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var fromLink = params.get("ref") || params.get("promo");
+      if (fromLink && !input.value) {
+        input.value = fromLink.toUpperCase().replace(/[^A-Z0-9_-]/g, "").slice(0, 40);
+      }
+    } catch (e) { /* URLSearchParams unavailable — field just stays blank */ }
+  }
+
   function initForm(formSelector, statusSelector, formType) {
     var form = document.querySelector(formSelector);
     if (!form) return;
@@ -300,6 +321,7 @@
     initForm("#waitlist-form", "#waitlist-form-status", "waitlist");
     initForm("#address-check-form", "#address-check-status", "address-check");
 
+    initPromoCode("wl-promo");
     initPhoneFormatting("wl-contact");
     initCityCapitalization("wl-city");
     initCityCapitalization("ac-city");

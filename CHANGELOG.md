@@ -4,7 +4,43 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v41.2 — current
+## v42.0 — current
+
+- **Optional Promo / Referral Code box on the waitlist form.** Sits next
+  to the plan dropdown, never required. Typed codes are auto-uppercased
+  and cleaned (letters, numbers, dashes only), so `smith` and `SMITH`
+  count as the same code. A link like `streetsideoh.com/?ref=SMITH`
+  pre-fills it automatically — hand out one link per ad, partner, or
+  friend and every signup through it is tagged with no typing.
+- **Saved safely:** the signup itself is saved first, then the code is
+  attached. If you haven't run the migration yet, signups still work
+  and the code is just skipped (with a warning in the Vercel logs).
+  **Run once in Neon's SQL Editor:**
+  ```sql
+  ALTER TABLE signups ADD COLUMN IF NOT EXISTS promo_code TEXT;
+  ```
+- **Admin:** new Promo column, a "Promo & Referral Codes" panel showing
+  signups per code (click a code to filter the table), a promo filter
+  dropdown, codes included in search and CSV export. Whether someone
+  gets special service is still the Discount dropdown on each row, so
+  code (where they came from) and discount (what they get) stay separate.
+- **Admin tidy-up:** table cut from 14 columns to 10 by stacking related
+  info (email over phone, street over city/ZIP, type badge under date);
+  consent now only shows when it's missing; header row stays visible
+  while scrolling the table, and the title bar stays pinned; Interest by
+  City and Promo panels sit side by side; Route Planner collapses (with
+  a stop-count badge); shorter map hint and a shorter map; denser
+  summary cards and filter bar; delete is a small ✕.
+- **Main page tidy-up:** waitlist form now has labeled groups (About you
+  / Where we'd service / Your plan), tighter field spacing, plan and
+  promo code side by side; leftover inline styles moved into the
+  stylesheet.
+- Verified with syntax checks on all JS/API files, HTML tag balance, and
+  logic tests for code cleaning, the per-code count (waitlist only), and
+  the filter. Not verified visually: this sandbox's browser can't open
+  the site, so give both pages a quick look after deploying.
+
+## v41.2
 
 - **Phone numbers now auto-format as you type** on the waitlist
   form's combined "Email or Phone" field — typing `6145551234`

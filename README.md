@@ -308,6 +308,11 @@ The dashboard also includes:
 - **Mark as Contacted** — a checkbox per row; contacted rows are
   highlighted green so you can track who you've already reached out
   to.
+- **Promo & referral codes** — optional box on the waitlist form
+  (also pre-filled from `?ref=CODE` or `?promo=CODE` in the link). The
+  admin shows a count per code, a filter, and a Promo column. The code
+  records where someone came from; the Discount dropdown below is what
+  they actually receive.
 - **Discount** — a dropdown per row (Founder Discount / Friends &
   Family / Free Service / none) that you set yourself from here —
   it's never something the customer picks on the public form, only
@@ -352,6 +357,7 @@ The dashboard also includes:
    ALTER TABLE signups ADD COLUMN IF NOT EXISTS interested_package TEXT;
    ALTER TABLE signups ADD COLUMN IF NOT EXISTS contacted BOOLEAN DEFAULT FALSE;
    ALTER TABLE signups ADD COLUMN IF NOT EXISTS discount_type TEXT;
+   ALTER TABLE signups ADD COLUMN IF NOT EXISTS promo_code TEXT;
    CREATE TABLE IF NOT EXISTS town_boundaries (
      town TEXT PRIMARY KEY, geojson JSONB, fetched_at TIMESTAMPTZ DEFAULT now()
    );

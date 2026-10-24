@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS signups (
   bin_storage_location   TEXT,
   interested_package     TEXT,                    -- 'curb', 'full', 'one-time', or 'not-sure'
   discount_type          TEXT,                    -- 'founder', 'friends-family', 'free-service', or NULL — set from the admin dashboard, never by the public form
+  promo_code             TEXT,                    -- optional promo/referral code typed on the waitlist form (uppercased)
   hear_about_us          TEXT,
   consent                BOOLEAN DEFAULT FALSE,
   contacted              BOOLEAN DEFAULT FALSE,   -- set from the admin dashboard
@@ -52,6 +53,7 @@ CREATE TABLE IF NOT EXISTS town_boundaries (
 --   ALTER TABLE signups ADD COLUMN IF NOT EXISTS interested_package TEXT;
 --   ALTER TABLE signups ADD COLUMN IF NOT EXISTS contacted BOOLEAN DEFAULT FALSE;
 --   ALTER TABLE signups ADD COLUMN IF NOT EXISTS discount_type TEXT;
+--   ALTER TABLE signups ADD COLUMN IF NOT EXISTS promo_code TEXT;
 --   CREATE TABLE IF NOT EXISTS town_boundaries (
 --     town TEXT PRIMARY KEY, geojson JSONB, fetched_at TIMESTAMPTZ DEFAULT now()
 --   );

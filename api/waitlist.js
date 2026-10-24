@@ -118,8 +118,9 @@ module.exports = async (req, res) => {
     // Discount type isn't collected on the public form — it's assigned
     // later by Streetside staff from the admin dashboard (see
     // api/admin-update.js) — so new rows always start with it NULL.
+    let insertedRows;
     try {
-      await sql`
+      insertedRows = await sql`
         INSERT INTO signups (
           form_type, first_name, last_name, email, phone,
           street_address, city, zip, collection_day, waste_provider,
@@ -131,6 +132,7 @@ module.exports = async (req, res) => {
           ${values[10]}, ${values[11]}, ${values[12]}, ${values[13]}, ${values[14]},
           ${values[15]}, ${values[16]}
         )
+        RETURNING id
       `;
     } catch (insertErr) {
       // If interested_package hasn't been added to the database yet
@@ -145,7 +147,7 @@ module.exports = async (req, res) => {
       console.warn(
         "[streetside] 'interested_package' column not found — run the migration in schema.sql. Saving this submission without it for now."
       );
-      await sql`
+      insertedRows = await sql`
         INSERT INTO signups (
           form_type, first_name, last_name, email, phone,
           street_address, city, zip, collection_day, waste_provider,
@@ -157,7 +159,27 @@ module.exports = async (req, res) => {
           ${values[10]}, ${values[11]}, ${values[12]}, ${values[14]},
           ${values[15]}, ${values[16]}
         )
+        RETURNING id
       `;
+    }
+
+    // Optional promo / referral code — saved in a follow-up step so a
+    // database that hasn't had the promo_code migration yet can never
+    // cost anyone their signup (see schema.sql). Re-sanitized here
+    // because the server never trusts what the browser already cleaned.
+    const promoCode = String(body.promoCode || "")
+      .toUpperCase()
+      .replace(/[^A-Z0-9_-]/g, "")
+      .slice(0, 40);
+    if (promoCode && insertedRows && insertedRows[0]) {
+      try {
+        await sql`UPDATE signups SET promo_code = ${promoCode} WHERE id = ${insertedRows[0].id}`;
+      } catch (promoErr) {
+        console.warn(
+          "[streetside] Could not save promo_code — run the migration in schema.sql (ALTER TABLE signups ADD COLUMN IF NOT EXISTS promo_code TEXT;). The signup itself was saved.",
+          promoErr && promoErr.message
+        );
+      }
     }
 
     // Best-effort mirror to Google Sheets — never blocks or breaks
@@ -177,6 +199,7 @@ module.exports = async (req, res) => {
       recyclingBinCount: body.recyclingBinCount || "",
       binStorageLocation: body.binStorageLocation || "",
       interestedPackage: body.interestedPackage || "",
+      promoCode: promoCode,
       hearAboutUs: body.hearAboutUs || "",
       consent: !!body.consent,
       submittedAt: body.submittedAt || new Date().toISOString(),

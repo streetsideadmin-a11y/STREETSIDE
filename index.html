@@ -248,7 +248,7 @@ fbq('track', 'PageView');
   <section class="neighborhood" id="neighborhood">
     <div class="container">
       <div class="neighborhood__inner reveal">
-        <span class="eyebrow" style="color:#fff;">Bring Streetside To Your Neighborhood</span>
+        <span class="eyebrow eyebrow--light">Bring Streetside To Your Neighborhood</span>
         <h2>Built for<br />neighborhoods.</h2>
         <p class="lede">The more neighbors who join, the more efficiently Streetside can open and serve routes. More neighbors. More routes.</p>
 
@@ -300,11 +300,11 @@ fbq('track', 'PageView');
         <div class="reveal">
           <span class="eyebrow">Service Area</span>
           <h2 class="display-md">Serving Southeastern Columbus, one neighborhood at a time.</h2>
-          <p class="lede" style="margin-top: var(--space-4);">Streetside opens routes based on service availability and neighborhood demand — the more neighbors on a street or in a subdivision, the sooner a route can open there.</p>
+          <p class="lede service-area__lede">Streetside opens routes based on service availability and neighborhood demand — the more neighbors on a street or in a subdivision, the sooner a route can open there.</p>
 
-          <div class="address-check" style="margin-top: var(--space-6);">
-            <h3 style="margin-bottom: var(--space-2);">Check your address</h3>
-            <p class="lede" style="font-size:0.92rem; margin-bottom: var(--space-5);">We'll let you know if your neighborhood already has a route, or add you to the waitlist for one.</p>
+          <div class="address-check">
+            <h3 class="address-check__title">Check your address</h3>
+            <p class="lede address-check__lede">We'll let you know if your neighborhood already has a route, or add you to the waitlist for one.</p>
 
             <form id="address-check-form" novalidate>
               <div class="field">
@@ -351,6 +351,7 @@ fbq('track', 'PageView');
         </div>
 
         <form id="waitlist-form" novalidate>
+          <p class="form-section-label">About you</p>
           <div class="field-row cols-2">
             <div class="field">
               <label for="wl-first">First Name</label>
@@ -367,6 +368,7 @@ fbq('track', 'PageView');
             <input id="wl-contact" name="emailOrPhone" type="text" required placeholder="you@example.com or (555) 555-5555" autocomplete="on" />
           </div>
 
+          <p class="form-section-label">Where we'd service</p>
           <div class="field">
             <label for="wl-street">Street Address</label>
             <input id="wl-street" name="streetAddress" type="text" required autocomplete="street-address" />
@@ -383,15 +385,22 @@ fbq('track', 'PageView');
             </div>
           </div>
 
-          <div class="field">
-            <label for="wl-package">Which Plan Are You Interested In?</label>
-            <select id="wl-package" name="interestedPackage" required>
-              <option value="" disabled selected>Select a plan</option>
-              <option value="curb">Curb Service</option>
-              <option value="full">Full Service</option>
-              <option value="one-time">One-Time Service</option>
-              <option value="not-sure">Not sure yet</option>
-            </select>
+          <p class="form-section-label">Your plan</p>
+          <div class="field-row cols-2">
+            <div class="field">
+              <label for="wl-package">Which Plan Are You Interested In?</label>
+              <select id="wl-package" name="interestedPackage" required>
+                <option value="" disabled selected>Select a plan</option>
+                <option value="curb">Curb Service</option>
+                <option value="full">Full Service</option>
+                <option value="one-time">One-Time Service</option>
+                <option value="not-sure">Not sure yet</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="wl-promo">Promo or Referral Code <span class="optional">(optional)</span></label>
+              <input id="wl-promo" name="promoCode" type="text" maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Have a code? Enter it here" />
+            </div>
           </div>
 
           <label class="consent">
@@ -399,7 +408,7 @@ fbq('track', 'PageView');
             <span>I agree that Streetside may contact me by email, phone, or text regarding service availability in my area.</span>
           </label>
 
-          <button type="submit" class="btn btn-primary btn-block" style="margin-top: var(--space-5);">
+          <button type="submit" class="btn btn-primary btn-block form-submit">
             Join the Waitlist
             <span class="btn-icon" aria-hidden="true">→</span>
           </button>

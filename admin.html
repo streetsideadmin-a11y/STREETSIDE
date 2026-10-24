@@ -121,6 +121,8 @@
     font-size: 0.85rem;
   }
   .admin-city-list__item strong { color: var(--color-accent); }
+  .admin-promo-pill { font: inherit; font-size: 0.85rem; cursor: pointer; }
+  .admin-promo-pill:hover { border-color: var(--color-brand); background: var(--green-tint); }
   .admin-city-list__empty { color: var(--color-ink-muted); font-size: 0.9rem; }
 
   .admin-route-hint { font-size: 0.85rem; color: var(--color-ink-muted); margin-bottom: var(--space-4); }
@@ -300,6 +302,65 @@
   }
   .admin-delete-btn:hover { background: #fbeaea; }
   #admin-dashboard { display: none; }
+
+  /* ---- v42 tidy-up ---- */
+  .admin-wrap.is-wide { max-width: 1320px; }
+  .admin-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    background: var(--color-bg);
+    padding: var(--space-3) 0;
+    margin-bottom: var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .admin-topbar .admin-header { margin-bottom: 0; }
+  .admin-summary { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--space-3); margin-bottom: var(--space-5); }
+  .admin-summary__card { padding: var(--space-3) var(--space-4); }
+  .admin-summary__card strong { font-size: 1.5rem; line-height: 1.1; }
+  .admin-panel { margin-bottom: var(--space-5); }
+  .admin-panel-grid { display: grid; grid-template-columns: 1fr; gap: var(--space-5); margin-bottom: var(--space-5); }
+  .admin-panel-grid .admin-panel { margin-bottom: 0; }
+  @media (min-width: 900px) { .admin-panel-grid { grid-template-columns: 3fr 2fr; } }
+  .admin-panel-sub { font-size: 0.8rem; color: var(--color-ink-muted); margin: calc(var(--space-2) * -1) 0 var(--space-4); }
+  .admin-route-hint { font-size: 0.8rem; margin-bottom: var(--space-3); }
+  #admin-map-el { height: 440px; }
+  details.admin-panel > summary {
+    cursor: pointer;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-display);
+    font-stretch: condensed;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 1rem;
+    color: var(--color-brand-strong);
+  }
+  details.admin-panel > summary::-webkit-details-marker { display: none; }
+  details.admin-panel > summary::after { content: "Show ▾"; font-family: var(--font-body); font-size: 0.75rem; font-weight: 600; text-transform: none; color: var(--color-ink-muted); }
+  details.admin-panel[open] > summary::after { content: "Hide ▴"; }
+  details.admin-panel[open] > summary { margin-bottom: var(--space-4); }
+  .admin-route-count { font-family: var(--font-body); font-size: 0.75rem; font-weight: 700; background: var(--color-brand-strong); color: #fff; border-radius: 999px; padding: 2px 9px; margin-left: var(--space-3); }
+
+  .admin-filters { align-items: center; padding: var(--space-3); background: var(--white); border: 1px solid var(--color-border); border-radius: var(--radius-md); }
+  .admin-filters .admin-filter-select, .admin-filters .admin-filter-search { padding: 8px 12px; font-size: 0.85rem; }
+  .admin-filter-count { margin: var(--space-3) 0 var(--space-2); }
+
+  .admin-table-wrap { max-height: 72vh; overflow: auto; }
+  table.admin-table { white-space: normal; }
+  table.admin-table th { z-index: 2; box-shadow: 0 1px 0 var(--color-border); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--color-ink-muted); white-space: nowrap; }
+  table.admin-table th, table.admin-table td { padding: 8px 12px; vertical-align: top; }
+  table.admin-table td.nowrap { white-space: nowrap; }
+  table.admin-table td .sub { display: block; font-size: 0.78rem; color: var(--color-ink-muted); margin-top: 2px; }
+  table.admin-table td .sub a { color: var(--color-ink-muted); }
+  table.admin-table td.col-center, table.admin-table th.col-center { text-align: center; }
+  .admin-badge { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--green-tint); color: var(--color-brand-strong); border: 1px solid var(--green-600); white-space: nowrap; }
+  .admin-badge.is-check { background: var(--off-white); color: var(--color-ink-muted); border-color: var(--color-border); }
+  .admin-badge.is-promo { background: #fff6e5; color: #7a4b00; border-color: #e5b25d; font-family: monospace; letter-spacing: 0.03em; }
+  .admin-consent-no { color: var(--red-700); font-weight: 700; }
+  .admin-delete-btn { padding: 2px 8px; line-height: 1.4; }
 </style>
 </head>
 <body>
@@ -325,17 +386,20 @@
 
 <!-- ============ DASHBOARD ============ -->
 <div class="admin-wrap is-wide" id="admin-dashboard">
-  <div class="admin-header">
-    <h1>Signups</h1>
-    <div class="admin-header__actions">
-      <button type="button" class="btn btn-outline-brand" id="admin-refresh-btn">Refresh</button>
-      <button type="button" class="btn btn-outline-brand" id="admin-export-btn">Export CSV</button>
-      <button type="button" class="btn btn-outline-brand" id="admin-logout-btn">Log Out</button>
+  <div class="admin-topbar">
+    <div class="admin-header">
+      <h1>Signups</h1>
+      <div class="admin-header__actions">
+        <button type="button" class="btn btn-outline-brand" id="admin-refresh-btn">Refresh</button>
+        <button type="button" class="btn btn-outline-brand" id="admin-export-btn">Export CSV</button>
+        <button type="button" class="btn btn-outline-brand" id="admin-logout-btn">Log Out</button>
+      </div>
     </div>
   </div>
 
   <div class="admin-summary" id="admin-summary"></div>
 
+  <div class="admin-panel-grid">
   <div class="admin-panel">
     <div class="admin-panel__header-row">
       <h2>Interest by City</h2>
@@ -348,17 +412,26 @@
   </div>
 
   <div class="admin-panel">
+    <div class="admin-panel__header-row">
+      <h2>Promo &amp; Referral Codes</h2>
+    </div>
+    <p class="admin-panel-sub">Waitlist signups only. Click a code to filter the table.</p>
+    <div class="admin-city-list" id="admin-promo-list"></div>
+  </div>
+  </div>
+
+  <div class="admin-panel">
     <h2>Waitlist Interest Map</h2>
-    <p class="admin-route-hint">Warmer colors mean more real waitlist signups in that town, traced to that town's actual municipal boundary where OpenStreetMap has one on file (falls back to a circle if a specific town doesn't have one). Address-check lookups aren't counted, only actual waitlist signups.</p>
+    <p class="admin-route-hint">Warmer = more waitlist signups. Click a town to filter the table. Address checks aren't counted.</p>
     <p class="admin-map-loading" id="admin-map-loading" style="display: none;">Loading real boundaries…</p>
     <div class="admin-map-wrap">
       <div id="admin-map-el"></div>
     </div>
   </div>
 
-  <div class="admin-panel">
-    <h2>Plan Today's Route</h2>
-    <p class="admin-route-hint">Check the "Route" box on rows in the table below to add them here — up to 9 stops per trip (Google Maps' own limit; split into more than one trip for larger routes).</p>
+  <details class="admin-panel" id="admin-route-panel">
+    <summary>Plan Today's Route <span class="admin-route-count" id="admin-route-count" style="display:none;"></span></summary>
+    <p class="admin-route-hint">Tick "Route" on rows in the table below to add them here — up to 9 stops per trip (Google Maps' limit).</p>
     <div class="field" style="max-width: 420px;">
       <label for="admin-route-origin">Starting Address <span class="optional">(optional — required to use sorting below)</span></label>
       <input type="text" id="admin-route-origin" placeholder="Include a recognized town, e.g. 123 Main St, Lancaster" />
@@ -377,7 +450,7 @@
       <button type="button" class="btn btn-primary" id="admin-route-open">Open Route in Google Maps</button>
       <button type="button" class="btn btn-outline-brand" id="admin-route-clear">Clear Route</button>
     </div>
-  </div>
+  </details>
 
   <p class="admin-map-filter-active" id="admin-map-filter-active" style="display: none;">
     Filtered by map: <strong id="admin-map-filter-town"></strong>
@@ -385,7 +458,7 @@
   </p>
 
   <div class="admin-filters" id="admin-filters">
-    <input type="text" id="admin-filter-search" placeholder="Search name, email, phone, address, city…" class="admin-filter-search" />
+    <input type="text" id="admin-filter-search" placeholder="Search name, email, phone, address, city, code…" class="admin-filter-search" />
     <select id="admin-filter-type" class="admin-filter-select">
       <option value="">All types</option>
       <option value="waitlist">Waitlist</option>
@@ -409,6 +482,10 @@
       <option value="free-service">Free Service</option>
       <option value="__none__">No discount</option>
     </select>
+    <select id="admin-filter-promo" class="admin-filter-select">
+      <option value="">All promo codes</option>
+      <option value="__none__">No code</option>
+    </select>
     <button type="button" class="btn btn-outline-brand admin-filter-clear" id="admin-filter-clear">Clear</button>
   </div>
   <p class="admin-filter-count" id="admin-filter-count"></p>
@@ -419,19 +496,15 @@
       <thead>
         <tr>
           <th class="is-sortable" data-sort-key="submitted_at">Submitted</th>
-          <th class="is-sortable" data-sort-key="form_type">Type</th>
           <th class="is-sortable" data-sort-key="last_name">Name</th>
-          <th>Email</th>
-          <th>Phone</th>
-          <th>Address</th>
-          <th class="is-sortable" data-sort-key="city">City</th>
-          <th>ZIP</th>
-          <th class="is-sortable" data-sort-key="interested_package">Package</th>
+          <th>Contact</th>
+          <th class="is-sortable" data-sort-key="city">Address</th>
+          <th class="is-sortable" data-sort-key="interested_package">Plan</th>
+          <th class="is-sortable" data-sort-key="promo_code">Promo</th>
           <th class="is-sortable" data-sort-key="discount_type">Discount</th>
-          <th>Consent</th>
-          <th class="is-sortable" data-sort-key="contacted">Contacted</th>
-          <th>Actions</th>
-          <th>Route</th>
+          <th class="is-sortable col-center" data-sort-key="contacted">Contacted</th>
+          <th class="col-center">Route</th>
+          <th></th>
         </tr>
       </thead>
       <tbody id="admin-table-body"></tbody>
@@ -679,22 +752,30 @@
     tableBody.innerHTML = rows
       .map(function (row) {
         var name = [row.first_name, row.last_name].filter(Boolean).join(" ") || "—";
+        var isCheck = row.form_type === "address-check";
+        var contactHtml =
+          (row.email ? '<a href="mailto:' + escapeHtml(row.email) + '">' + escapeHtml(row.email) + "</a>" : "") +
+          (row.phone
+            ? (row.email ? '<span class="sub">' : "") +
+              '<a href="tel:' + escapeHtml(row.phone) + '">' + escapeHtml(formatPhoneDisplay(row.phone)) + "</a>" +
+              (row.email ? "</span>" : "")
+            : "");
+        if (!contactHtml) contactHtml = "—";
+        var cityZip = [titleCaseCity(row.city), row.zip].filter(Boolean).join(" ");
         return (
           '<tr data-row-id="' + row.id + '"' + (row.contacted ? ' class="is-contacted"' : "") + ">" +
-          "<td>" + formatDate(row.submitted_at) + "</td>" +
-          "<td>" + escapeHtml(row.form_type) + "</td>" +
-          "<td>" + escapeHtml(name) + "</td>" +
-          "<td>" + (row.email ? '<a href="mailto:' + escapeHtml(row.email) + '">' + escapeHtml(row.email) + "</a>" : "—") + "</td>" +
-          "<td>" + (row.phone ? '<a href="tel:' + escapeHtml(row.phone) + '">' + escapeHtml(formatPhoneDisplay(row.phone)) + "</a>" : "—") + "</td>" +
-          "<td>" + escapeHtml(row.street_address || "—") + "</td>" +
-          "<td>" + escapeHtml(titleCaseCity(row.city) || "—") + "</td>" +
-          "<td>" + escapeHtml(row.zip || "—") + "</td>" +
-          "<td>" + escapeHtml(packageLabel(row.interested_package)) + "</td>" +
+          '<td class="nowrap">' + formatDate(row.submitted_at) +
+            '<span class="sub"><span class="admin-badge' + (isCheck ? " is-check" : "") + '">' + (isCheck ? "Address check" : "Waitlist") + "</span></span></td>" +
+          "<td>" + escapeHtml(name) +
+            (row.consent ? "" : '<span class="sub admin-consent-no">No consent</span>') + "</td>" +
+          "<td>" + contactHtml + "</td>" +
+          "<td>" + escapeHtml(row.street_address || "—") + '<span class="sub">' + escapeHtml(cityZip || "—") + "</span></td>" +
+          '<td class="nowrap">' + escapeHtml(packageLabel(row.interested_package)) + "</td>" +
+          '<td class="nowrap">' + (row.promo_code ? '<span class="admin-badge is-promo">' + escapeHtml(row.promo_code) + "</span>" : "—") + "</td>" +
           "<td>" + discountSelectHtml(row) + "</td>" +
-          "<td>" + (row.consent ? "Yes" : "No") + "</td>" +
-          "<td><label class=\"admin-contacted-toggle\"><input type=\"checkbox\" data-action=\"toggle-contacted\" data-id=\"" + row.id + "\"" + (row.contacted ? " checked" : "") + " /> " + (row.contacted ? "Yes" : "No") + "</label></td>" +
-          "<td><button type=\"button\" class=\"admin-delete-btn\" data-action=\"delete-row\" data-id=\"" + row.id + "\">Delete</button></td>" +
-          "<td><input type=\"checkbox\" data-action=\"route-select\" data-id=\"" + row.id + "\"" + (routeStopIds.has(row.id) ? " checked" : "") + " /></td>" +
+          '<td class="col-center"><input type="checkbox" data-action="toggle-contacted" data-id="' + row.id + '"' + (row.contacted ? " checked" : "") + ' aria-label="Contacted" /></td>' +
+          '<td class="col-center"><input type="checkbox" data-action="route-select" data-id="' + row.id + '"' + (routeStopIds.has(row.id) ? " checked" : "") + ' aria-label="Add to route" /></td>' +
+          '<td><button type="button" class="admin-delete-btn" data-action="delete-row" data-id="' + row.id + '" title="Delete this row" aria-label="Delete">✕</button></td>' +
           "</tr>"
         );
       })
@@ -709,6 +790,7 @@
     var pkg = document.getElementById("admin-filter-package").value;
     var city = document.getElementById("admin-filter-city").value;
     var discount = document.getElementById("admin-filter-discount").value;
+    var promo = document.getElementById("admin-filter-promo").value;
 
     var filtered = allSignups.filter(function (row) {
       if (type && row.form_type !== type) return false;
@@ -725,6 +807,12 @@
         return false;
       }
 
+      if (promo === "__none__") {
+        if (row.promo_code) return false;
+      } else if (promo && row.promo_code !== promo) {
+        return false;
+      }
+
       if (city && row.city !== city) return false;
 
       // Set by clicking a boundary/circle on the Waitlist Interest
@@ -734,7 +822,7 @@
       if (mapTownFilter && matchedTownFor(row) !== mapTownFilter) return false;
 
       if (search) {
-        var haystack = [row.first_name, row.last_name, row.email, row.phone, row.street_address, row.city, row.zip]
+        var haystack = [row.first_name, row.last_name, row.email, row.phone, row.street_address, row.city, row.zip, row.promo_code]
           .filter(Boolean)
           .join(" ")
           .toLowerCase();
@@ -761,17 +849,63 @@
     citySelect.value = currentValue;
   }
 
+  function populatePromoFilter() {
+    var sel = document.getElementById("admin-filter-promo");
+    var current = sel.value;
+    sel.innerHTML = '<option value="">All promo codes</option><option value="__none__">No code</option>';
+    Array.from(new Set(allSignups.map(function (r) { return r.promo_code; }).filter(Boolean)))
+      .sort()
+      .forEach(function (code) {
+        var opt = document.createElement("option");
+        opt.value = code;
+        opt.textContent = code;
+        sel.appendChild(opt);
+      });
+    sel.value = current;
+  }
+
+  function renderPromoBreakdown() {
+    var counts = {};
+    allSignups.forEach(function (row) {
+      if (row.form_type !== "waitlist" || !row.promo_code) return;
+      counts[row.promo_code] = (counts[row.promo_code] || 0) + 1;
+    });
+    var el = document.getElementById("admin-promo-list");
+    var codes = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; });
+    if (codes.length === 0) {
+      el.innerHTML = '<span class="admin-city-list__empty">No codes used yet.</span>';
+      return;
+    }
+    el.innerHTML = codes
+      .map(function (code) {
+        return (
+          '<button type="button" class="admin-city-list__item admin-promo-pill" data-promo="' + escapeHtml(code) + '"><strong>' +
+          counts[code] + "</strong> " + escapeHtml(code) + "</button>"
+        );
+      })
+      .join("");
+  }
+
+  document.getElementById("admin-promo-list").addEventListener("click", function (e) {
+    var pill = e.target.closest("[data-promo]");
+    if (!pill) return;
+    document.getElementById("admin-filter-promo").value = pill.getAttribute("data-promo");
+    applyFilters();
+    document.getElementById("admin-filters").scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+
   function clearAllFilters() {
     document.getElementById("admin-filter-search").value = "";
     document.getElementById("admin-filter-type").value = "";
     document.getElementById("admin-filter-package").value = "";
     document.getElementById("admin-filter-city").value = "";
     document.getElementById("admin-filter-discount").value = "";
+    document.getElementById("admin-filter-promo").value = "";
     setMapTownFilter(null);
   }
 
   function initFilters() {
-    ["admin-filter-search", "admin-filter-type", "admin-filter-package", "admin-filter-city", "admin-filter-discount"].forEach(function (id) {
+    ["admin-filter-search", "admin-filter-type", "admin-filter-package", "admin-filter-city", "admin-filter-discount", "admin-filter-promo"].forEach(function (id) {
       var el = document.getElementById(id);
       var evt = el.tagName === "SELECT" ? "change" : "input";
       el.addEventListener(evt, applyFilters);
@@ -794,7 +928,7 @@
   function exportCsv() {
     var headers = [
       "Submitted", "Type", "First Name", "Last Name", "Email", "Phone",
-      "Street Address", "City", "ZIP", "Package", "Discount", "Consent", "Contacted",
+      "Street Address", "City", "ZIP", "Package", "Promo Code", "Discount", "Consent", "Contacted",
     ];
     var lines = [headers.join(",")];
     currentFiltered.forEach(function (row) {
@@ -810,6 +944,7 @@
           row.city ? titleCaseCity(row.city) : "",
           row.zip || "",
           packageLabel(row.interested_package),
+          row.promo_code || "",
           discountLabel(row.discount_type),
           row.consent ? "Yes" : "No",
           row.contacted ? "Yes" : "No",
@@ -1124,6 +1259,12 @@
     var listEl = document.getElementById("admin-route-list");
     var emptyEl = document.getElementById("admin-route-empty");
 
+    var countBadge = document.getElementById("admin-route-count");
+    if (countBadge) {
+      countBadge.textContent = routeStopOrder.length + (routeStopOrder.length === 1 ? " stop" : " stops");
+      countBadge.style.display = routeStopOrder.length ? "inline-block" : "none";
+    }
+
     if (routeStopOrder.length === 0) {
       listEl.innerHTML = "";
       emptyEl.style.display = "block";
@@ -1370,7 +1511,9 @@
 
     allSignups = data.signups;
     populateCityFilter();
+    populatePromoFilter();
     renderCityBreakdown();
+    renderPromoBreakdown();
     applyFilters();
     renderAdminMap();
     return true;
