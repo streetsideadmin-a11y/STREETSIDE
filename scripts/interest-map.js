@@ -48,6 +48,7 @@
     "new lexington": [39.7020, -82.2085, "town"],
     "royalton": [39.6987, -82.6849, "town"],
     "walnut": [39.6673, -82.7213, "town"],
+    "amanda": [39.6417, -82.7438, "town"],
     "north berne": [39.7679, -82.5165, "town"],
     "pleasantville": [39.8993, -82.5210, "town"],
     "kirkersville": [39.9787, -82.6432, "town"],

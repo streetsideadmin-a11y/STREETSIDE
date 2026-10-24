@@ -4,7 +4,13 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v43.0 — current
+## v43.1 — current
+
+- Added **Amanda, OH** to both heatmaps (public and admin), so signups
+  with Amanda as the city now light up there, show its real boundary,
+  and can be click-filtered in admin like every other town.
+
+## v43.0
 
 - **Neighbor counter is back.** Hero now has a "Neighbors on board" card
   beside the Join the Waitlist button, and the Built for Neighborhoods
