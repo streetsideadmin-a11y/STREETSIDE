@@ -43,8 +43,18 @@
     requestAnimationFrame(step);
   }
 
+  // Hero counter note: honest at zero, warm once real neighbors exist.
+  function renderNeighborNote(count) {
+    var noteEl = document.querySelector("[data-neighbor-note]");
+    if (!noteEl) return;
+    noteEl.textContent =
+      count > 0
+        ? "Thank you to our growing community of neighbors!"
+        : "Be one of the first neighbors on board.";
+  }
+
   function renderSpotsCopy(remaining) {
-    var noteEl = document.querySelector("[data-counter-note]");
+    var noteEl = document.querySelector("[data-spots-note]");
     if (!noteEl) return;
     if (remaining <= 0) {
       noteEl.textContent = "Founding spots are full — join the regular waitlist!";
@@ -58,6 +68,7 @@
   function render(count) {
     var rawEls = document.querySelectorAll("[data-counter-value]");
     rawEls.forEach(function (el) { animateCount(el, count); });
+    renderNeighborNote(count);
 
     var spotsEls = document.querySelectorAll("[data-spots-remaining]");
     if (spotsEls.length) {
@@ -67,6 +78,8 @@
         var remaining = Math.max(total - count, 0);
         spotsEls.forEach(function (el) { animateCount(el, remaining); });
         renderSpotsCopy(remaining);
+        var barEl = document.querySelector("[data-spots-bar]");
+        if (barEl) barEl.style.width = Math.min((count / total) * 100, 100) + "%";
       }
     }
   }

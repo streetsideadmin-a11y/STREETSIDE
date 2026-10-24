@@ -115,10 +115,32 @@
     // --- Founding 250 promo banner, rendered separately above/below the cards ---
     var bannerMount = document.querySelector("[data-founding-offer]");
     if (founding && founding.enabled && bannerMount) {
+      var total = typeof founding.spotsTotal === "number" ? founding.spotsTotal : null;
       bannerMount.innerHTML =
-        '<h3>' + founding.headline + '</h3>' +
-        '<p>' + founding.description + '</p>';
-      bannerMount.style.display = "block";
+        '<div class="founding-offer__stamp" aria-hidden="true">' +
+          '<span class="founding-offer__pct">' + founding.discountPercent + '%</span>' +
+          '<span class="founding-offer__off">OFF</span>' +
+          '<span class="founding-offer__sub">first month</span>' +
+        '</div>' +
+        '<div class="founding-offer__body">' +
+          '<span class="founding-offer__eyebrow">' + founding.name + '</span>' +
+          '<h3>' + founding.headline + '</h3>' +
+          '<ul class="founding-offer__perks">' +
+            '<li>' + founding.discountPercent + '% off your first month</li>' +
+            '<li>Rate locked for ' + founding.lockYears + ' years</li>' +
+            (total !== null ? '<li>First ' + total + ' households only</li>' : '') +
+          '</ul>' +
+          '<p class="founding-offer__fine">' + founding.description + '</p>' +
+        '</div>' +
+        (total !== null
+          ? '<div class="founding-offer__meter">' +
+              '<div class="founding-offer__spots"><strong data-spots-remaining>' + total + '</strong><span>of ' + total + ' founding spots left</span></div>' +
+              '<div class="founding-offer__bar" role="presentation"><span data-spots-bar></span></div>' +
+              '<p class="founding-offer__note" data-spots-note></p>' +
+              '<a href="#waitlist" class="btn btn-accent btn-block">Claim my founding spot <span class="btn-icon" aria-hidden="true">→</span></a>' +
+            '</div>'
+          : '') ;
+      bannerMount.style.display = "grid";
     } else if (bannerMount) {
       bannerMount.style.display = "none";
     }

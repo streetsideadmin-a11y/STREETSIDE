@@ -112,7 +112,8 @@ fbq('track', 'PageView');
     <div class="container hero__content">
       <div class="hero__top">
         <a href="#pricing" class="hero__discount-badge reveal">
-          🎉 Founding Members Save 50% — Claim Your Discount
+          <span class="hero__discount-badge__pct">50% OFF</span>
+          <span>Founding 250 — first month. <strong><span data-spots-remaining>250</span> spots left</strong></span>
           <span class="btn-icon" aria-hidden="true">→</span>
         </a>
         <h1 class="hero__headline reveal">Professional<br />Bin Valet<br />Service.</h1>
@@ -128,6 +129,15 @@ fbq('track', 'PageView');
         </span>
 
         <div class="hero__row">
+          <div class="neighbor-counter" data-neighbor-counter>
+            <svg class="neighbor-counter__icon" width="34" height="34" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="9" cy="8" r="3.2" stroke="currentColor" stroke-width="1.8"/><path d="M3 19c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="17.5" cy="9" r="2.4" stroke="currentColor" stroke-width="1.8"/><path d="M16.5 14c2.8 0 4.5 1.8 4.5 4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <div>
+              <div class="neighbor-counter__number" data-counter-value>0</div>
+              <div class="neighbor-counter__label">Neighbors on board</div>
+            </div>
+            <div class="neighbor-counter__divider" aria-hidden="true"></div>
+            <p class="neighbor-counter__note" data-neighbor-note>Be one of the first neighbors on board.</p>
+          </div>
           <div class="hero__cta">
             <a href="#waitlist" class="btn btn-accent">
               Join the Waitlist
@@ -253,7 +263,11 @@ fbq('track', 'PageView');
         <p class="lede">The more neighbors who join, the more efficiently Streetside can open and serve routes. More neighbors. More routes.</p>
 
         <div class="neighborhood__stats">
-          <span class="pill">Every signup brings a route closer</span>
+          <div class="neighborhood__count">
+            <strong data-counter-value>0</strong>
+            <span>Neighbors on board</span>
+          </div>
+          <span class="pill">More neighbors = more routes</span>
         </div>
 
         <a href="#waitlist" class="btn btn-accent">
@@ -506,9 +520,9 @@ fbq('track', 'PageView');
 <script src="scripts/nav.js"></script>
 <script src="scripts/reveal.js"></script>
 <script src="scripts/scroll-ui.js"></script>
+<script src="scripts/main.js"></script>
 <script src="scripts/counter.js"></script>
 <script src="scripts/waitlist-form.js"></script>
 <script src="scripts/interest-map.js"></script>
-<script src="scripts/main.js"></script>
 </body>
 </html>

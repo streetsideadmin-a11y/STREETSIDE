@@ -4,7 +4,25 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v42.0 — current
+## v43.0 — current
+
+- **Neighbor counter is back.** Hero now has a "Neighbors on board" card
+  beside the Join the Waitlist button, and the Built for Neighborhoods
+  section shows the count too. Both read the real waitlist signup count
+  from `/api/neighbor-count` (address checks excluded). At zero it says
+  "Be one of the first neighbors on board."; once signups exist it says
+  "Thank you to our growing community of neighbors!"
+- **Founder discount redesigned to stand out.** The pricing banner now has
+  a red "50% OFF first month" stamp, check-mark perks, a live
+  "spots left of 250" meter with progress bar, and a "Claim my founding
+  spot" button. The hero badge is now a red pill with "50% OFF" and live
+  spots left. Spots left = 250 minus real waitlist signups.
+- Mobile layout checked for hero counter, badge, and banner (stacks cleanly).
+- Script order changed so the founding banner is built before the counter
+  fills it in. Previewed and approved before shipping; previews used a
+  sample count of 37 only in screenshots, never in the site.
+
+## v42.0
 
 - **Optional Promo / Referral Code box on the waitlist form.** Sits next
   to the plan dropdown, never required. Typed codes are auto-uppercased
