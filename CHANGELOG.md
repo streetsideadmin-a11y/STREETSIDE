@@ -4,7 +4,19 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v43.2 — current
+## v44.0 — current
+
+- **Halloween theme (switchable).** Midnight-purple and black surfaces with
+  pumpkin-orange accents, a moonlit hero with flying bats and a cobweb, a
+  "Happy Halloween" bar above the header, bat silhouettes above the footer,
+  and a pumpkin-tinted founding-offer banner. Logos are untouched.
+- **To turn it off after Halloween:** open `config/site-config.js` and change
+  `seasonalTheme: "halloween"` to `seasonalTheme: null`. Nothing else changes.
+- New file `styles/theme-halloween.css`; `config/site-config.js` now loads in
+  the page head so the theme applies before first paint. The admin
+  dashboard is not themed.
+
+## v43.2
 
 - **Removed our own dots and town labels from both maps** (public and
   admin). The map underneath already labels every town, so only the heat

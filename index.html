@@ -25,6 +25,7 @@
 <link rel="stylesheet" href="styles/base.css" />
 <link rel="stylesheet" href="styles/components.css" />
 <link rel="stylesheet" href="styles/sections.css" />
+<link rel="stylesheet" href="styles/theme-halloween.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -58,9 +59,32 @@ fbq('track', 'PageView');
 </script>
 <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1374634321449512&ev=PageView&noscript=1"/></noscript>
 <!-- End Meta Pixel Code -->
+<!-- Seasonal theme: loaded early so the page never flashes the normal
+     colors first. Controlled by `seasonalTheme` in config/site-config.js
+     (set it to null to go back to the regular look). -->
+<script src="config/site-config.js"></script>
+<script>
+  (function () {
+    var t = window.STREETSIDE_CONFIG && window.STREETSIDE_CONFIG.seasonalTheme;
+    if (t) document.documentElement.setAttribute("data-theme", t);
+  })();
+</script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
+
+<!-- ============ SEASONAL: HALLOWEEN BAR (only shows when seasonalTheme is "halloween") ============ -->
+<div class="season-bar" role="note">
+  <svg class="season-bar__icon" width="22" height="28" viewBox="0 0 40 52" aria-hidden="true">
+    <rect x="2" y="8" width="36" height="8" rx="2" fill="#3b2a55"/>
+    <path d="M6 16H34L31 48H9Z" fill="#f26a0f"/>
+    <polygon points="13,25 19,25 16,31" fill="#1a1024"/><polygon points="21,25 27,25 24,31" fill="#1a1024"/>
+    <path d="M12 37L15 34L18 38L20 34L22 38L25 34L28 37L26 43H14Z" fill="#1a1024"/>
+    <circle cx="12" cy="49.5" r="2.2" fill="#1a1024"/><circle cx="28" cy="49.5" r="2.2" fill="#1a1024"/>
+  </svg>
+  <span>Happy Halloween from Streetside — we handle trash day, you handle the candy.</span>
+  <a href="#waitlist">Join the waitlist <span aria-hidden="true">→</span></a>
+</div>
 
 <!-- ============ HEADER ============ -->
 <header class="site-header">
@@ -108,6 +132,13 @@ fbq('track', 'PageView');
   <section class="hero" id="top" aria-label="Introduction">
     <div class="hero__photo" role="img" aria-label="Trash and recycling bins at the curb in front of a suburban home"></div>
     <div class="hero__scrim"></div>
+    <div class="halloween-decor" aria-hidden="true">
+      <div class="halloween-decor__moon"></div>
+      <svg class="bat bat--1" viewBox="0 0 24 16" aria-hidden="true"><path d="M12 6C10 3 6 3 1 7c3 0 4 2 5 4 1.5-1.500 3-1 4 1l2-2.500 2 2.500c1-2 2.500-2.500 4-1 1-2 2-4 5-4-5-4-9-4-11-1Z" fill="currentColor"/></svg>
+      <svg class="bat bat--2" viewBox="0 0 24 16" aria-hidden="true"><path d="M12 6C10 3 6 3 1 7c3 0 4 2 5 4 1.5-1.500 3-1 4 1l2-2.500 2 2.500c1-2 2.500-2.500 4-1 1-2 2-4 5-4-5-4-9-4-11-1Z" fill="currentColor"/></svg>
+      <svg class="bat bat--3" viewBox="0 0 24 16" aria-hidden="true"><path d="M12 6C10 3 6 3 1 7c3 0 4 2 5 4 1.5-1.500 3-1 4 1l2-2.500 2 2.500c1-2 2.500-2.500 4-1 1-2 2-4 5-4-5-4-9-4-11-1Z" fill="currentColor"/></svg>
+      <svg class="cobweb cobweb--tl" viewBox="0 0 120 120"><g fill="none" stroke="currentColor" stroke-width="1"><path d="M0 0L120 0M0 0L112 42M0 0L88 88M0 0L42 112M0 0L0 120"/><path d="M40 0Q34 34 0 40M72 0Q60 58 0 72M104 0Q86 80 0 104"/><path d="M38 14Q30 30 14 38" opacity="0"/></g></svg>
+    </div>
 
     <div class="container hero__content">
       <div class="hero__top">
@@ -448,6 +479,7 @@ fbq('track', 'PageView');
 
 <!-- ============ FOOTER ============ -->
 <footer class="site-footer">
+  <div class="footer-bats" aria-hidden="true"></div>
   <div class="container">
     <div class="site-footer__top">
       <div>
@@ -516,7 +548,6 @@ fbq('track', 'PageView');
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 19V5M12 5L5 12M12 5L19 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
 
-<script src="config/site-config.js"></script>
 <script src="scripts/nav.js"></script>
 <script src="scripts/reveal.js"></script>
 <script src="scripts/scroll-ui.js"></script>

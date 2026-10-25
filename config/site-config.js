@@ -13,6 +13,15 @@
  */
 
 window.STREETSIDE_CONFIG = {
+  /**
+   * SEASONAL THEME
+   * ---------------
+   * "halloween" turns on the spooky look (purple/black/pumpkin, bats,
+   * cobwebs, announcement bar). Set to null to return to the normal
+   * Streetside look — nothing else needs to change.
+   */
+  seasonalTheme: "halloween", // "halloween" | null
+
   business: {
     name: "Streetside",
     fullName: "Streetside Waste & Property Services",

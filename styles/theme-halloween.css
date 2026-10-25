@@ -1,0 +1,177 @@
+/* ==========================================================================
+   SEASONAL THEME — HALLOWEEN
+   Everything here is scoped to html[data-theme="halloween"], which is set
+   from `seasonalTheme` in config/site-config.js. Set that to null and none
+   of this applies. Logos and images are never recolored.
+   ========================================================================== */
+
+/* Decor is invisible unless the theme is on */
+.season-bar,
+.halloween-decor,
+.footer-bats { display: none; }
+
+html[data-theme="halloween"] {
+  /* Dark-green brand surfaces become midnight purple */
+  --green-900: #120d1b;
+  --green-800: #1d1430;
+  --green-700: #2b1c47;
+  --green-600: #4a2f73;
+  --green-tint: #f3eef8;
+
+  /* Accent red becomes pumpkin */
+  --red-600: #d4450c;
+  --red-700: #b13808;
+
+  /* Warmer paper */
+  --off-white: #f8f3ea;
+  --paper: #f0e8dc;
+
+  --halloween-glow: #ff8a1f;
+  --halloween-bone: #f4efe6;
+
+  --shadow-md: 0 12px 32px rgba(18, 13, 27, 0.2);
+}
+
+/* ---- Announcement bar ---- */
+html[data-theme="halloween"] .season-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 9px var(--space-4);
+  background: var(--green-900);
+  color: var(--halloween-bone);
+  font-family: var(--font-display);
+  font-stretch: condensed;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  text-align: center;
+  border-bottom: 2px solid var(--halloween-glow);
+}
+html[data-theme="halloween"] .season-bar a {
+  color: var(--halloween-glow);
+  white-space: nowrap;
+}
+html[data-theme="halloween"] .season-bar a:hover { color: var(--white); }
+.season-bar__icon { flex: none; }
+
+/* ---- Hero ---- */
+html[data-theme="halloween"] .hero__photo {
+  filter: saturate(0.8) brightness(0.82) contrast(1.05);
+}
+html[data-theme="halloween"] .hero__photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(74, 47, 115, 0.5), rgba(212, 69, 12, 0.22));
+  mix-blend-mode: multiply;
+}
+html[data-theme="halloween"] .hero__scrim {
+  background: linear-gradient(
+    100deg,
+    rgba(18, 13, 27, 0.96) 0%,
+    rgba(18, 13, 27, 0.9) 32%,
+    rgba(18, 13, 27, 0.55) 52%,
+    rgba(18, 13, 27, 0.1) 68%,
+    rgba(18, 13, 27, 0) 78%
+  );
+}
+html[data-theme="halloween"] .hero__tagline { color: var(--halloween-glow); }
+
+html[data-theme="halloween"] .halloween-decor {
+  display: block;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+.halloween-decor__moon {
+  position: absolute;
+  top: 7%;
+  right: 9%;
+  width: clamp(90px, 12vw, 170px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff6df 0%, #f6e3b4 55%, #e8cf94 100%);
+  box-shadow: 0 0 60px 20px rgba(255, 190, 90, 0.35), 0 0 160px 60px rgba(255, 138, 31, 0.18);
+  opacity: 0.92;
+  /* faint craters */
+  background-image:
+    radial-gradient(circle at 62% 30%, rgba(190, 160, 100, 0.35) 0 7%, transparent 8%),
+    radial-gradient(circle at 34% 62%, rgba(190, 160, 100, 0.3) 0 11%, transparent 12%),
+    radial-gradient(circle at 70% 72%, rgba(190, 160, 100, 0.28) 0 5%, transparent 6%),
+    radial-gradient(circle at 35% 35%, #fff6df 0%, #f6e3b4 55%, #e8cf94 100%);
+}
+.cobweb {
+  position: absolute;
+  width: clamp(110px, 16vw, 210px);
+  color: var(--halloween-bone);
+  opacity: 0.4;
+}
+.cobweb--tl { top: 0; left: 0; }
+
+.bat {
+  position: absolute;
+  width: 34px;
+  color: #a98be0;
+  opacity: 0.85;
+  filter: drop-shadow(0 0 4px rgba(255, 138, 31, 0.55));
+  animation: bat-fly 24s linear infinite;
+}
+.bat--1 { top: 16%; left: -60px; width: 40px; animation-duration: 22s; }
+.bat--2 { top: 28%; left: -60px; width: 30px; animation-duration: 30s; animation-delay: -11s; }
+.bat--3 { top: 8%; left: -60px; width: 52px; animation-duration: 36s; animation-delay: -22s; }
+
+@keyframes bat-fly {
+  0%   { transform: translate(0, 0) scaleY(1); }
+  25%  { transform: translate(30vw, 28px) scaleY(0.75); }
+  50%  { transform: translate(60vw, -14px) scaleY(1); }
+  75%  { transform: translate(85vw, 26px) scaleY(0.75); }
+  100% { transform: translate(112vw, 0) scaleY(1); }
+}
+
+@media (max-width: 720px) {
+  .halloween-decor__moon { top: 3%; right: 6%; }
+  .cobweb { opacity: 0.3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bat { animation: none; left: 12%; }
+  .bat--2 { left: 38%; }
+  .bat--3 { left: 64%; }
+}
+
+/* Keep real hero content above the decor */
+html[data-theme="halloween"] .hero__content { z-index: 2; }
+
+/* ---- Buttons, perks, small details ---- */
+html[data-theme="halloween"] .btn-accent { color: var(--red-700); }
+html[data-theme="halloween"] .founding-offer__perks li::before { color: var(--halloween-glow); }
+html[data-theme="halloween"] .founding-offer {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(255, 138, 31, 0.16), transparent 45%),
+    linear-gradient(135deg, var(--green-800), var(--green-700));
+  box-shadow: 0 14px 34px rgba(18, 13, 27, 0.35);
+}
+
+/* ---- Footer ---- */
+html[data-theme="halloween"] .site-footer {
+  position: relative;
+  background: var(--green-900);
+}
+html[data-theme="halloween"] .footer-bats {
+  display: block;
+  position: absolute;
+  top: -40px;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='40' viewBox='0 0 220 40'%3E%3Cg fill='%23120d1b'%3E%3Cpath transform='translate(24 18) scale(1.3)' d='M12 6C10 3 6 3 1 7c3 0 4 2 5 4 1.5-1.5 3-1 4 1l2-2.5 2 2.5c1-2 2.5-2.5 4-1 1-2 2-4 5-4-5-4-9-4-11-1Z'/%3E%3Cpath transform='translate(98 6) scale(0.95)' d='M12 6C10 3 6 3 1 7c3 0 4 2 5 4 1.5-1.5 3-1 4 1l2-2.5 2 2.5c1-2 2.5-2.5 4-1 1-2 2-4 5-4-5-4-9-4-11-1Z'/%3E%3Cpath transform='translate(160 22) scale(1.1)' d='M12 6C10 3 6 3 1 7c3 0 4 2 5 4 1.5-1.5 3-1 4 1l2-2.5 2 2.5c1-2 2.5-2.5 4-1 1-2 2-4 5-4-5-4-9-4-11-1Z'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: bottom left;
+  pointer-events: none;
+}
