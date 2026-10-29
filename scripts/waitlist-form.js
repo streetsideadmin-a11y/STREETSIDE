@@ -20,6 +20,40 @@
  * needs no further changes.
  */
 (function () {
+  // When this page finished loading — sent with each submission so the
+  // server can ignore bots that "fill out" a form in a split second.
+  var pageLoadedAt = Date.now();
+
+  // --- Where did this visitor come from? -----------------------------
+  // Saves ad/campaign tags from the link they arrived on (?utm_source=...
+  // ?fbclid=...) the first time they land, so it can still be attached to
+  // their signup after they scroll, click around, or come back later.
+  // Everything is wrapped in try/catch because browser storage can be
+  // blocked (private windows, strict privacy settings) — that must never
+  // affect the signup itself.
+  var ATTR_KEYS = ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"];
+  function captureAttribution() {
+    try {
+      var params = new URLSearchParams(window.location.search);
+      var found = [];
+      ATTR_KEYS.forEach(function (k) {
+        var v = (params.get(k) || "").replace(/[^A-Za-z0-9 _.\-+%]/g, "").slice(0, 60);
+        if (v) found.push(k.replace("utm_", "") + "=" + v);
+      });
+      if (params.get("fbclid")) found.push("fbclid=yes");
+      if (found.length) {
+        try { localStorage.setItem("streetside_attribution", found.join("&")); } catch (e) { /* storage blocked */ }
+        return found.join("&");
+      }
+    } catch (e) { /* URLSearchParams unavailable */ }
+    return "";
+  }
+  var attributionFromThisVisit = captureAttribution();
+  function getAttribution() {
+    if (attributionFromThisVisit) return attributionFromThisVisit;
+    try { return localStorage.getItem("streetside_attribution") || ""; } catch (e) { return ""; }
+  }
+
   function serializeForm(form) {
     var data = {};
     new FormData(form).forEach(function (value, key) {
@@ -119,6 +153,9 @@
     var payload = serializeForm(form);
     payload.formType = formType; // "waitlist" or "address-check"
     payload.submittedAt = new Date().toISOString();
+    payload.formLoadedAt = pageLoadedAt;
+    var attribution = getAttribution();
+    if (attribution) payload.attribution = attribution;
 
     // The waitlist form has one combined "email or phone" field —
     // split it back into the email/phone fields the backend, the
@@ -132,6 +169,22 @@
         payload.phone = contact;
       }
       delete payload.emailOrPhone;
+    }
+
+    if (formType === "waitlist") {
+      var emailOk = !payload.email || /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(payload.email).trim());
+      var phoneDigits = String(payload.phone || "").replace(/\D/g, "");
+      var phoneOk = !payload.phone || phoneDigits.length === 10 || (phoneDigits.length === 11 && phoneDigits.charAt(0) === "1");
+      if (!emailOk || !phoneOk) {
+        showStatus(
+          statusEl,
+          !emailOk
+            ? "That email address doesn't look quite right — please double-check it."
+            : "That phone number doesn't look quite right — please enter all 10 digits, or use your email instead.",
+          "error"
+        );
+        return;
+      }
     }
 
     if (!config.endpoint) {
@@ -154,7 +207,15 @@
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error("Form endpoint responded with " + res.status);
+      if (!res.ok) {
+        var errBody = {};
+        try { errBody = await res.json(); } catch (e) { /* not JSON */ }
+        if ((res.status === 400 || res.status === 429) && errBody && errBody.error) {
+          showStatus(statusEl, errBody.error, "error");
+          return;
+        }
+        throw new Error("Form endpoint responded with " + res.status);
+      }
 
       var data = {};
       try {
@@ -193,7 +254,9 @@
       } else {
         showStatus(
           statusEl,
-          "You're on the list! We'll be in touch about Streetside service in your neighborhood.",
+          data.duplicate
+            ? "You're already on the list — no need to sign up again! We'll be in touch as soon as there's news for your neighborhood."
+            : "You're on the list! We'll be in touch about Streetside service in your neighborhood.",
           "success"
         );
         showNeighborShare(form);
@@ -204,7 +267,7 @@
         // Guarded because fbq won't exist if the Pixel script is
         // blocked (ad blockers, browser privacy settings, etc.) —
         // that should never break the signup itself.
-        if (typeof fbq === "function") {
+        if (typeof fbq === "function" && !data.duplicate) {
           fbq("track", "Lead");
         }
       }

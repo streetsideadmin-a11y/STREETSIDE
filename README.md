@@ -254,6 +254,34 @@ Apps Script (a Google Workspace account gets more) — plenty for a
 launching business, but worth knowing if signups ever spike hard in
 one day.
 
+## Spam protection, duplicate signups, and signup alerts
+
+**Built in, nothing to set up:** the signup form has a hidden trap
+field for bots, ignores forms "filled out" in under 1.5 seconds,
+limits one visitor to 6 submissions per 10 minutes, pauses signups if
+60+ arrive in 10 minutes, and checks that the email / phone looks
+real. Someone who signs up twice with the same email or phone number
+is told they're already on the list and is **not** saved again, and
+the founding-spots counter counts each email / phone only once.
+
+**Optional — get an email for every new signup:**
+1. Make a free account at resend.com and copy an API key.
+2. In Vercel → Settings → Environment Variables add
+   `RESEND_API_KEY` (the key) and `NOTIFY_EMAIL` (where alerts go).
+   With only these two set, Resend's test sender is used and it can
+   only deliver to the email you registered with Resend — which is
+   usually what you want. (Optional `NOTIFY_FROM`, e.g.
+   `Streetside <alerts@yourdomain.com>`, once you verify a domain.)
+3. Redeploy. If the keys are missing or Resend is down, signups still
+   save normally.
+
+**Optional — see which ad each signup came from:** run
+`ALTER TABLE signups ADD COLUMN IF NOT EXISTS attribution TEXT;` in
+Neon. Then put UTM tags on your ad links, e.g.
+`https://streetsideoh.com/?utm_source=facebook&utm_medium=paid&utm_campaign=oct-launch`.
+It shows under each signup's date in the admin page, in the CSV
+export, and in the alert email.
+
 ## Meta Pixel — ad conversion tracking
 
 The Meta Pixel (Facebook/Instagram ads tracking) is installed on
@@ -526,19 +554,13 @@ marked as pending in `config/site-config.js` and in the UI itself:
 
 ## About the fonts
 
-The brief asked for a bold/condensed/industrial display face. Because
-this environment can't reach Google Fonts or any CDN, headings use a
-carefully chosen **system font stack** (`Archivo Narrow` /
-`Roboto Condensed` / `Arial Narrow` and similar, with `font-stretch:
-condensed`) — so the look holds up on real devices without a webfont
-download, though it won't be pixel-identical to a specific font like
-Oswald or Bebas Neue.
-
-To get an exact match later: download **Oswald** or **Bebas Neue**
-(both free/open-license) from Google Fonts, drop the `.woff2` files
-into a new `fonts/` folder, and add an `@font-face` block at the top
-of `styles/tokens.css` pointing `--font-display` at it. Everything
-else (sizing, spacing, weight) is already set up to take it as-is.
+Headings use **Archivo Narrow** and body text uses **Inter**, loaded
+from Google Fonts (a `<link>` in the `<head>` of each page). If a
+visitor's device blocks it, the page falls back to a similar system
+font, so nothing breaks. To self-host instead (no Google request, and
+the Privacy Policy line about Google Fonts can be removed): download
+both families, put the `.woff2` files in a `fonts/` folder, and add
+`@font-face` blocks at the top of `styles/tokens.css`.
 
 ## About the hero photo
 
@@ -549,7 +571,9 @@ crop taken from the unobstructed right-hand portion of that same
 screenshot — the actual house and bins from your photo, just isolated
 from the overlaid UI. If you have the original, uncropped photo file,
 drop it in as `images/hero-bins-house.jpg` (same filename) for a
-higher-resolution version.
+higher-resolution version. (The Republic Services / GFL logos that
+were visible on the bins have been painted out so the photo doesn't
+imply a partnership with another company.)
 
 ## Accessibility & performance notes
 

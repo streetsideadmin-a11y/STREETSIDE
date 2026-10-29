@@ -27,6 +27,9 @@
 <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
 <link rel="manifest" href="/site.webmanifest" />
 
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400..700&amp;family=Inter:wght@400..900&amp;display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="styles/tokens.css" />
 <link rel="stylesheet" href="styles/base.css" />
 <link rel="stylesheet" href="styles/components.css" />
@@ -364,6 +367,9 @@ fbq('track', 'PageView');
             <p class="lede address-check__lede">We'll let you know if your neighborhood already has a route, or add you to the waitlist for one.</p>
 
             <form id="address-check-form" novalidate>
+          <div class="hp-field" aria-hidden="true">
+            <label>Leave this field empty<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+          </div>
               <div class="field">
                 <label for="ac-street">Street Address</label>
                 <input id="ac-street" name="streetAddress" type="text" required autocomplete="street-address" />
@@ -408,6 +414,9 @@ fbq('track', 'PageView');
         </div>
 
         <form id="waitlist-form" novalidate>
+          <div class="hp-field" aria-hidden="true">
+            <label>Leave this field empty<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+          </div>
           <p class="form-section-label">About you</p>
           <div class="field-row cols-2">
             <div class="field">

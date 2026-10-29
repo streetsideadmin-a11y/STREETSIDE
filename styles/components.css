@@ -719,3 +719,14 @@
 .address-check__lede { font-size: 0.92rem; margin-bottom: var(--space-5); }
 .service-area__lede { margin-top: var(--space-4); }
 .eyebrow--light { color: #fff; }
+
+
+/* Spam trap: real people never see or fill this. Bots usually do. */
+.hp-field {
+  position: absolute !important;
+  left: -10000px !important;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}

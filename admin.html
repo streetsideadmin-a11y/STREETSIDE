@@ -6,6 +6,9 @@
 <title>Admin | Streetside</title>
 <meta name="robots" content="noindex, nofollow" />
 <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@400..700&amp;family=Inter:wght@400..900&amp;display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="styles/tokens.css" />
 <link rel="stylesheet" href="styles/base.css" />
 <link rel="stylesheet" href="styles/components.css" />
@@ -765,7 +768,8 @@
         return (
           '<tr data-row-id="' + row.id + '"' + (row.contacted ? ' class="is-contacted"' : "") + ">" +
           '<td class="nowrap">' + formatDate(row.submitted_at) +
-            '<span class="sub"><span class="admin-badge' + (isCheck ? " is-check" : "") + '">' + (isCheck ? "Address check" : "Waitlist") + "</span></span></td>" +
+            '<span class="sub"><span class="admin-badge' + (isCheck ? " is-check" : "") + '">' + (isCheck ? "Address check" : "Waitlist") + "</span></span>" +
+            (row.attribution ? '<span class="sub" title="Where this person came from (ad / campaign link)">via ' + escapeHtml(row.attribution.replace(/&/g, " · ")) + "</span>" : "") + "</td>" +
           "<td>" + escapeHtml(name) +
             (row.consent ? "" : '<span class="sub admin-consent-no">No consent</span>') + "</td>" +
           "<td>" + contactHtml + "</td>" +
@@ -928,7 +932,7 @@
   function exportCsv() {
     var headers = [
       "Submitted", "Type", "First Name", "Last Name", "Email", "Phone",
-      "Street Address", "City", "ZIP", "Package", "Promo Code", "Discount", "Consent", "Contacted",
+      "Street Address", "City", "ZIP", "Package", "Promo Code", "Discount", "Consent", "Contacted", "Came From",
     ];
     var lines = [headers.join(",")];
     currentFiltered.forEach(function (row) {
@@ -948,6 +952,7 @@
           discountLabel(row.discount_type),
           row.consent ? "Yes" : "No",
           row.contacted ? "Yes" : "No",
+          row.attribution || "",
         ]
           .map(csvField)
           .join(",")

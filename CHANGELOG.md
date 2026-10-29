@@ -4,7 +4,33 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v44.5 — current
+## v44.7 — current
+
+- **Spam protection on signups:** hidden bot trap field, "too fast to be
+  human" check, 6-per-10-minutes limit per visitor, a flood brake, field
+  length limits, and real email / phone validation (with friendly messages).
+- **Duplicate signups:** the same email or phone can't take a second
+  founding spot; they're told they're already on the list. The spots counter
+  counts each email / phone once.
+- **Email alert for each new signup** (optional — needs `RESEND_API_KEY` and
+  `NOTIFY_EMAIL` in Vercel; see README).
+- **Source tracking:** ad-link tags (`utm_source`, `utm_campaign`, `fbclid`…)
+  are saved with the signup, shown in the admin page and CSV. Needs one
+  Neon migration (see README).
+- **Fonts:** Archivo Narrow + Inter now actually load (Google Fonts).
+  Privacy Policy mentions it.
+- **Hero photo:** Republic Services and GFL logos removed from the bins.
+- Signup time is now stamped by the server, not the visitor's browser.
+
+## v44.6
+
+- **Privacy Policy now matches the site.** It said the site uses no cookies,
+  analytics or ad trackers, but the Meta Pixel and Vercel Analytics are on the
+  pages. The "Cookies & Tracking" section now discloses both, the "Site owner:
+  update this section" note that was visible to visitors is gone, and the date
+  reads October 2026. (Have an attorney give the final wording a look.)
+
+## v44.5
 
 - **"Southeastern Columbus" is now "Southeastern Ohio"** everywhere: page title,
   search description and keywords, link-preview text, the hero, the Service

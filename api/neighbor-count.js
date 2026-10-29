@@ -1,6 +1,7 @@
 // Vercel serverless function — GET /api/neighbor-count
 // ---------------------------------------------------------------
-// Returns { count: <real number of waitlist signups> } straight from
+// Returns { count: <real number of waitlist signups, counting each
+// email / phone number once> } straight from
 // the database. scripts/counter.js already knows how to call this —
 // just flip neighborCounter.source to "api" in config/site-config.js
 // once this is deployed and working (see README.md).
@@ -17,7 +18,11 @@ module.exports = async (req, res) => {
   try {
     const sql = neon(process.env.DATABASE_URL);
     const rows = await sql`
-      SELECT COUNT(*)::int AS count
+      SELECT COUNT(DISTINCT COALESCE(
+               NULLIF(lower(btrim(email)), ''),
+               NULLIF(right(regexp_replace(coalesce(phone, ''), '[^0-9]', '', 'g'), 10), ''),
+               id::text
+             ))::int AS count
       FROM signups
       WHERE form_type = 'waitlist'
     `;
