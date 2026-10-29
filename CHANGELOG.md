@@ -4,7 +4,15 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v44.0 — current
+## v44.1 — current
+
+- **Founding spots meter now lives in the hero.** The orange "50% OFF" pill at
+  the top of the main page is now a small card: the same pill, a progress bar
+  that fills as real neighbors join, and "N of 250 founding spots left" with a
+  "Claim yours →" link to pricing. Both it and the pricing-section banner read
+  from the same real signup count. Works with the Halloween theme on or off.
+
+## v44.0
 
 - **Halloween theme (switchable).** Midnight-purple and black surfaces with
   pumpkin-orange accents, a moonlit hero with flying bats and a cobweb, a

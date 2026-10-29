@@ -78,8 +78,12 @@
         var remaining = Math.max(total - count, 0);
         spotsEls.forEach(function (el) { animateCount(el, remaining); });
         renderSpotsCopy(remaining);
-        var barEl = document.querySelector("[data-spots-bar]");
-        if (barEl) barEl.style.width = Math.min((count / total) * 100, 100) + "%";
+        document.querySelectorAll("[data-spots-bar]").forEach(function (barEl) {
+          barEl.style.width = Math.min((count / total) * 100, 100) + "%";
+        });
+        document.querySelectorAll("[data-spots-total]").forEach(function (el) {
+          el.textContent = String(total);
+        });
       }
     }
   }
