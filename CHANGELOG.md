@@ -4,7 +4,25 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v44.1 — current
+## v44.3 — current
+
+- **New round badge** in the footer (512×512, transparent outside the circle).
+  Everything from v44.2 is included.
+
+## v44.2
+
+- **New logos.** The horizontal logo (header on every page, 404, admin login)
+  is your new dark-lettered version, trimmed and given a transparent
+  background. A white-lettered version is saved as
+  `images/streetside-logo-horizontal-light.png` for dark backgrounds (not
+  used yet). Because it is much wider than the old one, the full menu now
+  shows from 1180px wide and up; narrower screens use the menu button.
+- **New icon set** made from the stacked logo: browser-tab icons (`favicon.ico`,
+  16/32), phone home-screen icons (180, 192, 512) and a `site.webmanifest`.
+- **Better link previews:** a 1200×630 `images/og-image.png` (Facebook, text
+  messages, etc.) replaces the tiny round badge.
+
+## v44.1
 
 - **Founding spots meter now lives in the hero.** The orange "50% OFF" pill at
   the top of the main page is now a small card: the same pill, a progress bar

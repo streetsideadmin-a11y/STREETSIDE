@@ -97,13 +97,13 @@
 
 .brand-logo img {
   height: 100%;
-  max-height: 64px;
+  max-height: 56px; /* wide (about 5.2 : 1) lockup — keep it from crowding the nav */
   width: auto;
 }
 
 @media (max-width: 720px) {
   .brand-logo img {
-    max-height: 48px;
+    max-height: 40px;
   }
 }
 
@@ -119,6 +119,7 @@
 
 .primary-nav a {
   position: relative;
+  white-space: nowrap;
   font-family: var(--font-display);
   font-stretch: condensed;
   font-weight: 700;
@@ -197,9 +198,14 @@
 .nav-toggle[aria-expanded="true"] span::before { top: 0; transform: rotate(45deg); }
 .nav-toggle[aria-expanded="true"] span::after { top: 0; transform: rotate(-45deg); }
 
-@media (min-width: 960px) {
+/* The wide logo needs more room than the old one, so the full nav
+   appears from 1180px up; narrower screens use the menu button. */
+@media (min-width: 1180px) {
   .primary-nav { display: block; }
   .nav-toggle { display: none; }
+}
+@media (min-width: 1180px) and (max-width: 1320px) {
+  .primary-nav ul { gap: var(--space-5); }
 }
 
 /* Mobile menu panel */
@@ -238,7 +244,7 @@
 
 .mobile-menu .btn { margin-top: var(--space-4); }
 
-@media (min-width: 960px) {
+@media (min-width: 1180px) {
   .mobile-menu { display: none; }
 }
 
