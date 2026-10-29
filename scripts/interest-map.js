@@ -142,7 +142,14 @@
   async function init() {
     var mapEl = document.getElementById("interest-map-el");
     var caption = document.querySelector("[data-interest-map] .map-caption");
-    if (!mapEl || typeof L === "undefined") return;
+    if (!mapEl) return;
+    if (typeof L === "undefined") {
+      // The map library didn't load (offline, blocked by an extension,
+      // CDN hiccup). Say so instead of leaving "Loading…" up forever.
+      var cap = document.querySelector(".map-caption");
+      if (cap) cap.textContent = "The interest map isn't available right now — please check back soon.";
+      return;
+    }
 
     var lats = Object.values(TOWNS).map(function (t) { return t[0]; });
     var lngs = Object.values(TOWNS).map(function (t) { return t[1]; });

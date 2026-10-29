@@ -26,7 +26,7 @@ window.STREETSIDE_CONFIG = {
     name: "Streetside",
     fullName: "Streetside Waste & Property Services",
     tagline: "We take it to the street. You don't have to.",
-    serviceRegion: "Southeastern Columbus",
+    serviceRegion: "Southeastern Ohio",
     // TODO: real support contact details before launch.
     contactEmail: null, // e.g. "hello@streetsideoh.com"
     contactPhone: null, // e.g. "(740) 555-0100"
@@ -180,7 +180,7 @@ window.STREETSIDE_CONFIG = {
    * than claiming to confirm availability in real time.
    */
   serviceArea: {
-    region: "Southeastern Columbus",
+    region: "Southeastern Ohio",
     // TODO: list real cities/neighborhoods as routes are confirmed.
     activeAreas: [],
     waitlistAreas: [],
@@ -241,7 +241,7 @@ window.STREETSIDE_CONFIG = {
     },
     {
       q: "Where is Streetside available?",
-      a: "Streetside is launching in Southeastern Columbus and is opening routes neighborhood by neighborhood based on signups.",
+      a: "Streetside is launching in Southeastern Ohio and is opening routes neighborhood by neighborhood based on signups.",
     },
     {
       q: "What if my neighborhood isn't available?",

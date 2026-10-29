@@ -36,8 +36,29 @@ fbq('track', 'PageView');
 </script>
 <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1374634321449512&ev=PageView&noscript=1"/></noscript>
 <!-- End Meta Pixel Code -->
+<link rel="stylesheet" href="styles/theme-halloween.css" />
+<script src="config/site-config.js"></script>
+<script>
+  (function () {
+    var t = window.STREETSIDE_CONFIG && window.STREETSIDE_CONFIG.seasonalTheme;
+    if (t) document.documentElement.setAttribute("data-theme", t);
+  })();
+</script>
 </head>
 <body>
+<!-- Seasonal bar: only shows when seasonalTheme is "halloween" in config/site-config.js -->
+<div class="season-bar" role="note">
+  <svg class="season-bar__icon" width="22" height="28" viewBox="0 0 40 52" aria-hidden="true">
+    <rect x="2" y="8" width="36" height="8" rx="2" fill="#3b2a55"/>
+    <path d="M6 16H34L31 48H9Z" fill="#f26a0f"/>
+    <polygon points="13,25 19,25 16,31" fill="#1a1024"/><polygon points="21,25 27,25 24,31" fill="#1a1024"/>
+    <path d="M12 37L15 34L18 38L20 34L22 38L25 34L28 37L26 43H14Z" fill="#1a1024"/>
+    <circle cx="12" cy="49.5" r="2.2" fill="#1a1024"/><circle cx="28" cy="49.5" r="2.2" fill="#1a1024"/>
+  </svg>
+  <span>Happy Halloween from Streetside — we handle trash day, you handle the candy.</span>
+  <a href="/#waitlist">Join the waitlist <span aria-hidden="true">→</span></a>
+</div>
+
 <header class="site-header">
   <div class="container site-header__inner">
     <a href="index.html" class="brand-logo" aria-label="Streetside home">
@@ -100,6 +121,7 @@ fbq('track', 'PageView');
 </main>
 
 <footer class="site-footer">
+  <div class="footer-bats" aria-hidden="true"></div>
   <div class="container">
     <div class="site-footer__bottom" style="border-top:none; padding-top:0;">
       <span>&copy; <span data-year>2026</span> Streetside Waste &amp; Property Services. All rights reserved.</span>

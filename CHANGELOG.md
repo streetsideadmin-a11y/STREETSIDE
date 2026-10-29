@@ -4,7 +4,41 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v44.3 — current
+## v44.5 — current
+
+- **"Southeastern Columbus" is now "Southeastern Ohio"** everywhere: page title,
+  search description and keywords, link-preview text, the hero, the Service
+  Area heading, the footer, the FAQ answer, and the Privacy Policy.
+
+## v44.4
+
+Bug-check pass over the whole site. Fixed:
+
+- **Browser-tab icon was missing the road.** The 16/32px icons were just the
+  green S. They now use the full S-and-road mark.
+- **Phones 360px wide or narrower:** the Service Area section was slightly wider
+  than the screen (content got clipped). Single-column layouts now size
+  correctly on every width down to 320px (site and admin).
+- **Terms, Privacy and 404 pages** didn't get the Halloween theme or bar, so
+  they looked different from the main page. They do now (and follow the same
+  on/off setting).
+- **Contrast:** small orange labels (eyebrows, step numbers) and the crossed-out
+  old prices were too faint to read comfortably; darkened to pass accessibility
+  contrast checks.
+- **Map fallback:** if the map library can't load, the caption now says so
+  instead of showing "Loading interest map…" forever.
+- **Pricing cards:** a little breathing room between the plan name and its
+  description.
+- **Form:** the "Email or Phone" placeholder was cut off on phones; shortened.
+
+Checked and working: waitlist and address-check forms (including phone and city
+formatting, promo code cleanup, success, error and re-submit), the mobile menu
+(open, close on link, Escape), FAQ, pricing and founding meter, neighbor
+counter, admin dashboard (filters, signups/address-check toggle, discount
+dropdown, contacted checkbox, CSV export, logout), the theme on and off, and
+no console errors on any page.
+
+## v44.3
 
 - **New round badge** in the footer (512×512, transparent outside the circle).
   Everything from v44.2 is included.

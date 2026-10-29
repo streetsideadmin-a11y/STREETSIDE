@@ -232,7 +232,7 @@
 
 .steps-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-6);
 }
 
@@ -322,7 +322,7 @@
 
 .benefits-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-5);
 }
 
@@ -547,7 +547,7 @@
 
 @media (max-width: 600px) {
   .founding-offer { padding: var(--space-5); gap: var(--space-5); border-left-width: 6px; }
-  .founding-offer { grid-template-columns: 1fr; grid-template-areas: "stamp" "body" "meter"; }
+  .founding-offer { grid-template-columns: minmax(0, 1fr); grid-template-areas: "stamp" "body" "meter"; }
   .founding-offer__stamp { width: 124px; height: 124px; }
   .founding-offer__pct { font-size: 2.8rem; }
 }
@@ -624,7 +624,7 @@
 
 .service-area__grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-7);
   align-items: start;
 }
@@ -696,7 +696,7 @@
 
 .site-footer__top {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-7);
   padding-bottom: var(--space-7);
   border-bottom: 1px solid rgba(255,255,255,0.12);

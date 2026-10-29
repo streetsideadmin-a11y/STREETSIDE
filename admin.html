@@ -319,7 +319,7 @@
   .admin-summary__card { padding: var(--space-3) var(--space-4); }
   .admin-summary__card strong { font-size: 1.5rem; line-height: 1.1; }
   .admin-panel { margin-bottom: var(--space-5); }
-  .admin-panel-grid { display: grid; grid-template-columns: 1fr; gap: var(--space-5); margin-bottom: var(--space-5); }
+  .admin-panel-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-5); margin-bottom: var(--space-5); }
   .admin-panel-grid .admin-panel { margin-bottom: 0; }
   @media (min-width: 900px) { .admin-panel-grid { grid-template-columns: 3fr 2fr; } }
   .admin-panel-sub { font-size: 0.8rem; color: var(--color-ink-muted); margin: calc(var(--space-2) * -1) 0 var(--space-4); }

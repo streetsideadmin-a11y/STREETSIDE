@@ -391,7 +391,7 @@
 
 .field-row {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 0 var(--space-5);
 }
 
@@ -585,7 +585,7 @@
   font-family: var(--font-body);
   font-weight: 600;
   font-size: 1.15rem;
-  color: var(--gray-400);
+  color: #6b6b64; /* darker than --gray-400 so the old price still passes contrast on white */
   text-decoration: line-through;
   text-decoration-color: var(--red-600);
   text-decoration-thickness: 2px;
@@ -641,6 +641,7 @@
   margin-bottom: var(--space-4);
 }
 
+.price-card h3 { margin-bottom: var(--space-2); }
 .price-card__desc {
   color: var(--color-ink-muted);
   font-size: 0.95rem;
