@@ -730,3 +730,139 @@
   height: 1px;
   overflow: hidden;
 }
+
+
+/* ==========================================================================
+   CONTACT — header button, pop-up card, floating button, page section
+   ========================================================================== */
+
+/* Header "Contact Us" button. Hidden on the in-between desktop widths
+   (1180-1279px) where the header has no spare room. */
+.header-contact { position: relative; }
+.header-contact__btn { white-space: nowrap; }
+@media (min-width: 1180px) and (max-width: 1279px) {
+  .header-contact { display: none; }
+}
+@media (max-width: 959px) {
+  .header-contact { display: none; }
+}
+
+/* The pop-up card */
+.contact-panel {
+  width: 290px;
+  max-width: calc(100vw - 32px);
+  padding: 8px;
+  background: var(--white);
+  color: var(--color-ink);
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+  z-index: 520;
+}
+.contact-panel[hidden] { display: none; }
+.header-contact .contact-panel {
+  position: absolute;
+  top: calc(100% + 14px);
+  right: 0;
+}
+.contact-panel__title {
+  margin: 8px 12px 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b6b64;
+}
+.contact-panel__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  color: var(--color-ink);
+  text-decoration: none;
+}
+.contact-panel__row:hover,
+.contact-panel__row:focus-visible { background: var(--green-tint); }
+.contact-panel__row strong { display: block; font-weight: 700; }
+.contact-panel__row small { display: block; font-size: 0.82rem; color: #6b6b64; overflow-wrap: anywhere; }
+.contact-panel__icon {
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--color-brand);
+  color: var(--white);
+}
+
+/* Floating button (desktop). On phones, the Contact button in the
+   sticky bar opens the same pop-up instead. */
+.contact-float {
+  position: fixed;
+  right: var(--space-5);
+  bottom: calc(var(--space-5) + 56px);
+  z-index: 58;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+.contact-float__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 20px;
+  border-radius: 999px;
+  background: var(--color-brand);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  transition: background var(--dur-fast) var(--ease-out);
+}
+.contact-float__btn:hover { background: var(--green-700); }
+@media (max-width: 860px) {
+  .contact-float__btn { display: none; }
+  .contact-float { right: var(--space-4); bottom: 96px; }
+}
+
+/* Contact section above the footer */
+.contact-band {
+  padding-block: var(--space-8);
+  background: var(--paper);
+  text-align: center;
+}
+.contact-band__inner { max-width: 720px; margin-inline: auto; }
+.contact-band h2 { margin: 0 0 var(--space-3); }
+.contact-band p { margin: 0 0 var(--space-6); color: #3a3a3a; }
+.contact-band__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-4);
+}
+.contact-band__actions .btn { gap: 10px; }
+
+/* Call / Text / Email row inside the mobile menu */
+.mobile-menu__contact {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.mobile-menu .mobile-menu__contact a.mobile-menu__contact-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 8px;
+  border: 2px solid rgba(255, 255, 255, 0.55);
+  border-radius: var(--radius-sm, 8px);
+  color: var(--white);
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+}

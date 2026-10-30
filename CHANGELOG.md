@@ -4,7 +4,18 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v44.8 — current
+## v44.9 — current
+
+- **Contact Us, three ways:** a "Contact Us" button in the header (desktop), a
+  floating "Contact us" button (desktop) / "Contact" button in the bottom bar
+  (phones), and a "Questions? Talk to a real person." section above the footer.
+  The buttons open a Call / Text / Email card; the phone and email come from
+  `config/site-config.js`. The mobile menu also has Call / Text / Email buttons.
+  Without JavaScript the buttons scroll to the new section instead.
+- **Fixed:** with the Halloween bar showing, opening the phone menu at the top
+  of the page hid the first link ("How It Works") behind the header.
+
+## v44.8
 
 - **Real contact details added:** streetsideoh@gmail.com and (740) 640-6628 now
   show (as tap-to-email / tap-to-call links) in the homepage footer, the Terms

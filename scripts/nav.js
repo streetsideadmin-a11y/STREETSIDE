@@ -14,9 +14,15 @@
       toggle.setAttribute("aria-expanded", "false");
       menu.classList.remove("is-open");
       document.body.style.overflow = "";
+      menu.style.top = "";
     }
 
     function openMenu() {
+      // Start the menu right under the header, wherever it currently is.
+      // (With the seasonal announcement bar showing, the header sits lower
+      // than its usual spot, and a fixed offset would hide the first links.)
+      var header = document.querySelector(".site-header");
+      if (header) menu.style.top = Math.max(0, Math.round(header.getBoundingClientRect().bottom)) + "px";
       toggle.setAttribute("aria-expanded", "true");
       menu.classList.add("is-open");
       document.body.style.overflow = "hidden";

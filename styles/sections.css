@@ -839,8 +839,13 @@
   transform: translateY(0);
 }
 
+.sticky-cta { gap: var(--space-3); grid-template-columns: auto 1fr; }
+.sticky-cta .btn { padding-inline: 0.9rem; font-size: 0.8rem; letter-spacing: 0.06em; white-space: nowrap; }
+.sticky-cta__contact { gap: 8px; }
+.sticky-cta__join { width: 100%; }
+
 @media (max-width: 860px) {
-  .sticky-cta { display: block; }
+  .sticky-cta { display: grid; }
 }
 
 /* ---- Back-to-top button ---- */
