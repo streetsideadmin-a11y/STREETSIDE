@@ -27,7 +27,7 @@ window.STREETSIDE_CONFIG = {
     fullName: "Streetside Waste & Property Services",
     tagline: "We take it to the street. You don't have to.",
     serviceRegion: "Southeastern Ohio",
-    contactEmail: "streetsideoh@gmail.com",
+    contactEmail: "streetsideadmin@gmail.com",
     contactPhone: "(740) 640-6628",
     socialLinks: {
       instagram: "https://www.instagram.com/streetside_wnps",

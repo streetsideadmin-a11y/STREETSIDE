@@ -4,7 +4,38 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v44.9 — current
+## v45.1 — current
+
+Full bug-check and quality-of-life pass. Fixed:
+
+- **Tiny phones (320px):** the "Join the Waitlist" button in the bottom bar ran
+  off the right edge of the screen.
+- **Hard-to-tap links on phones:** footer links, the banner link and legal
+  links were ~20px tall; they now have 44px tap areas.
+- **Spreadsheet formula protection:** if someone types something like `=...` into
+  the public form, the admin CSV export and the Google Sheet sync now defuse it
+  so it can't run as a formula when you open the file.
+- **Admin login lockout:** 5 wrong passwords from one place pauses logins for
+  15 minutes.
+- **Security headers** (`vercel.json`) and 1-day image caching.
+- **Faster first paint:** the hero photo now preloads; the footer badge was
+  shrunk from 212 KB to 51 KB and lazy-loads; an unused 280 KB logo file removed.
+- **Accessibility / SEO:** descriptive picture descriptions for the How It Works
+  graphics, labels on the admin filters, a description on the 404 page, canonical
+  links on Terms and Privacy.
+
+Checked and fine: no broken links or missing images, no console errors, no
+sideways scrolling from 320px to 1920px, text contrast passes in both the
+Halloween and normal looks, keyboard Tab order and focus rings, FAQ, forms,
+duplicate/spam handling, mobile menu, and the Halloween-off switch
+(`seasonalTheme: null`).
+
+## v45.0
+
+- Contact email changed to streetsideadmin@gmail.com everywhere (footer, buttons
+  and pop-up, Terms, Privacy Policy, search-engine business info).
+
+## v44.9
 
 - **Contact Us, three ways:** a "Contact Us" button in the header (desktop), a
   floating "Contact us" button (desktop) / "Contact" button in the bottom bar

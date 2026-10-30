@@ -15,6 +15,13 @@ function sign(secret, expiry) {
   return crypto.createHmac("sha256", secret).update("admin:" + expiry).digest("hex");
 }
 
+// Lock out an IP after 5 wrong passwords in 15 minutes. Kept in memory,
+// so it's best-effort across Vercel's servers — it stops a script
+// hammering the login, on top of the delay and long password.
+const failures = new Map();
+const MAX_FAILS = 5;
+const LOCK_WINDOW_MS = 15 * 60 * 1000;
+
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
     res.status(405).json({ error: "Method not allowed" });
@@ -42,6 +49,14 @@ module.exports = async (req, res) => {
   }
   body = body || {};
 
+  const ip = String((req.headers["x-forwarded-for"] || "")).split(",")[0].trim() || "unknown";
+  const now = Date.now();
+  const recentFails = (failures.get(ip) || []).filter(function (t) { return now - t < LOCK_WINDOW_MS; });
+  if (recentFails.length >= MAX_FAILS) {
+    res.status(429).json({ error: "Too many incorrect attempts. Please wait 15 minutes and try again." });
+    return;
+  }
+
   const submitted = String(body.password || "");
   const expected = String(adminPassword);
 
@@ -58,6 +73,8 @@ module.exports = async (req, res) => {
     // Small artificial delay to slow down automated guessing —
     // not a substitute for a real rate limiter, but better than
     // nothing for a low-traffic admin panel.
+    recentFails.push(now);
+    failures.set(ip, recentFails);
     await new Promise((resolve) => setTimeout(resolve, 400));
     res.status(401).json({ error: "Incorrect password." });
     return;

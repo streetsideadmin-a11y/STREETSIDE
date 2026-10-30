@@ -49,11 +49,19 @@ async function syncToGoogleSheet(payload) {
   var url = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
   if (!url) return;
 
+  // A spreadsheet treats text starting with = + - @ as a formula, and the
+  // signup form is public — so defuse those before they reach the Sheet.
+  const safe = {};
+  Object.keys(payload).forEach(function (k) {
+    const v = payload[k];
+    safe[k] = typeof v === "string" && /^[=+\-@\t\r]/.test(v) ? "'" + v : v;
+  });
+
   try {
     await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(safe),
     });
   } catch (err) {
     console.warn("[streetside] Google Sheets sync failed (submission was still saved to the database):", err);

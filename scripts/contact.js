@@ -9,7 +9,7 @@
  */
 (function () {
   var business = ((window.STREETSIDE_CONFIG || {}).business) || {};
-  var email = business.contactEmail || "streetsideoh@gmail.com";
+  var email = business.contactEmail || "streetsideadmin@gmail.com";
   var phone = business.contactPhone || "(740) 640-6628";
   var digits = phone.replace(/\D/g, "");
   var tel = "+" + (digits.length === 10 ? "1" + digits : digits);

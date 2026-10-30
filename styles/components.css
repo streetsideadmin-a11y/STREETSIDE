@@ -866,3 +866,22 @@
   font-size: 1rem;
   letter-spacing: 0.06em;
 }
+
+
+/* ---- Quality-of-life: bigger tap targets on touch screens ---- */
+@media (max-width: 860px) {
+  .site-footer .footer-col li a,
+  .site-footer__bottom .legal-links a,
+  .season-bar a,
+  .mobile-menu__contact-btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .site-footer .footer-col li a { padding-block: 4px; }
+}
+@media (max-width: 380px) {
+  /* Tiny phones: keep the bottom bar's two buttons inside the screen. */
+  .sticky-cta .btn-icon { display: none; }
+  .sticky-cta .btn { padding-inline: 0.7rem; letter-spacing: 0.03em; }
+}

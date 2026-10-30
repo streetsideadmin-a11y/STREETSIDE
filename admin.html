@@ -461,13 +461,13 @@
   </p>
 
   <div class="admin-filters" id="admin-filters">
-    <input type="text" id="admin-filter-search" placeholder="Search name, email, phone, address, city, code…" class="admin-filter-search" />
-    <select id="admin-filter-type" class="admin-filter-select">
+    <input type="text" id="admin-filter-search" aria-label="Search signups" placeholder="Search name, email, phone, address, city, code…" class="admin-filter-search" />
+    <select id="admin-filter-type" aria-label="Filter by form type" class="admin-filter-select">
       <option value="">All types</option>
       <option value="waitlist">Waitlist</option>
       <option value="address-check">Address check</option>
     </select>
-    <select id="admin-filter-package" class="admin-filter-select">
+    <select id="admin-filter-package" aria-label="Filter by plan" class="admin-filter-select">
       <option value="">All plans</option>
       <option value="curb">Curb Service</option>
       <option value="full">Full Service</option>
@@ -475,17 +475,17 @@
       <option value="not-sure">Not sure yet</option>
       <option value="__none__">Not specified</option>
     </select>
-    <select id="admin-filter-city" class="admin-filter-select">
+    <select id="admin-filter-city" aria-label="Filter by city" class="admin-filter-select">
       <option value="">All cities</option>
     </select>
-    <select id="admin-filter-discount" class="admin-filter-select">
+    <select id="admin-filter-discount" aria-label="Filter by discount" class="admin-filter-select">
       <option value="">All discounts</option>
       <option value="founder">Founder Discount</option>
       <option value="friends-family">Friends &amp; Family</option>
       <option value="free-service">Free Service</option>
       <option value="__none__">No discount</option>
     </select>
-    <select id="admin-filter-promo" class="admin-filter-select">
+    <select id="admin-filter-promo" aria-label="Filter by promo code" class="admin-filter-select">
       <option value="">All promo codes</option>
       <option value="__none__">No code</option>
     </select>
@@ -923,6 +923,9 @@
   // --- CSV export --------------------------------------------------
   function csvField(val) {
     var str = val == null ? "" : String(val);
+    // Stop spreadsheet programs from treating a typed "=..." / "+..." /
+    // "@..." as a formula (a signup form is public, anyone can type it).
+    if (/^[=+\-@\t\r]/.test(str)) str = "'" + str;
     if (/[",\n]/.test(str)) {
       str = '"' + str.replace(/"/g, '""') + '"';
     }
