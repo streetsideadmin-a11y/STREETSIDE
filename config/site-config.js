@@ -27,9 +27,8 @@ window.STREETSIDE_CONFIG = {
     fullName: "Streetside Waste & Property Services",
     tagline: "We take it to the street. You don't have to.",
     serviceRegion: "Southeastern Ohio",
-    // TODO: real support contact details before launch.
-    contactEmail: null, // e.g. "hello@streetsideoh.com"
-    contactPhone: null, // e.g. "(740) 555-0100"
+    contactEmail: "streetsideoh@gmail.com",
+    contactPhone: "(740) 640-6628",
     socialLinks: {
       instagram: "https://www.instagram.com/streetside_wnps",
       facebook: "https://www.facebook.com/profile.php?id=61593453727059",

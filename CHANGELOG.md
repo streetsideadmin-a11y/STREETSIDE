@@ -4,7 +4,13 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v44.7 — current
+## v44.8 — current
+
+- **Real contact details added:** streetsideoh@gmail.com and (740) 640-6628 now
+  show (as tap-to-email / tap-to-call links) in the homepage footer, the Terms
+  and Privacy "Contact Us" sections, and the site's search-engine business info.
+
+## v44.7
 
 - **Spam protection on signups:** hidden bot trap field, "too fast to be
   human" check, 6-per-10-minutes limit per visitor, a flood brake, field
