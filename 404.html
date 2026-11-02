@@ -62,6 +62,7 @@ fbq('track', 'PageView');
 <noscript><img alt="" height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=1374634321449512&ev=PageView&noscript=1"/></noscript>
 <!-- End Meta Pixel Code -->
 <link rel="stylesheet" href="styles/theme-halloween.css" />
+<link rel="stylesheet" href="styles/theme-thanksgiving.css" />
 <script src="config/site-config.js"></script>
 <script>
   (function () {
@@ -72,7 +73,14 @@ fbq('track', 'PageView');
 </head>
 <body>
 <!-- Seasonal bar: only shows when seasonalTheme is "halloween" in config/site-config.js -->
-<div class="season-bar" role="note">
+<!-- ============ SEASONAL: THANKSGIVING BAR (only shows when seasonalTheme is "thanksgiving") ============ -->
+<div class="season-bar season-bar--thanksgiving" role="note">
+  <svg class="season-bar__icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="#f6b93b" stroke="#f6b93b" stroke-width="0.9" stroke-linejoin="round" d="M12 1.5L13.9 5.6L16.4 4.2L15.9 8.6L19.6 7.4L18.2 11L22 12.2L18.5 14.6L19.4 17.4L14.8 16.6L13.2 20L12.6 20L12.6 23L11.4 23L11.4 20L10.8 20L9.2 16.6L4.6 17.4L5.5 14.6L2 12.2L5.8 11L4.4 7.4L8.1 8.6L7.6 4.2L10.1 5.6Z"/></svg>
+  <span>Happy Thanksgiving from Streetside<span class="season-bar__long"> — we handle trash day, you handle the turkey.</span></span>
+  <a href="#waitlist">Join the waitlist <span aria-hidden="true">→</span></a>
+</div>
+
+<div class="season-bar season-bar--halloween" role="note">
   <svg class="season-bar__icon" width="22" height="28" viewBox="0 0 40 52" aria-hidden="true">
     <rect x="2" y="8" width="36" height="8" rx="2" fill="#3b2a55"/>
     <path d="M6 16H34L31 48H9Z" fill="#f26a0f"/>
@@ -119,6 +127,7 @@ fbq('track', 'PageView');
 
 <footer class="site-footer">
   <div class="footer-bats" aria-hidden="true"></div>
+  <div class="footer-leaves" aria-hidden="true"></div>
   <div class="container">
     <div class="site-footer__bottom" style="border-top:none; padding-top:0;">
       <span>&copy; <span data-year>2026</span> Streetside Waste &amp; Property Services. All rights reserved.</span>

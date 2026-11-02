@@ -34,7 +34,7 @@ html[data-theme="halloween"] {
 }
 
 /* ---- Announcement bar ---- */
-html[data-theme="halloween"] .season-bar {
+html[data-theme="halloween"] .season-bar--halloween {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -52,11 +52,11 @@ html[data-theme="halloween"] .season-bar {
   text-align: center;
   border-bottom: 2px solid var(--halloween-glow);
 }
-html[data-theme="halloween"] .season-bar a {
+html[data-theme="halloween"] .season-bar--halloween a {
   color: var(--halloween-glow);
   white-space: nowrap;
 }
-html[data-theme="halloween"] .season-bar a:hover { color: var(--white); }
+html[data-theme="halloween"] .season-bar--halloween a:hover { color: var(--white); }
 .season-bar__icon { flex: none; }
 
 /* ---- Hero ---- */

@@ -254,6 +254,14 @@ Apps Script (a Google Workspace account gets more) — plenty for a
 launching business, but worth knowing if signups ever spike hard in
 one day.
 
+## Seasonal themes
+
+`seasonalTheme` at the top of `config/site-config.js` switches the whole
+look: `"thanksgiving"` (burgundy / pumpkin / gold, falling leaves),
+`"halloween"` (purple / pumpkin, bats), or `null` for the regular
+Streetside green. Nothing else needs to change. Each theme lives in its
+own file (`styles/theme-thanksgiving.css`, `styles/theme-halloween.css`).
+
 ## Spam protection, duplicate signups, and signup alerts
 
 **Built in, nothing to set up:** the signup form has a hidden trap

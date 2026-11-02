@@ -1,0 +1,193 @@
+/* ==========================================================================
+   SEASONAL THEME — THANKSGIVING
+   Everything here is scoped to html[data-theme="thanksgiving"], which is set
+   from `seasonalTheme` in config/site-config.js. Set that to null and none
+   of this applies. Logos and images are never recolored.
+   ========================================================================== */
+
+/* Decor is invisible unless the theme is on */
+.season-bar--thanksgiving,
+.thanks-decor,
+.footer-leaves { display: none; }
+
+html[data-theme="thanksgiving"] {
+  /* Dark-green brand surfaces become deep burgundy */
+  --green-900: #2a0e11;
+  --green-800: #411519;
+  --green-700: #5c1f25;
+  --green-600: #7c3138;
+  --green-tint: #f8efe1;
+
+  /* Accent red becomes harvest pumpkin */
+  --red-600: #a8480b;
+  --red-700: #8a3a08;
+
+  /* Warm cream paper */
+  --off-white: #fcf6ea;
+  --paper: #f4e9d6;
+
+  --harvest-gold: #f6b93b;
+  --harvest-cream: #fbf1dc;
+  --hero-offer-link: #f6b93b;
+
+  --shadow-md: 0 12px 32px rgba(42, 14, 17, 0.2);
+}
+
+/* ---- Announcement bar ---- */
+html[data-theme="thanksgiving"] .season-bar--thanksgiving {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 9px var(--space-4);
+  background: var(--green-900);
+  color: var(--harvest-cream);
+  font-family: var(--font-display);
+  font-stretch: condensed;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  text-align: center;
+  border-bottom: 2px solid var(--harvest-gold);
+}
+html[data-theme="thanksgiving"] .season-bar--thanksgiving a {
+  color: var(--harvest-gold);
+  white-space: nowrap;
+}
+html[data-theme="thanksgiving"] .season-bar--thanksgiving a:hover { color: var(--white); }
+
+@media (max-width: 560px) {
+  /* Keep the bar to one short line on phones. */
+  .season-bar--thanksgiving .season-bar__long { display: none; }
+}
+
+/* ---- Hero ---- */
+html[data-theme="thanksgiving"] .hero__photo {
+  filter: sepia(0.22) saturate(1.05) brightness(0.92) contrast(1.04);
+}
+html[data-theme="thanksgiving"] .hero__photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(168, 72, 11, 0.26), rgba(92, 31, 37, 0.2));
+  mix-blend-mode: multiply;
+}
+html[data-theme="thanksgiving"] .hero__scrim {
+  background: linear-gradient(
+    100deg,
+    rgba(42, 14, 17, 0.95) 0%,
+    rgba(42, 14, 17, 0.88) 32%,
+    rgba(42, 14, 17, 0.52) 52%,
+    rgba(42, 14, 17, 0.1) 68%,
+    rgba(42, 14, 17, 0) 78%
+  );
+}
+html[data-theme="thanksgiving"] .hero__tagline { color: var(--harvest-gold); }
+
+html[data-theme="thanksgiving"] .thanks-decor {
+  display: block;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Low harvest sun */
+.thanks-decor__sun {
+  position: absolute;
+  top: 8%;
+  right: 9%;
+  width: clamp(90px, 12vw, 170px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 38%, #fff3c9 0%, #ffd98a 45%, #f6a93b 100%);
+  box-shadow: 0 0 60px 22px rgba(246, 169, 59, 0.38), 0 0 170px 70px rgba(214, 110, 30, 0.22);
+  opacity: 0.9;
+}
+
+/* Falling leaves */
+.leaf {
+  position: absolute;
+  top: 0;
+  left: var(--x, 50%);
+  width: calc(var(--size, 26px) * 1.4);
+  color: var(--c, #d9822b);
+  opacity: 0.9;
+  filter: drop-shadow(0 1px 2px rgba(42, 14, 17, 0.35));
+  animation: leaf-fall var(--dur, 22s) linear infinite;
+  animation-delay: var(--delay, 0s);
+  will-change: transform;
+}
+.leaf--1  { --x: 6%;  --size: 28px; --c: #d9822b; --dur: 21s; --delay: -3s;  --drift: 70px; }
+.leaf--2  { --x: 14%; --size: 20px; --c: #b5422a; --dur: 27s; --delay: -14s; --drift: -60px; }
+.leaf--3  { --x: 24%; --size: 32px; --c: #f0b43a; --dur: 24s; --delay: -8s;  --drift: 90px; }
+.leaf--4  { --x: 36%; --size: 22px; --c: #c2571a; --dur: 30s; --delay: -20s; --drift: -80px; }
+.leaf--5  { --x: 47%; --size: 26px; --c: #8f2f2f; --dur: 23s; --delay: -5s;  --drift: 60px; }
+.leaf--6  { --x: 58%; --size: 34px; --c: #e39a2e; --dur: 28s; --delay: -17s; --drift: -90px; }
+.leaf--7  { --x: 68%; --size: 21px; --c: #b5422a; --dur: 25s; --delay: -11s; --drift: 70px; }
+.leaf--8  { --x: 77%; --size: 30px; --c: #f0b43a; --dur: 32s; --delay: -24s; --drift: -70px; }
+.leaf--9  { --x: 86%; --size: 24px; --c: #c2571a; --dur: 22s; --delay: -9s;  --drift: 80px; }
+.leaf--10 { --x: 93%; --size: 29px; --c: #d9822b; --dur: 29s; --delay: -2s;  --drift: -60px; }
+
+@keyframes leaf-fall {
+  0%   { transform: translate(0, -60px) rotate(0deg); opacity: 0; }
+  8%   { opacity: 0.9; }
+  25%  { transform: translate(calc(var(--drift) * 0.6), 28vh) rotate(110deg); }
+  50%  { transform: translate(calc(var(--drift) * -0.4), 56vh) rotate(215deg); }
+  75%  { transform: translate(var(--drift), 84vh) rotate(320deg); }
+  92%  { opacity: 0.9; }
+  100% { transform: translate(calc(var(--drift) * 0.3), 112vh) rotate(420deg); opacity: 0; }
+}
+
+@media (max-width: 720px) {
+  .thanks-decor__sun { top: 3%; right: 6%; }
+  .leaf--4, .leaf--7, .leaf--9 { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* No falling — leaves just rest along the bottom of the hero. */
+  .leaf { animation: none; opacity: 0.8; top: auto; bottom: 18px; transform: rotate(var(--rest, 20deg)); }
+  .leaf--1 { --rest: 20deg; } .leaf--2 { --rest: -35deg; bottom: 40px; } .leaf--3 { --rest: 70deg; }
+  .leaf--5 { --rest: -15deg; bottom: 30px; } .leaf--6 { --rest: 50deg; } .leaf--8 { --rest: -60deg; bottom: 36px; }
+  .leaf--10 { --rest: 35deg; }
+}
+
+/* Keep real hero content above the decor */
+html[data-theme="thanksgiving"] .hero__content { z-index: 2; }
+
+/* ---- Buttons, perks, small details ---- */
+html[data-theme="thanksgiving"] .btn-accent { color: var(--red-700); }
+html[data-theme="thanksgiving"] .founding-offer__perks li::before { color: var(--harvest-gold); }
+html[data-theme="thanksgiving"] .founding-offer {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(246, 185, 59, 0.2), transparent 45%),
+    linear-gradient(135deg, var(--green-800), var(--green-700));
+  box-shadow: 0 14px 34px rgba(42, 14, 17, 0.35);
+}
+html[data-theme="thanksgiving"] .hero__offer {
+  background: rgba(42, 14, 17, 0.78);
+}
+html[data-theme="thanksgiving"] .hero__offer__bar > span {
+  box-shadow: 0 0 10px rgba(246, 185, 59, 0.55);
+}
+
+/* ---- Footer ---- */
+html[data-theme="thanksgiving"] .site-footer {
+  position: relative;
+  background: var(--green-900);
+}
+html[data-theme="thanksgiving"] .footer-leaves {
+  display: block;
+  position: absolute;
+  top: -40px;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='40' viewBox='0 0 260 40'%3E%3Cg fill='%232a0e11'%3E%3Cpath transform='translate(14 14) rotate(-18) scale(1.15)' d='M12 1.5L13.9 5.6L16.4 4.2L15.9 8.6L19.6 7.4L18.2 11L22 12.2L18.5 14.6L19.4 17.4L14.8 16.6L13.2 20L12.6 20L12.6 23L11.4 23L11.4 20L10.8 20L9.2 16.6L4.6 17.4L5.5 14.6L2 12.2L5.8 11L4.4 7.4L8.1 8.6L7.6 4.2L10.1 5.6Z' stroke='%232a0e11' stroke-width='0.9' stroke-linejoin='round'/%3E%3Cpath transform='translate(88 4) rotate(24) scale(0.85)' d='M12 1.5L13.9 5.6L16.4 4.2L15.9 8.6L19.6 7.4L18.2 11L22 12.2L18.5 14.6L19.4 17.4L14.8 16.6L13.2 20L12.6 20L12.6 23L11.4 23L11.4 20L10.8 20L9.2 16.6L4.6 17.4L5.5 14.6L2 12.2L5.8 11L4.4 7.4L8.1 8.6L7.6 4.2L10.1 5.6Z' stroke='%232a0e11' stroke-width='0.9' stroke-linejoin='round'/%3E%3Cpath transform='translate(150 16) rotate(-8) scale(1.0)' d='M12 1.5L13.9 5.6L16.4 4.2L15.9 8.6L19.6 7.4L18.2 11L22 12.2L18.5 14.6L19.4 17.4L14.8 16.6L13.2 20L12.6 20L12.6 23L11.4 23L11.4 20L10.8 20L9.2 16.6L4.6 17.4L5.5 14.6L2 12.2L5.8 11L4.4 7.4L8.1 8.6L7.6 4.2L10.1 5.6Z' stroke='%232a0e11' stroke-width='0.9' stroke-linejoin='round'/%3E%3Cpath transform='translate(214 6) rotate(30) scale(0.9)' d='M12 1.5L13.9 5.6L16.4 4.2L15.9 8.6L19.6 7.4L18.2 11L22 12.2L18.5 14.6L19.4 17.4L14.8 16.6L13.2 20L12.6 20L12.6 23L11.4 23L11.4 20L10.8 20L9.2 16.6L4.6 17.4L5.5 14.6L2 12.2L5.8 11L4.4 7.4L8.1 8.6L7.6 4.2L10.1 5.6Z' stroke='%232a0e11' stroke-width='0.9' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: bottom left;
+  pointer-events: none;
+}

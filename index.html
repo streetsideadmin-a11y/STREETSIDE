@@ -36,6 +36,7 @@
 <link rel="stylesheet" href="styles/components.css" />
 <link rel="stylesheet" href="styles/sections.css" />
 <link rel="stylesheet" href="styles/theme-halloween.css" />
+<link rel="stylesheet" href="styles/theme-thanksgiving.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -86,7 +87,14 @@ fbq('track', 'PageView');
 <a class="skip-link" href="#main">Skip to content</a>
 
 <!-- ============ SEASONAL: HALLOWEEN BAR (only shows when seasonalTheme is "halloween") ============ -->
-<div class="season-bar" role="note">
+<!-- ============ SEASONAL: THANKSGIVING BAR (only shows when seasonalTheme is "thanksgiving") ============ -->
+<div class="season-bar season-bar--thanksgiving" role="note">
+  <svg class="season-bar__icon" width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path fill="#f6b93b" stroke="#f6b93b" stroke-width="0.9" stroke-linejoin="round" d="M12 1.5L13.9 5.6L16.4 4.2L15.9 8.6L19.6 7.4L18.2 11L22 12.2L18.5 14.6L19.4 17.4L14.8 16.6L13.2 20L12.6 20L12.6 23L11.4 23L11.4 20L10.8 20L9.2 16.6L4.6 17.4L5.5 14.6L2 12.2L5.8 11L4.4 7.4L8.1 8.6L7.6 4.2L10.1 5.6Z"/></svg>
+  <span>Happy Thanksgiving from Streetside<span class="season-bar__long"> — we handle trash day, you handle the turkey.</span></span>
+  <a href="#waitlist">Join the waitlist <span aria-hidden="true">→</span></a>
+</div>
+
+<div class="season-bar season-bar--halloween" role="note">
   <svg class="season-bar__icon" width="22" height="28" viewBox="0 0 40 52" aria-hidden="true">
     <rect x="2" y="8" width="36" height="8" rx="2" fill="#3b2a55"/>
     <path d="M6 16H34L31 48H9Z" fill="#f26a0f"/>
@@ -159,6 +167,20 @@ fbq('track', 'PageView');
       <svg class="bat bat--2" viewBox="0 0 24 16" aria-hidden="true"><path d="M12 6C10 3 6 3 1 7c3 0 4 2 5 4 1.5-1.500 3-1 4 1l2-2.500 2 2.500c1-2 2.500-2.500 4-1 1-2 2-4 5-4-5-4-9-4-11-1Z" fill="currentColor"/></svg>
       <svg class="bat bat--3" viewBox="0 0 24 16" aria-hidden="true"><path d="M12 6C10 3 6 3 1 7c3 0 4 2 5 4 1.5-1.500 3-1 4 1l2-2.500 2 2.500c1-2 2.500-2.500 4-1 1-2 2-4 5-4-5-4-9-4-11-1Z" fill="currentColor"/></svg>
       <svg class="cobweb cobweb--tl" viewBox="0 0 120 120"><g fill="none" stroke="currentColor" stroke-width="1"><path d="M0 0L120 0M0 0L112 42M0 0L88 88M0 0L42 112M0 0L0 120"/><path d="M40 0Q34 34 0 40M72 0Q60 58 0 72M104 0Q86 80 0 104"/><path d="M38 14Q30 30 14 38" opacity="0"/></g></svg>
+    </div>
+
+    <div class="thanks-decor" aria-hidden="true">
+      <div class="thanks-decor__sun"></div>
+      <svg class="leaf leaf--1" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="0.9" stroke-linejoin="round" d="M12 1.5L13.9 5.6L16.4 4.2L15.9 8.6L19.6 7.4L18.2 11L22 12.2L18.5 14.6L19.4 17.4L14.8 16.6L13.2 20L12.6 20L12.6 23L11.4 23L11.4 20L10.8 20L9.2 16.6L4.6 17.4L5.5 14.6L2 12.2L5.8 11L4.4 7.4L8.1 8.6L7.6 4.2L10.1 5.6Z"/><path d="M12 21V8M12 14L8 11M12 14l4-3" stroke="rgba(42,14,17,.45)" stroke-width=".6" fill="none"/></svg>
+      <svg class="leaf leaf--2" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="0.9" stroke-linejoin="round" d="M12 1.5L13.9 5.6L16.4 4.2L15.9 8.6L19.6 7.4L18.2 11L22 12.2L18.5 14.6L19.4 17.4L14.8 16.6L13.2 20L12.6 20L12.6 23L11.4 23L11.4 20L10.8 20L9.2 16.6L4.6 17.4L5.5 14.6L2 12.2L5.8 11L4.4 7.4L8.1 8.6L7.6 4.2L10.1 5.6Z"/><path d="M12 21V8M12 14L8 11M12 14l4-3" stroke="rgba(42,14,17,.45)" stroke-width=".6" fill="none"/></svg>
+      <svg class="leaf leaf--3" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2C9 4 8 6 8.5 8 6.5 8 5 9.5 6 11.5 4.5 12.5 4.8 14.8 7 15.8 6.8 17.8 9 19 10.8 18.4L11.4 22.5H12.6L13.2 18.4C15 19 17.2 17.8 17 15.8 19.2 14.8 19.5 12.5 18 11.5 19 9.5 17.5 8 15.5 8 16 6 15 4 12 2Z"/><path d="M12 21V6M12 15L9 12M12 15l3-3M12 11L10 9M12 11l2-2" stroke="rgba(42,14,17,.45)" stroke-width=".6" fill="none"/></svg>
+      <svg class="leaf leaf--4" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="0.9" stroke-linejoin="round" d="M12 1.5L13.9 5.6L16.4 4.2L15.9 8.6L19.6 7.4L18.2 11L22 12.2L18.5 14.6L19.4 17.4L14.8 16.6L13.2 20L12.6 20L12.6 23L11.4 23L11.4 20L10.8 20L9.2 16.6L4.6 17.4L5.5 14.6L2 12.2L5.8 11L4.4 7.4L8.1 8.6L7.6 4.2L10.1 5.6Z"/><path d="M12 21V8M12 14L8 11M12 14l4-3" stroke="rgba(42,14,17,.45)" stroke-width=".6" fill="none"/></svg>
+      <svg class="leaf leaf--5" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="0.9" stroke-linejoin="round" d="M12 1.5L13.9 5.6L16.4 4.2L15.9 8.6L19.6 7.4L18.2 11L22 12.2L18.5 14.6L19.4 17.4L14.8 16.6L13.2 20L12.6 20L12.6 23L11.4 23L11.4 20L10.8 20L9.2 16.6L4.6 17.4L5.5 14.6L2 12.2L5.8 11L4.4 7.4L8.1 8.6L7.6 4.2L10.1 5.6Z"/><path d="M12 21V8M12 14L8 11M12 14l4-3" stroke="rgba(42,14,17,.45)" stroke-width=".6" fill="none"/></svg>
+      <svg class="leaf leaf--6" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2C9 4 8 6 8.5 8 6.5 8 5 9.5 6 11.5 4.5 12.5 4.8 14.8 7 15.8 6.8 17.8 9 19 10.8 18.4L11.4 22.5H12.6L13.2 18.4C15 19 17.2 17.8 17 15.8 19.2 14.8 19.5 12.5 18 11.5 19 9.5 17.5 8 15.5 8 16 6 15 4 12 2Z"/><path d="M12 21V6M12 15L9 12M12 15l3-3M12 11L10 9M12 11l2-2" stroke="rgba(42,14,17,.45)" stroke-width=".6" fill="none"/></svg>
+      <svg class="leaf leaf--7" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="0.9" stroke-linejoin="round" d="M12 1.5L13.9 5.6L16.4 4.2L15.9 8.6L19.6 7.4L18.2 11L22 12.2L18.5 14.6L19.4 17.4L14.8 16.6L13.2 20L12.6 20L12.6 23L11.4 23L11.4 20L10.8 20L9.2 16.6L4.6 17.4L5.5 14.6L2 12.2L5.8 11L4.4 7.4L8.1 8.6L7.6 4.2L10.1 5.6Z"/><path d="M12 21V8M12 14L8 11M12 14l4-3" stroke="rgba(42,14,17,.45)" stroke-width=".6" fill="none"/></svg>
+      <svg class="leaf leaf--8" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="0.9" stroke-linejoin="round" d="M12 1.5L13.9 5.6L16.4 4.2L15.9 8.6L19.6 7.4L18.2 11L22 12.2L18.5 14.6L19.4 17.4L14.8 16.6L13.2 20L12.6 20L12.6 23L11.4 23L11.4 20L10.8 20L9.2 16.6L4.6 17.4L5.5 14.6L2 12.2L5.8 11L4.4 7.4L8.1 8.6L7.6 4.2L10.1 5.6Z"/><path d="M12 21V8M12 14L8 11M12 14l4-3" stroke="rgba(42,14,17,.45)" stroke-width=".6" fill="none"/></svg>
+      <svg class="leaf leaf--9" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2C9 4 8 6 8.5 8 6.5 8 5 9.5 6 11.5 4.5 12.5 4.8 14.8 7 15.8 6.8 17.8 9 19 10.8 18.4L11.4 22.5H12.6L13.2 18.4C15 19 17.2 17.8 17 15.8 19.2 14.8 19.5 12.5 18 11.5 19 9.5 17.5 8 15.5 8 16 6 15 4 12 2Z"/><path d="M12 21V6M12 15L9 12M12 15l3-3M12 11L10 9M12 11l2-2" stroke="rgba(42,14,17,.45)" stroke-width=".6" fill="none"/></svg>
+      <svg class="leaf leaf--10" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" stroke="currentColor" stroke-width="0.9" stroke-linejoin="round" d="M12 1.5L13.9 5.6L16.4 4.2L15.9 8.6L19.6 7.4L18.2 11L22 12.2L18.5 14.6L19.4 17.4L14.8 16.6L13.2 20L12.6 20L12.6 23L11.4 23L11.4 20L10.8 20L9.2 16.6L4.6 17.4L5.5 14.6L2 12.2L5.8 11L4.4 7.4L8.1 8.6L7.6 4.2L10.1 5.6Z"/><path d="M12 21V8M12 14L8 11M12 14l4-3" stroke="rgba(42,14,17,.45)" stroke-width=".6" fill="none"/></svg>
     </div>
 
     <div class="container hero__content">
@@ -528,6 +550,7 @@ fbq('track', 'PageView');
 <!-- ============ FOOTER ============ -->
 <footer class="site-footer">
   <div class="footer-bats" aria-hidden="true"></div>
+  <div class="footer-leaves" aria-hidden="true"></div>
   <div class="container">
     <div class="site-footer__top">
       <div>

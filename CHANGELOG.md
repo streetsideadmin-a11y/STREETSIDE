@@ -4,7 +4,19 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v45.1 — current
+## v45.2 — current
+
+- **Thanksgiving theme** (now on by default): deep burgundy surfaces, pumpkin
+  accents and harvest gold on warm cream; a "Happy Thanksgiving from Streetside"
+  banner; a warm sunset tint and low harvest sun over the hero photo; softly
+  falling maple and oak leaves (they rest in place for visitors who have
+  reduced motion turned on); a leaf border above the footer. Logos and photos
+  are untouched. Applies to the homepage, 404, Terms and Privacy pages.
+- **Halloween is now off.** Switch seasons with `seasonalTheme` in
+  `config/site-config.js`: `"thanksgiving"`, `"halloween"`, or `null` (regular
+  look). Set it to `null` after Thanksgiving (Nov 26).
+
+## v45.1
 
 Full bug-check and quality-of-life pass. Fixed:
 
