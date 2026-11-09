@@ -467,6 +467,12 @@
       <option value="waitlist">Waitlist</option>
       <option value="address-check">Address check</option>
     </select>
+    <select id="admin-filter-service" aria-label="Filter by service" class="admin-filter-select">
+      <option value="">All services</option>
+      <option value="bin-valet">Bin Valet</option>
+      <option value="bin-cleaning">Bin Cleaning</option>
+      <option value="snow-removal">Snow Removal</option>
+    </select>
     <select id="admin-filter-package" aria-label="Filter by plan" class="admin-filter-select">
       <option value="">All plans</option>
       <option value="curb">Curb Service</option>
@@ -502,7 +508,7 @@
           <th class="is-sortable" data-sort-key="last_name">Name</th>
           <th>Contact</th>
           <th class="is-sortable" data-sort-key="city">Address</th>
-          <th class="is-sortable" data-sort-key="interested_package">Plan</th>
+          <th class="is-sortable" data-sort-key="services_interested">Interested in</th>
           <th class="is-sortable" data-sort-key="promo_code">Promo</th>
           <th class="is-sortable" data-sort-key="discount_type">Discount</th>
           <th class="is-sortable col-center" data-sort-key="contacted">Contacted</th>
@@ -598,6 +604,18 @@
       "not-sure": "Not sure yet",
     };
     return labels[id] || id || "—";
+  }
+
+  var SERVICE_LABELS = { "bin-valet": "Bin Valet", "bin-cleaning": "Bin Cleaning", "snow-removal": "Snow Removal" };
+
+  // Older signups (before Bin Cleaning / Snow Removal existed) have no
+  // services_interested value — they were all Bin Valet signups.
+  function serviceIds(row) {
+    if (row.services_interested) return String(row.services_interested).split(",").filter(Boolean);
+    return row.form_type === "waitlist" ? ["bin-valet"] : [];
+  }
+  function serviceNames(row) {
+    return serviceIds(row).map(function (id) { return SERVICE_LABELS[id] || id; });
   }
 
   var DISCOUNT_OPTIONS = [
@@ -774,7 +792,8 @@
             (row.consent ? "" : '<span class="sub admin-consent-no">No consent</span>') + "</td>" +
           "<td>" + contactHtml + "</td>" +
           "<td>" + escapeHtml(row.street_address || "—") + '<span class="sub">' + escapeHtml(cityZip || "—") + "</span></td>" +
-          '<td class="nowrap">' + escapeHtml(packageLabel(row.interested_package)) + "</td>" +
+          '<td class="nowrap">' + (serviceNames(row).length ? serviceNames(row).map(function (n) { return '<span class="admin-badge">' + escapeHtml(n) + "</span>"; }).join(" ") : "—") +
+            (serviceIds(row).indexOf("bin-valet") !== -1 ? '<span class="sub">Plan: ' + escapeHtml(packageLabel(row.interested_package)) + "</span>" : "") + "</td>" +
           '<td class="nowrap">' + (row.promo_code ? '<span class="admin-badge is-promo">' + escapeHtml(row.promo_code) + "</span>" : "—") + "</td>" +
           "<td>" + discountSelectHtml(row) + "</td>" +
           '<td class="col-center"><input type="checkbox" data-action="toggle-contacted" data-id="' + row.id + '"' + (row.contacted ? " checked" : "") + ' aria-label="Contacted" /></td>' +
@@ -792,12 +811,15 @@
     var search = document.getElementById("admin-filter-search").value.trim().toLowerCase();
     var type = document.getElementById("admin-filter-type").value;
     var pkg = document.getElementById("admin-filter-package").value;
+    var service = document.getElementById("admin-filter-service").value;
     var city = document.getElementById("admin-filter-city").value;
     var discount = document.getElementById("admin-filter-discount").value;
     var promo = document.getElementById("admin-filter-promo").value;
 
     var filtered = allSignups.filter(function (row) {
       if (type && row.form_type !== type) return false;
+
+      if (service && serviceIds(row).indexOf(service) === -1) return false;
 
       if (pkg === "__none__") {
         if (row.interested_package) return false;
@@ -902,6 +924,7 @@
     document.getElementById("admin-filter-search").value = "";
     document.getElementById("admin-filter-type").value = "";
     document.getElementById("admin-filter-package").value = "";
+    document.getElementById("admin-filter-service").value = "";
     document.getElementById("admin-filter-city").value = "";
     document.getElementById("admin-filter-discount").value = "";
     document.getElementById("admin-filter-promo").value = "";
@@ -909,7 +932,7 @@
   }
 
   function initFilters() {
-    ["admin-filter-search", "admin-filter-type", "admin-filter-package", "admin-filter-city", "admin-filter-discount", "admin-filter-promo"].forEach(function (id) {
+    ["admin-filter-search", "admin-filter-type", "admin-filter-package", "admin-filter-service", "admin-filter-city", "admin-filter-discount", "admin-filter-promo"].forEach(function (id) {
       var el = document.getElementById(id);
       var evt = el.tagName === "SELECT" ? "change" : "input";
       el.addEventListener(evt, applyFilters);
@@ -935,7 +958,7 @@
   function exportCsv() {
     var headers = [
       "Submitted", "Type", "First Name", "Last Name", "Email", "Phone",
-      "Street Address", "City", "ZIP", "Package", "Promo Code", "Discount", "Consent", "Contacted", "Came From",
+      "Street Address", "City", "ZIP", "Services Interested", "Bin Valet Plan", "Promo Code", "Discount", "Consent", "Contacted", "Came From",
     ];
     var lines = [headers.join(",")];
     currentFiltered.forEach(function (row) {
@@ -950,7 +973,8 @@
           row.street_address || "",
           row.city ? titleCaseCity(row.city) : "",
           row.zip || "",
-          packageLabel(row.interested_package),
+          serviceNames(row).join(" + "),
+          serviceIds(row).indexOf("bin-valet") !== -1 ? packageLabel(row.interested_package) : "",
           row.promo_code || "",
           discountLabel(row.discount_type),
           row.consent ? "Yes" : "No",
@@ -1510,6 +1534,9 @@
       { label: "Waitlist", value: s.waitlist },
       { label: "Address checks", value: s.addressCheck },
     ];
+    Object.keys(s.byService || {}).forEach(function (id) {
+      cards.push({ label: (SERVICE_LABELS[id] || id) + " interest", value: s.byService[id] });
+    });
     Object.keys(s.byPackage).forEach(function (pkg) {
       cards.push({ label: packageLabel(pkg), value: s.byPackage[pkg] });
     });

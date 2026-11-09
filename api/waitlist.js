@@ -131,6 +131,23 @@ function phoneDigitsOf(value) {
   return d;
 }
 
+// The services a signup can be interested in. Anything else sent to the
+// server is thrown away. Older cached copies of the website send no
+// `services` at all — those people were always signing up for Bin Valet.
+const SERVICE_IDS = ["bin-valet", "bin-cleaning", "snow-removal"];
+const SERVICE_NAMES = { "bin-valet": "Bin Valet", "bin-cleaning": "Bin Cleaning", "snow-removal": "Snow Removal" };
+
+function cleanServices(value, formType) {
+  if (formType !== "waitlist") return [];
+  if (value === undefined || value === null || value === "") return ["bin-valet"];
+  const list = [].concat(value).map(function (v) { return String(v).trim().toLowerCase(); });
+  return SERVICE_IDS.filter(function (id) { return list.indexOf(id) !== -1; });
+}
+
+function servicesLabel(list) {
+  return (list || []).map(function (id) { return SERVICE_NAMES[id] || id; }).join(", ");
+}
+
 // ---------------------------------------------------------------
 // OWNER NOTIFICATION (optional)
 // ---------------------------------------------------------------
@@ -155,7 +172,8 @@ async function notifyOwner(info) {
   const rows = [
     ["Contact", info.email || info.phone],
     ["Address", [info.streetAddress, info.city, info.zip].filter(Boolean).join(", ")],
-    ["Package", info.interestedPackage],
+    ["Interested in", info.servicesLabel],
+    ["Bin Valet plan", info.interestedPackage],
     ["Promo code", info.promoCode],
     ["Heard about us", info.hearAboutUs],
     ["Came from", info.attribution],
@@ -231,6 +249,7 @@ module.exports = async (req, res) => {
     recyclingBinCount: toCount(raw.recyclingBinCount),
     binStorageLocation: clean(raw.binStorageLocation, 100),
     interestedPackage: clean(raw.interestedPackage, 40),
+    services: cleanServices(raw.services, formType),
     hearAboutUs: clean(raw.hearAboutUs, 100),
     promoCode: raw.promoCode,
     attribution: clean(raw.attribution, 300),
@@ -238,6 +257,9 @@ module.exports = async (req, res) => {
     // Always the server's clock — the browser's can be wrong or faked.
     submittedAt: new Date().toISOString(),
   };
+
+  // A plan only applies to Bin Valet.
+  if (body.services.indexOf("bin-valet") === -1) body.interestedPackage = "";
 
   // The waitlist form's "Email or Phone" field means either one on its
   // own is a valid submission (requiring email specifically would
@@ -251,7 +273,10 @@ module.exports = async (req, res) => {
     const emailOk = !!body.email && isEmail(body.email);
     const phoneOk = !!body.phone && phoneDigitsOf(body.phone).length === 10;
     isValid = emailOk || phoneOk;
-    if (!isValid && (body.email || body.phone)) {
+    if (isValid && !body.services.length) {
+      isValid = false;
+      validationError = "Please choose at least one service you're interested in.";
+    } else if (!isValid && (body.email || body.phone)) {
       validationError = body.email
         ? "That email address doesn't look quite right — please double-check it."
         : "That phone number doesn't look quite right — please enter all 10 digits, or use your email instead.";
@@ -398,6 +423,21 @@ module.exports = async (req, res) => {
       }
     }
 
+    // Which services they're interested in — saved in a follow-up step
+    // (like promo_code) so a database without the `services_interested`
+    // column yet never loses a signup (see schema.sql).
+    const servicesText = body.services.join(",");
+    if (servicesText && insertedRows && insertedRows[0]) {
+      try {
+        await sql`UPDATE signups SET services_interested = ${servicesText} WHERE id = ${insertedRows[0].id}`;
+      } catch (svcErr) {
+        console.warn(
+          "[streetside] Could not save services_interested — run the migration in schema.sql (ALTER TABLE signups ADD COLUMN IF NOT EXISTS services_interested TEXT;). The signup itself was saved.",
+          svcErr && svcErr.message
+        );
+      }
+    }
+
     // Best-effort mirror to Google Sheets — never blocks or breaks
     // the response if it fails; the database row above already saved.
     await syncToGoogleSheet({
@@ -415,6 +455,7 @@ module.exports = async (req, res) => {
       recyclingBinCount: body.recyclingBinCount === null ? "" : body.recyclingBinCount,
       binStorageLocation: body.binStorageLocation,
       interestedPackage: body.interestedPackage,
+      servicesInterested: servicesLabel(body.services),
       promoCode: promoCode,
       attribution: body.attribution,
       hearAboutUs: body.hearAboutUs,
@@ -432,6 +473,7 @@ module.exports = async (req, res) => {
         city: body.city,
         zip: body.zip,
         interestedPackage: body.interestedPackage,
+        servicesLabel: servicesLabel(body.services),
         promoCode: promoCode,
         hearAboutUs: body.hearAboutUs,
         attribution: body.attribution,

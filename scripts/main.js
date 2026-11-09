@@ -146,10 +146,10 @@
     }
   }
 
-  function renderAdditionalServices() {
-    var mount = document.querySelector("[data-additional-services]");
-    var services = ((window.STREETSIDE_CONFIG || {}).additionalServices) || [];
-    var section = document.getElementById("additional-services");
+  function renderServices() {
+    var mount = document.querySelector("[data-services]");
+    var services = ((window.STREETSIDE_CONFIG || {}).services) || [];
+    var section = document.getElementById("services");
     if (!mount || !section) return;
 
     if (!services.length) {
@@ -158,13 +158,29 @@
     }
 
     services.forEach(function (service) {
-      var card = el("div", "service-card reveal-item" + (service.comingSoon ? " service-card--coming-soon" : ""));
-      if (service.comingSoon) {
-        card.appendChild(el("span", "service-card__badge", "Coming Soon"));
-      }
+      var soon = service.status === "coming-soon";
+      var card = el("div", "service-card reveal-item" + (soon ? " service-card--coming-soon" : " service-card--available"));
+      card.appendChild(el("span", "service-card__badge" + (soon ? "" : " service-card__badge--live"), soon ? "Coming Soon" : "Signups Open"));
       card.appendChild(el("h3", null, service.name));
       card.appendChild(el("p", "service-card__desc", service.description));
+      var link = el("a", "service-card__cta", (service.cta || "I'm interested") + " \u2192");
+      link.href = "#waitlist";
+      link.setAttribute("data-pick-service", service.id);
+      link.setAttribute("aria-label", (service.cta || "I'm interested") + " \u2014 " + service.name);
+      card.appendChild(link);
       mount.appendChild(card);
+    });
+
+    // Tapping a card's button ticks that service on the signup form
+    // (the page then scrolls to the form through the normal #waitlist link).
+    mount.addEventListener("click", function (e) {
+      var a = e.target.closest ? e.target.closest("[data-pick-service]") : null;
+      if (!a) return;
+      var box = document.querySelector('#waitlist-form input[name="services"][value="' + a.getAttribute("data-pick-service") + '"]');
+      if (box && !box.checked) {
+        box.checked = true;
+        box.dispatchEvent(new Event("change", { bubbles: true }));
+      }
     });
   }
 
@@ -320,7 +336,7 @@
 
   document.addEventListener("DOMContentLoaded", function () {
     renderPricing();
-    renderAdditionalServices();
+    renderServices();
     renderFAQ();
     renderHearAboutUs();
     renderFooterContact();

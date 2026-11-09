@@ -168,7 +168,8 @@ setup needed, just a script pasted into the Sheet itself.
      var headers = ["Submitted At", "Form Type", "First Name", "Last Name",
        "Email", "Phone", "Street Address", "City", "ZIP", "Collection Day",
        "Waste Provider", "Trash Bins", "Recycling Bins",
-       "Bin Storage Location", "Interested Package", "Heard About Us", "Consent"];
+       "Bin Storage Location", "Interested Package", "Heard About Us", "Consent",
+       "Services Interested"];
 
      if (sheet.getLastRow() === 0) {
        sheet.appendRow(headers);
@@ -181,7 +182,8 @@ setup needed, just a script pasted into the Sheet itself.
        data.collectionDay || "", data.wasteProvider || "",
        data.trashBinCount || "", data.recyclingBinCount || "",
        data.binStorageLocation || "", data.interestedPackage || "",
-       data.hearAboutUs || "", data.consent ? "Yes" : "No"
+       data.hearAboutUs || "", data.consent ? "Yes" : "No",
+       data.servicesInterested || ""
      ]);
 
      // Send the person a confirmation email — only for full waitlist
@@ -253,6 +255,17 @@ A personal Gmail account can send about 100 emails/day through
 Apps Script (a Google Workspace account gets more) — plenty for a
 launching business, but worth knowing if signups ever spike hard in
 one day.
+
+## Services (Bin Valet, Bin Cleaning, Snow Removal)
+
+The "Our Services" cards on the homepage come from `services` in
+`config/site-config.js`. Each has a `status` of `"available"` (shows
+"Signups Open") or `"coming-soon"`. When Bin Cleaning or Snow Removal
+launches, change its `status` to `"available"` and, if you like, update
+its description and the "Coming Soon" wording on the form checkboxes in
+`index.html`. Every signup records which services the person ticked
+(`services_interested` in the database — see the migration in
+`schema.sql`); the admin page shows it and can filter by it.
 
 ## Seasonal themes
 

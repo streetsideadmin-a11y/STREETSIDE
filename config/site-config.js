@@ -143,50 +143,42 @@ window.STREETSIDE_CONFIG = {
     ],
   },
 
-  additionalServices: [
+  // The three things Streetside offers. Shown as cards in the "Our
+  // Services" section and as checkboxes on the waitlist form.
+  //   status: "available" -> normal card, "coming-soon" -> Coming Soon badge
+  // No prices are listed for Bin Cleaning or Snow Removal yet on purpose.
+  services: [
+    {
+      id: "bin-valet",
+      name: "Bin Valet",
+      status: "available",
+      description: "We take your trash and recycling bins to the curb before collection and bring them back afterward — every week.",
+      cta: "Join the waitlist",
+    },
     {
       id: "bin-cleaning",
       name: "Bin Cleaning",
-      description: "Pressure-washed and deodorized right at the curb — no more grime, no more smell.",
-      comingSoon: true,
+      status: "coming-soon",
+      description: "Pressure-washed and deodorized — no more grime, no more smell.",
+      cta: "I'm interested",
     },
     {
       id: "snow-removal",
       name: "Snow Removal",
-      description: "Can't get your bins out because of snow? We'll clear a path and handle it for you, even in winter weather.",
-      comingSoon: true,
+      status: "coming-soon",
+      description: "Driveways and walkways cleared so you can get out the door and your bins can get to the curb, even in winter weather.",
+      cta: "I'm interested",
     },
   ],
-
-  foundingOffer: {
-    enabled: true,
-    name: "Founding 250",
-    headline: "Lock in founding-member pricing.",
-    description: "The first 250 subscribers get 50% off their first month, and their rate locked in for 2 years, as long as they stay subscribed.",
-    discountPercent: 50,
-    discountMonths: 1,
-    lockYears: 2,
-    spotsTotal: 250,
-    // Intentionally no "spotsRemaining" — see note above.
-  },
-
-  /**
-   * SERVICE AREA
-   * -----------------
-   * Seed list only — structured so cities/ZIPs/neighborhoods can be
-   * added as routes open. No real address-verification system is
-   * connected yet, so the "check your address" tool always collects
-   * the submission as a waitlist / service-interest entry rather
-   * than claiming to confirm availability in real time.
-   */
-  serviceArea: {
-    region: "Southeastern Ohio",
-    // TODO: list real cities/neighborhoods as routes are confirmed.
-    activeAreas: [],
-    waitlistAreas: [],
-  },
-
   faq: [
+    {
+      q: "What services does Streetside offer?",
+      a: "Bin Valet (we take your trash and recycling bins to the curb and back) is our core service. Bin Cleaning and Snow Removal are coming soon — pick the ones you're interested in when you join the waitlist and we'll reach out as each one becomes available in your area.",
+    },
+    {
+      q: "How much do Bin Cleaning and Snow Removal cost?",
+      a: "Pricing for Bin Cleaning and Snow Removal hasn't been announced yet. Tell us you're interested when you join the waitlist and we'll let you know as soon as it is.",
+    },
     {
       q: "What exactly does Streetside do?",
       a: "Streetside moves your trash and recycling bins from their normal storage spot to the curb before your regular collection day, then returns them to storage once they've been emptied.",

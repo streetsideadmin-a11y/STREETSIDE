@@ -4,7 +4,34 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v45.2 — current
+## v46.0 — current
+
+**Broader brand: Bin Valet + Bin Cleaning + Snow Removal.**
+
+- **New hero:** "Your Curb, Handled Year-Round." with three service chips and
+  the Streetside tagline. Page title, search description, social-share text and
+  search-engine data now describe all three services.
+- **New "Our Services" section** (replaces "More Ways We Can Help") with a card
+  for each service. Bin Valet shows "Signups Open"; Bin Cleaning and Snow
+  Removal show "Coming Soon". Each card's button ticks that service on the
+  signup form and jumps to it. Edit the cards in `config/site-config.js`
+  under `services`. No prices are shown for the two new services.
+- **Signup form:** new "What are you interested in?" checkboxes (Bin Valet is
+  pre-ticked). The Bin Valet plan menu only appears when Bin Valet is ticked.
+  At least one service is required.
+- **Behind the scenes:** the choice is saved with every signup
+  (`services_interested`), included in your owner alert email and the Google
+  Sheet feed, and shown in the admin page with a new "Interested in" column,
+  a service filter, "interest" count cards and a CSV column. Older signups
+  count as Bin Valet.
+- Two new FAQs (what services, what do the new ones cost). Terms and Privacy
+  pages mention the new services. Section headings for How It Works and
+  Pricing now say they are about Bin Valet.
+- **Database:** run `ALTER TABLE signups ADD COLUMN IF NOT EXISTS services_interested TEXT;`
+  in Neon. Until you do, signups still save normally — only the service
+  choice is not stored (the code logs a reminder).
+
+## v45.2
 
 - **Thanksgiving theme** (now on by default): deep burgundy surfaces, pumpkin
   accents and harvest gold on warm cream; a "Happy Thanksgiving from Streetside"

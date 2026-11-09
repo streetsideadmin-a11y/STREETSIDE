@@ -34,11 +34,24 @@ module.exports = async (req, res) => {
         return s.form_type === "address-check";
       }).length,
       byPackage: {},
+      byService: { "bin-valet": 0, "bin-cleaning": 0, "snow-removal": 0 },
       byCity: {},
     };
     signups.forEach(function (s) {
-      var pkg = s.interested_package || "not specified";
-      summary.byPackage[pkg] = (summary.byPackage[pkg] || 0) + 1;
+      // Signups from before Bin Cleaning / Snow Removal existed have no
+      // services_interested value — they were all Bin Valet signups.
+      var services = s.services_interested
+        ? String(s.services_interested).split(",")
+        : s.form_type === "waitlist" ? ["bin-valet"] : [];
+      services.forEach(function (id) {
+        if (summary.byService[id] !== undefined) summary.byService[id] += 1;
+      });
+
+      // Plans only apply to Bin Valet.
+      if (services.indexOf("bin-valet") !== -1 || s.interested_package) {
+        var pkg = s.interested_package || "not specified";
+        summary.byPackage[pkg] = (summary.byPackage[pkg] || 0) + 1;
+      }
 
       if (s.city) {
         var cityKey = s.city.trim();

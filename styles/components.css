@@ -885,3 +885,33 @@
   .sticky-cta .btn-icon { display: none; }
   .sticky-cta .btn { padding-inline: 0.7rem; letter-spacing: 0.03em; }
 }
+
+
+/* ---- WAITLIST: "WHAT ARE YOU INTERESTED IN?" CHOICES ---- */
+.service-picks {
+  border: 0;
+  margin: 0 0 var(--space-4);
+  padding: 0;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+}
+.service-pick {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--white);
+  cursor: pointer;
+}
+.service-pick input { margin-top: 4px; accent-color: var(--color-brand-strong); }
+.service-pick strong { display: block; }
+.service-pick small { color: var(--color-ink-muted); font-size: 0.82rem; }
+.service-pick:has(input:checked) {
+  border-color: var(--color-brand-strong);
+  background: var(--color-bg-alt);
+}
+.service-pick:has(input:focus-visible) { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+[data-valet-plan][hidden] { display: none; }

@@ -172,6 +172,12 @@
     }
 
     if (formType === "waitlist") {
+      // Which services they ticked — always sent as a list.
+      payload.services = payload.services === undefined ? [] : [].concat(payload.services);
+      if (!payload.services.length) {
+        showStatus(statusEl, "Please choose at least one service you're interested in.", "error");
+        return;
+      }
       var emailOk = !payload.email || /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(payload.email).trim());
       var phoneDigits = String(payload.phone || "").replace(/\D/g, "");
       var phoneOk = !payload.phone || phoneDigits.length === 10 || (phoneDigits.length === 11 && phoneDigits.charAt(0) === "1");
@@ -365,6 +371,28 @@
     } catch (e) { /* URLSearchParams unavailable — field just stays blank */ }
   }
 
+  // The "Which Bin Valet plan?" menu only matters when Bin Valet is ticked:
+  // hide it (and stop requiring it) when it isn't.
+  function initServicePicks() {
+    var form = document.querySelector("#waitlist-form");
+    if (!form) return;
+    var valet = form.querySelector('input[name="services"][value="bin-valet"]');
+    var planWrap = form.querySelector("[data-valet-plan]");
+    var plan = form.querySelector("#wl-package");
+    if (!valet || !planWrap || !plan) return;
+    function sync() {
+      var on = valet.checked;
+      planWrap.hidden = !on;
+      plan.required = on;
+      plan.disabled = !on;
+    }
+    form.querySelectorAll('input[name="services"]').forEach(function (box) {
+      box.addEventListener("change", sync);
+    });
+    form.addEventListener("reset", function () { setTimeout(sync, 0); });
+    sync();
+  }
+
   function initForm(formSelector, statusSelector, formType) {
     var form = document.querySelector(formSelector);
     if (!form) return;
@@ -384,6 +412,7 @@
     initForm("#waitlist-form", "#waitlist-form-status", "waitlist");
     initForm("#address-check-form", "#address-check-status", "address-check");
 
+    initServicePicks();
     initPromoCode("wl-promo");
     initPhoneFormatting("wl-contact");
     initCityCapitalization("wl-city");
