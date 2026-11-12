@@ -185,71 +185,132 @@
     });
   }
 
-  // Snow Removal price estimator (sizes and prices come from site-config.js).
+  // Snow Removal price estimator. Customers type their total square feet,
+  // or open "Help me measure" and add each area as length x width.
   function renderSnowPricing() {
     var mount = document.querySelector("[data-snow-pricing]");
-    var cfg = (window.STREETSIDE_CONFIG || {}).snowRemoval;
-    var options = window.STREETSIDE_SNOW_OPTIONS || [];
-    if (!mount || !cfg || !options.length) return;
+    var snow = window.STREETSIDE_SNOW;
+    var cfg = snow && snow.cfg;
+    if (!mount || !cfg || !cfg.ratePerSqft) return;
 
     var includes = (cfg.includes || [])
       .map(function (i) { return "<li>" + i + "</li>"; })
       .join("");
 
+    var areaTypes = ["Driveway", "Sidewalk", "Walkway", "Patio", "Steps", "Other"];
+
     mount.innerHTML =
       '<div class="snow-pricing__inner">' +
         '<div class="snow-pricing__copy">' +
-          '<span class="eyebrow">Snow Removal Pricing</span>' +
-          "<h3>Priced by the size of your property.</h3>" +
-          "<p>$" + cfg.ratePerSqft.toFixed(2) + " per square foot, per visit, with a $" + cfg.minimumPrice + " minimum (covers up to " + cfg.minimumSqft.toLocaleString("en-US") + " sq ft).</p>" +
+          '<div class="snow-stat"><span class="snow-stat__big">$' + cfg.ratePerSqft.toFixed(2) + '</span><span class="snow-stat__unit">per square foot, per visit</span></div>' +
+          "<p>" + snow.money(cfg.minimumPrice) + " minimum, which covers up to " + cfg.minimumSqft.toLocaleString("en-US") + " sq ft.</p>" +
           '<p class="snow-pricing__includes-label">Every visit includes:</p>' +
           '<ul class="snow-pricing__includes">' + includes + "</ul>" +
+          '<ol class="snow-steps">' +
+            "<li><strong>Enter your size.</strong> Type your square feet or use the measuring helper.</li>" +
+            "<li><strong>Tell us you're in.</strong> Join the list and choose Snow Removal.</li>" +
+            "<li><strong>We confirm.</strong> We check the size and price with you before service begins.</li>" +
+          "</ol>" +
         "</div>" +
         '<div class="snow-pricing__calc">' +
-          '<label for="snow-size">How big is the area to clear?</label>' +
-          '<select id="snow-size"><option value="">Select a size</option></select>' +
+          '<label for="snow-sqft">Total square feet to clear</label>' +
+          '<div class="snow-pricing__input"><input id="snow-sqft" type="number" inputmode="numeric" min="1" max="1000000" step="1" placeholder="e.g. 1,800" /><span>sq ft</span></div>' +
+          '<details class="snow-measure">' +
+            "<summary>Not sure? Help me measure</summary>" +
+            '<p class="snow-measure__help">Add each area you want cleared — driveway, sidewalk, walkway, patio, steps. Enter its length and width in feet (a rough guess is fine, a step or stride is about 2.5 ft). We\'ll add it up for you.</p>' +
+            '<div class="snow-measure__rows" data-measure-rows></div>' +
+            '<button type="button" class="snow-measure__add" data-measure-add>+ Add another area</button>' +
+            '<p class="snow-measure__total">Measured total: <strong data-measure-total>0 sq ft</strong></p>' +
+          "</details>" +
           '<div class="snow-pricing__result" aria-live="polite">' +
             '<span class="snow-pricing__result-label">Estimated price</span>' +
             '<span class="snow-pricing__result-price" data-snow-price>&mdash;</span>' +
-            '<span class="snow-pricing__result-note" data-snow-note>Pick a size to see your price per visit.</span>' +
+            '<span class="snow-pricing__result-note" data-snow-note>Enter your square feet to see your price per visit.</span>' +
           "</div>" +
-          '<p class="snow-pricing__fine">Estimate based on the size range you choose. Not sure how big your property is? Pick your best guess — we\'ll confirm before service begins.</p>' +
+          '<p class="snow-pricing__fine">This is an estimate based on the square footage you enter. We\'ll confirm the size and price before service begins.</p>' +
           '<a class="btn btn-primary btn-block" href="#waitlist" data-pick-service="snow-removal">I\'m interested in Snow Removal</a>' +
         "</div>" +
       "</div>";
 
-    var select = mount.querySelector("#snow-size");
-    options.forEach(function (o, i) {
-      var opt = document.createElement("option");
-      opt.value = String(i);
-      opt.textContent = o.label;
-      select.appendChild(opt);
-    });
+    var input = mount.querySelector("#snow-sqft");
+    var rowsEl = mount.querySelector("[data-measure-rows]");
+    var totalEl = mount.querySelector("[data-measure-total]");
+    var priceEl = mount.querySelector("[data-snow-price]");
+    var noteEl = mount.querySelector("[data-snow-note]");
+    var formInput = function () { return document.getElementById("wl-snow-sqft"); };
 
-    function money(n) { return "$" + n.toLocaleString("en-US"); }
-    select.addEventListener("change", function () {
-      var o = options[parseInt(select.value, 10)];
-      var priceEl = mount.querySelector("[data-snow-price]");
-      var noteEl = mount.querySelector("[data-snow-note]");
-      if (!o) {
-        priceEl.textContent = "\u2014";
-        noteEl.textContent = "Pick a size to see your price per visit.";
+    function updateResult() {
+      var sqft = parseFloat(input.value);
+      var price = snow.price(sqft);
+      if (price === null) {
+        priceEl.innerHTML = "&mdash;";
+        noteEl.textContent = "Enter your square feet to see your price per visit.";
       } else {
-        priceEl.innerHTML = money(o.price) + " <small>per visit</small>";
-        noteEl.textContent = o.minimum
-          ? "Minimum price. Salting included."
-          : "Based on the top of this size range at $" + parseFloat(cfg.ratePerSqft).toFixed(2) + " per sq ft. Salting included.";
+        priceEl.innerHTML = snow.money(price) + " <small>per visit</small>";
+        noteEl.textContent = sqft * cfg.ratePerSqft < cfg.minimumPrice
+          ? "Minimum price applies. Salting included."
+          : Math.round(sqft).toLocaleString("en-US") + " sq ft \u00d7 $" + cfg.ratePerSqft.toFixed(2) + ". Salting included.";
       }
-      // keep the signup form's size menu in step
-      var formSel = document.getElementById("wl-snow-size");
-      if (formSel && o) formSel.value = o.label + " \u2014 about " + money(o.price) + "/visit";
+      var f = formInput();
+      if (f && f.value !== input.value) {
+        f.value = input.value;
+        f.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+    }
+    input.addEventListener("input", updateResult);
+
+    // Typing in the signup form's box updates this estimator too.
+    document.addEventListener("input", function (e) {
+      if (e.target && e.target.id === "wl-snow-sqft" && input.value !== e.target.value) {
+        input.value = e.target.value;
+        updateResult();
+      }
     });
 
-    // "I'm interested" also carries their chosen size into the form
+    function addRow() {
+      var row = el("div", "snow-measure__row");
+      var opts = areaTypes.map(function (t) { return "<option>" + t + "</option>"; }).join("");
+      row.innerHTML =
+        '<select aria-label="Area type">' + opts + "</select>" +
+        '<input type="number" inputmode="decimal" min="0" step="any" placeholder="Length" aria-label="Length in feet" />' +
+        '<span class="snow-measure__x">&times;</span>' +
+        '<input type="number" inputmode="decimal" min="0" step="any" placeholder="Width" aria-label="Width in feet" />' +
+        '<span class="snow-measure__ft">ft</span>' +
+        '<span class="snow-measure__sub">0 sq ft</span>' +
+        '<button type="button" class="snow-measure__remove" aria-label="Remove this area">&times;</button>';
+      row.querySelector(".snow-measure__remove").addEventListener("click", function () {
+        row.remove();
+        recalc();
+      });
+      row.addEventListener("input", recalc);
+      rowsEl.appendChild(row);
+    }
+
+    function recalc() {
+      var total = 0;
+      rowsEl.querySelectorAll(".snow-measure__row").forEach(function (row) {
+        var nums = row.querySelectorAll("input");
+        var area = (parseFloat(nums[0].value) || 0) * (parseFloat(nums[1].value) || 0);
+        if (area < 0) area = 0;
+        row.querySelector(".snow-measure__sub").textContent = Math.round(area).toLocaleString("en-US") + " sq ft";
+        total += area;
+      });
+      total = Math.round(total);
+      totalEl.textContent = total.toLocaleString("en-US") + " sq ft";
+      input.value = total > 0 ? String(total) : "";
+      updateResult();
+    }
+
+    mount.querySelector("[data-measure-add]").addEventListener("click", addRow);
+    addRow();
+
+    // "I'm interested" carries the size into the signup form.
     mount.querySelector("[data-pick-service]").addEventListener("click", function () {
-      var o = options[parseInt(select.value, 10)];
-      var formSel = document.getElementById("wl-snow-size");
-      if (formSel && o) formSel.value = o.label + " \u2014 about " + money(o.price) + "/visit";
+      var f = formInput();
+      if (f && input.value) {
+        f.value = input.value;
+        f.dispatchEvent(new Event("input", { bubbles: true }));
+      }
     });
   }
 

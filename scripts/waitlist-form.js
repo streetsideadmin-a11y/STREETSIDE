@@ -389,27 +389,38 @@
     form.querySelectorAll('input[name="services"]').forEach(function (box) {
       box.addEventListener("change", sync);
     });
-    form.addEventListener("reset", function () { setTimeout(sync, 0); setTimeout(syncSnow, 0); });
+    form.addEventListener("reset", function () { setTimeout(function () { sync(); syncSnow(); updateSnowLabel(); }, 0); });
     sync();
 
-    // Snow Removal: show the size menu only when Snow Removal is ticked.
+    // Snow Removal: show the square-feet box only when Snow Removal is ticked.
     var snow = form.querySelector('input[name="services"][value="snow-removal"]');
     var snowWrap = form.querySelector("[data-snow-size]");
-    var snowSel = form.querySelector("#wl-snow-size");
-    function syncSnow() {
-      if (!snow || !snowWrap || !snowSel) return;
-      snowWrap.hidden = !snow.checked;
-      snowSel.disabled = !snow.checked;
+    var snowInput = form.querySelector("#wl-snow-sqft");
+    var snowLabel = form.querySelector("#wl-snow-label");
+    var snowHint = form.querySelector("[data-snow-form-price]");
+    var baseHint = snowHint ? snowHint.innerHTML : "";
+    var snowMath = window.STREETSIDE_SNOW;
+    function updateSnowLabel() {
+      if (!snowInput || !snowLabel) return;
+      var lbl = snowMath ? snowMath.label(parseFloat(snowInput.value)) : "";
+      snowLabel.value = lbl;
+      if (snowHint) {
+        snowHint.innerHTML = lbl
+          ? "<strong>Estimate: " + lbl.split(" \u2014 about ")[1].replace("/visit", " per visit") + ".</strong> We'll confirm the size and price before service begins."
+          : baseHint;
+      }
     }
-    if (snow && snowWrap && snowSel) {
-      (window.STREETSIDE_SNOW_OPTIONS || []).forEach(function (o) {
-        var opt = document.createElement("option");
-        opt.value = o.label + " \u2014 about $" + o.price.toLocaleString("en-US") + "/visit";
-        opt.textContent = o.label + " \u2014 $" + o.price.toLocaleString("en-US") + "/visit";
-        snowSel.appendChild(opt);
-      });
+    function syncSnow() {
+      if (!snow || !snowWrap || !snowInput || !snowLabel) return;
+      snowWrap.hidden = !snow.checked;
+      snowInput.disabled = !snow.checked;
+      snowLabel.disabled = !snow.checked;
+    }
+    if (snow && snowWrap && snowInput && snowLabel) {
+      snowInput.addEventListener("input", updateSnowLabel);
       snow.addEventListener("change", syncSnow);
       syncSnow();
+      updateSnowLabel();
     }
   }
 

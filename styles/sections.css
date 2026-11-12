@@ -561,7 +561,7 @@
 
 /* ---- OUR SERVICES ---- */
 .services {
-  padding: var(--space-9) 0;
+  padding: var(--space-8) 0 var(--space-7);
   background: var(--color-bg);
 }
 
@@ -593,8 +593,17 @@
   padding: var(--space-6);
 }
 
+.service-card {
+  box-shadow: 0 1px 2px rgba(18, 20, 22, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.service-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(18, 20, 22, 0.1);
+}
 .service-card--coming-soon {
   border-style: dashed;
+  background: transparent;
 }
 
 .service-card--available {
@@ -973,7 +982,7 @@
 }
 @media (max-width: 720px) { .hero .neighbor-counter { flex: 0 0 auto; } }
 
-/* ---- SNOW REMOVAL PRICE ESTIMATOR ---- */
+/* ---- SNOW REMOVAL (its own section) ---- */
 .service-card__price {
   margin-top: var(--space-3);
   font-family: var(--font-display);
@@ -985,25 +994,65 @@
   color: var(--color-brand-strong);
 }
 
+.snow-section {
+  position: relative;
+  padding: var(--space-9) 0;
+  background: var(--color-brand-strong);
+  color: #fff;
+  overflow: hidden;
+}
+.snow-section::before {
+  content: "";
+  position: absolute;
+  left: -10%;
+  bottom: -30%;
+  width: 55%;
+  height: 120%;
+  background: rgba(255, 255, 255, 0.04);
+  transform: skewX(-14deg);
+  pointer-events: none;
+}
+.snow-section > .container { position: relative; }
+.snow-section__anchor { position: absolute; top: -90px; }
+
+.snow-section__head {
+  max-width: 680px;
+  margin: 0 auto var(--space-7);
+  text-align: center;
+}
+.snow-section__head h2 { color: #fff; margin-bottom: var(--space-3); }
+.snow-section__head .eyebrow { justify-content: center; }
+.snow-section__head .lede { color: rgba(255, 255, 255, 0.86); }
+
 .snow-pricing {
   max-width: 1000px;
-  margin: var(--space-7) auto 0;
-  background: var(--white);
-  border: 2px solid var(--color-brand);
-  border-radius: var(--radius-md);
-  padding: var(--space-6);
+  margin: 0 auto;
 }
-
 .snow-pricing__inner {
   display: grid;
-  grid-template-columns: 1.1fr 1fr;
+  grid-template-columns: 1fr 1.05fr;
   gap: var(--space-7);
   align-items: start;
 }
 
-.snow-pricing h3 { margin: var(--space-2) 0 var(--space-3); font-size: 1.5rem; }
-.snow-pricing p { color: var(--color-ink-muted); }
-.snow-pricing__includes-label { margin-top: var(--space-4); font-weight: 700; color: var(--color-ink) !important; }
+.snow-pricing__copy p { color: rgba(255, 255, 255, 0.86); }
+.snow-stat { display: flex; flex-direction: column; gap: 2px; margin-bottom: var(--space-3); }
+.snow-stat__big {
+  font-family: var(--font-display);
+  font-stretch: condensed;
+  font-weight: 800;
+  font-size: clamp(3.2rem, 8vw, 4.6rem);
+  line-height: 1;
+  color: #fff;
+}
+.snow-stat__unit {
+  font-weight: 700;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.78);
+}
+.snow-pricing__includes-label { margin-top: var(--space-5); font-weight: 700; color: #fff !important; }
 
 .snow-pricing__includes {
   list-style: none;
@@ -1014,24 +1063,24 @@
   padding: 0;
 }
 .snow-pricing__includes li {
-  background: var(--color-bg-alt);
-  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--color-border-on-dark);
   border-radius: 999px;
-  padding: 5px 14px;
+  padding: 6px 16px;
   font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--color-ink);
+  font-size: 0.92rem;
+  color: #fff;
 }
 
-.snow-pricing__calc label { display: block; font-weight: 700; margin-bottom: 6px; }
-.snow-pricing__calc select {
-  width: 100%;
-  padding: 12px 14px;
-  font: inherit;
-  border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-md);
+.snow-pricing__calc {
   background: var(--white);
+  color: var(--color-ink);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
 }
+.snow-pricing__calc label { display: block; font-weight: 700; margin-bottom: 6px; }
+.snow-pricing__calc p { color: var(--color-ink-muted); }
 
 .snow-pricing__result {
   margin: var(--space-4) 0 var(--space-3);
@@ -1062,6 +1111,129 @@
 .snow-pricing__fine { font-size: 0.85rem; margin-bottom: var(--space-4); }
 
 @media (max-width: 760px) {
-  .snow-pricing { padding: var(--space-5); }
-  .snow-pricing__inner { grid-template-columns: 1fr; gap: var(--space-5); }
+  .snow-section { padding: var(--space-8) 0; }
+  .snow-pricing__calc { padding: var(--space-5); }
+  .snow-pricing__inner { grid-template-columns: 1fr; gap: var(--space-6); }
 }
+
+/* ---- SNOW: SQUARE-FOOT INPUT AND MEASURING HELPER ---- */
+.snow-pricing__input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.snow-pricing__input input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 14px;
+  font: inherit;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--white);
+}
+.snow-pricing__input span { font-weight: 700; color: var(--color-ink-muted); }
+
+.snow-measure {
+  margin-top: var(--space-3);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+}
+.snow-measure summary {
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--color-brand-strong);
+}
+.snow-measure__help { font-size: 0.88rem; margin: 10px 0; }
+.snow-measure__rows { display: grid; gap: 10px; }
+.snow-measure__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) auto minmax(0, 1fr) auto;
+  gap: 6px 8px;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--color-border);
+}
+.snow-measure__row select,
+.snow-measure__row input {
+  width: 100%;
+  min-width: 0;
+  padding: 9px 10px;
+  font: inherit;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--white);
+}
+.snow-measure__x, .snow-measure__ft { font-weight: 700; color: var(--color-ink-muted); }
+.snow-measure__sub {
+  grid-column: 1 / 5;
+  font-size: 0.85rem;
+  color: var(--color-ink-muted);
+}
+.snow-measure__remove {
+  grid-column: 5;
+  grid-row: 2;
+  justify-self: end;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--white);
+  color: var(--color-ink-muted);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.snow-measure__add {
+  margin-top: 10px;
+  background: none;
+  border: 0;
+  padding: 4px 0;
+  font: inherit;
+  font-weight: 700;
+  color: var(--color-brand-strong);
+  text-decoration: underline;
+  cursor: pointer;
+}
+.snow-measure__total { margin: 8px 0 0; font-size: 0.95rem; color: var(--color-ink) !important; }
+
+@media (max-width: 520px) {
+  .snow-measure { padding: 10px; }
+  .snow-measure__row {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto;
+  }
+  .snow-measure__row select { grid-column: 1 / -1; }
+  .snow-measure__sub { grid-column: 1 / 4; }
+  .snow-measure__remove { grid-column: 4; grid-row: auto; }
+}
+
+.snow-steps {
+  list-style: none;
+  counter-reset: snowstep;
+  margin: var(--space-5) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+.snow-steps li {
+  counter-increment: snowstep;
+  position: relative;
+  padding-left: 44px;
+  color: rgba(255, 255, 255, 0.86);
+}
+.snow-steps li::before {
+  content: counter(snowstep);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.snow-steps strong { color: #fff; }

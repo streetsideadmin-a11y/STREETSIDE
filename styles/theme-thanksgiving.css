@@ -191,3 +191,59 @@ html[data-theme="thanksgiving"] .footer-leaves {
   background-position: bottom left;
   pointer-events: none;
 }
+
+/* ---- Festive "Reserve My Spot" button (header + mobile menu) ---- */
+html[data-theme="thanksgiving"] .btn-festive {
+  position: relative;
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #ffb35c 0%, #f58a2c 50%, #e8741c 100%);
+  color: #2a0e11;
+  border: 2px solid #ffe2bd;
+  box-shadow: 0 6px 18px rgba(199, 90, 10, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+html[data-theme="thanksgiving"] .btn-festive .btn-festive__leaf {
+  display: inline-block;
+  flex: none;
+  margin: -4px 0 -4px -2px;
+  filter: drop-shadow(0 1px 1px rgba(42, 14, 17, 0.25));
+}
+html[data-theme="thanksgiving"] .btn-festive:hover .btn-festive__leaf {
+  animation: festive-wobble 0.6s ease-in-out;
+}
+@keyframes festive-wobble {
+  0%, 100% { transform: rotate(0); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+}
+html[data-theme="thanksgiving"] .btn-festive:hover,
+html[data-theme="thanksgiving"] .btn-festive:focus-visible {
+  background: linear-gradient(135deg, #ffc27d 0%, #ff9a40 50%, #f08226 100%);
+  color: #2a0e11;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(199, 90, 10, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+/* soft light sweep every few seconds */
+html[data-theme="thanksgiving"] .btn-festive::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -60%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  transform: skewX(-20deg);
+  animation: festive-sheen 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes festive-sheen {
+  0%, 55% { left: -60%; }
+  85%, 100% { left: 130%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme="thanksgiving"] .btn-festive:hover .btn-festive__leaf { animation: none; }
+  html[data-theme="thanksgiving"] .btn-festive::after { animation: none; display: none; }
+}

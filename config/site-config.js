@@ -147,13 +147,12 @@ window.STREETSIDE_CONFIG = {
   // estimator on the homepage and the signup form update automatically.
   //   ratePerSqft = dollars per square foot
   //   minimumPrice = lowest price, which covers up to minimumSqft
-  //   sizeStepSqft = how big each size choice in the dropdown is
+  // Customers type their square footage (or use "Help me measure"), and the
+  // price is worked out from these numbers.
   snowRemoval: {
     ratePerSqft: 0.05,
     minimumPrice: 40,
     minimumSqft: 800,
-    sizeStepSqft: 500,
-    maxSqft: 10000,
     includes: ["Salting", "Driveways", "Sidewalks", "Walkways", "Steps", "Patios"],
   },
 
@@ -179,17 +178,17 @@ window.STREETSIDE_CONFIG = {
     {
       id: "snow-removal",
       name: "Snow Removal",
-      status: "coming-soon",
+      status: "available",
       description: "Snow cleared and salted so you can get out the door and your bins can get to the curb, even in winter weather.",
       priceNote: "From $40 per visit",
       cta: "See pricing",
-      ctaHref: "#snow-pricing",
+      ctaHref: "#snow-removal",
     },
   ],
   faq: [
     {
       q: "What services does Streetside offer?",
-      a: "Bin Valet (we take your trash and recycling bins to the curb and back) is our core service. Bin Cleaning and Snow Removal are coming soon — pick the ones you're interested in when you join the waitlist and we'll reach out as each one becomes available in your area.",
+      a: "Bin Valet (we take your trash and recycling bins to the curb and back) and Snow Removal (driveways, sidewalks, walkways, steps and patios cleared and salted) are open for signups. Bin Cleaning is coming soon — pick the services you're interested in when you join the waitlist and we'll reach out as each one becomes available in your area.",
     },
     {
       q: "How much does Snow Removal cost? What about Bin Cleaning?",
@@ -274,22 +273,23 @@ window.STREETSIDE_CONFIG = {
 };
 
 
-// Builds the Snow Removal size/price choices from the numbers above.
-// Used by the homepage estimator and the signup form so they always agree.
-window.STREETSIDE_SNOW_OPTIONS = (function () {
-  var cfg = (window.STREETSIDE_CONFIG || {}).snowRemoval;
-  if (!cfg) return [];
-  function fmt(n) { return n.toLocaleString("en-US"); }
-  var out = [];
-  var sizes = [cfg.minimumSqft];
-  // 1,000 sq ft is the first full size choice after the minimum tier
-  for (var s = 1000; s <= cfg.maxSqft; s += cfg.sizeStepSqft) sizes.push(s);
-  var prev = 0;
-  sizes.forEach(function (upTo) {
-    var price = Math.max(cfg.minimumPrice, Math.round(upTo * cfg.ratePerSqft));
-    var label = prev === 0 ? "Up to " + fmt(upTo) + " sq ft" : fmt(prev + 1) + "\u2013" + fmt(upTo) + " sq ft";
-    out.push({ upTo: upTo, price: price, label: label, minimum: prev === 0 });
-    prev = upTo;
-  });
-  return out;
+// Snow Removal price math, shared by the homepage estimator and the signup
+// form so they always agree.
+window.STREETSIDE_SNOW = (function () {
+  var cfg = (window.STREETSIDE_CONFIG || {}).snowRemoval || {};
+  function price(sqft) {
+    sqft = Number(sqft);
+    if (!(sqft > 0)) return null;
+    return Math.max(cfg.minimumPrice, Math.round(sqft * cfg.ratePerSqft * 100) / 100);
+  }
+  function money(n) {
+    return "$" + n.toLocaleString("en-US", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
+  }
+  function label(sqft) {
+    var p = price(sqft);
+    if (p === null) return "";
+    var size = Math.round(Number(sqft)).toLocaleString("en-US") + " sq ft";
+    return size + " \u2014 about " + money(p) + "/visit" + (p === cfg.minimumPrice && sqft * cfg.ratePerSqft < cfg.minimumPrice ? " (minimum)" : "");
+  }
+  return { price: price, money: money, label: label, cfg: cfg };
 })();

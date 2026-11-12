@@ -91,6 +91,7 @@
 .brand-logo {
   display: flex;
   align-items: center;
+  flex: none; /* never let a wide nav or button squeeze the logo */
   height: 100%;
   padding: var(--space-3) 0;
 }
@@ -199,13 +200,20 @@
 .nav-toggle[aria-expanded="true"] span::after { top: 0; transform: rotate(-45deg); }
 
 /* The wide logo needs more room than the old one, so the full nav
-   appears from 1180px up; narrower screens use the menu button. */
-@media (min-width: 1180px) {
+   appears from 1300px up; narrower screens use the menu button. */
+@media (min-width: 1300px) {
   .primary-nav { display: block; }
   .nav-toggle { display: none; }
 }
-@media (min-width: 1180px) and (max-width: 1320px) {
+/* Header is crowded on laptop-sized screens (logo + 6 links + the sign-up
+   button), so tighten it a little there. Wide screens get the roomy layout. */
+@media (min-width: 1300px) and (max-width: 1799px) {
+  .brand-logo img { max-height: 48px; }
   .primary-nav ul { gap: var(--space-5); }
+}
+@media (min-width: 1300px) and (max-width: 1320px) {
+  .primary-nav ul { gap: var(--space-4); }
+  .header-actions .btn { padding-left: var(--space-4); padding-right: var(--space-4); }
 }
 
 /* Mobile menu panel */
@@ -244,7 +252,7 @@
 
 .mobile-menu .btn { margin-top: var(--space-4); }
 
-@media (min-width: 1180px) {
+@media (min-width: 1300px) {
   .mobile-menu { display: none; }
 }
 
@@ -737,10 +745,11 @@
    ========================================================================== */
 
 /* Header "Contact Us" button. Hidden on the in-between desktop widths
-   (1180-1279px) where the header has no spare room. */
+   (1100-1559px) where the header has no spare room (the floating Contact
+   button is still there). */
 .header-contact { position: relative; }
 .header-contact__btn { white-space: nowrap; }
-@media (min-width: 1180px) and (max-width: 1279px) {
+@media (min-width: 1100px) and (max-width: 1559px) {
   .header-contact { display: none; }
 }
 @media (max-width: 959px) {
@@ -918,3 +927,6 @@
 
 .field-hint { margin: 6px 0 0; font-size: 0.85rem; color: var(--color-ink-muted); }
 [data-snow-size][hidden] { display: none; }
+
+/* "Get Signed Up" header button — plain unless a seasonal theme styles it */
+.btn-festive__leaf { display: none; }

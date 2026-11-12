@@ -4,7 +4,35 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v46.4 — current
+## v46.6 — current
+
+- **Snow Removal is now its own section** (dark band, big "$0.05 per sq ft",
+  what's included, three steps, and the price estimator in a white card) and is
+  no longer marked "Coming Soon". Bin Cleaning is the only service still
+  coming soon.
+- **Section order:** the Services overview now sits right under the top banner;
+  Snow Removal comes after Bin Valet pricing.
+- **Festive "Reserve My Spot" button** replaces "Join the Waitlist" in the
+  header and mobile menu (pumpkin-orange with a little pumpkin icon and a soft
+  shine; plain when no seasonal theme is on). The top banner link says
+  "Reserve my spot" too.
+- Small polish: service cards lift on hover, tighter spacing around Services.
+- **Header fit:** the longer button squeezed the logo out of shape on laptop
+  screens. The logo can no longer be squeezed, is a little smaller on laptop
+  widths, the menu button takes over below 1300px, and the header "Contact Us"
+  button hides on mid-size screens (the floating Contact button is still there).
+
+## v46.5
+
+**Snow Removal: customers enter their actual square footage.** The size
+dropdown is replaced by a "Total square feet to clear" box that shows the exact
+price as they type ($0.05 per sq ft, $40 minimum). A "Not sure? Help me
+measure" helper lets them add each area (driveway, sidewalk, walkway, patio,
+steps) as length x width in feet and totals it for them. The signup form has
+the same box (kept in step with the estimator), and what they entered is saved
+with the signup, e.g. "1,800 sq ft — about $90/visit".
+
+## v46.4
 
 **Snow Removal pricing: flat $0.05 per sq ft, $40 minimum (up to 800 sq ft).**
 The dropdown shows size ranges in 500 sq ft steps up to 10,000 sq ft ($50 at
