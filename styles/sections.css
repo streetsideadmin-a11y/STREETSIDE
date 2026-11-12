@@ -972,3 +972,96 @@
   .hero .neighbor-counter__note { max-width: none; flex-basis: 100%; }
 }
 @media (max-width: 720px) { .hero .neighbor-counter { flex: 0 0 auto; } }
+
+/* ---- SNOW REMOVAL PRICE ESTIMATOR ---- */
+.service-card__price {
+  margin-top: var(--space-3);
+  font-family: var(--font-display);
+  font-stretch: condensed;
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-brand-strong);
+}
+
+.snow-pricing {
+  max-width: 1000px;
+  margin: var(--space-7) auto 0;
+  background: var(--white);
+  border: 2px solid var(--color-brand);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+}
+
+.snow-pricing__inner {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: var(--space-7);
+  align-items: start;
+}
+
+.snow-pricing h3 { margin: var(--space-2) 0 var(--space-3); font-size: 1.5rem; }
+.snow-pricing p { color: var(--color-ink-muted); }
+.snow-pricing__includes-label { margin-top: var(--space-4); font-weight: 700; color: var(--color-ink) !important; }
+
+.snow-pricing__includes {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+}
+.snow-pricing__includes li {
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-ink);
+}
+
+.snow-pricing__calc label { display: block; font-weight: 700; margin-bottom: 6px; }
+.snow-pricing__calc select {
+  width: 100%;
+  padding: 12px 14px;
+  font: inherit;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--white);
+}
+
+.snow-pricing__result {
+  margin: var(--space-4) 0 var(--space-3);
+  padding: var(--space-4);
+  background: var(--color-bg-alt);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.snow-pricing__result-label {
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-ink-muted);
+}
+.snow-pricing__result-price {
+  font-family: var(--font-display);
+  font-stretch: condensed;
+  font-weight: 800;
+  font-size: 2.4rem;
+  line-height: 1.1;
+  color: var(--color-brand-strong);
+}
+.snow-pricing__result-price small { font-size: 1rem; font-weight: 700; color: var(--color-ink-muted); }
+.snow-pricing__result-note { font-size: 0.9rem; color: var(--color-ink-muted); }
+.snow-pricing__fine { font-size: 0.85rem; margin-bottom: var(--space-4); }
+
+@media (max-width: 760px) {
+  .snow-pricing { padding: var(--space-5); }
+  .snow-pricing__inner { grid-template-columns: 1fr; gap: var(--space-5); }
+}

@@ -174,6 +174,7 @@ async function notifyOwner(info) {
     ["Address", [info.streetAddress, info.city, info.zip].filter(Boolean).join(", ")],
     ["Interested in", info.servicesLabel],
     ["Bin Valet plan", info.interestedPackage],
+    ["Snow area size", info.snowPropertySize],
     ["Promo code", info.promoCode],
     ["Heard about us", info.hearAboutUs],
     ["Came from", info.attribution],
@@ -250,6 +251,7 @@ module.exports = async (req, res) => {
     binStorageLocation: clean(raw.binStorageLocation, 100),
     interestedPackage: clean(raw.interestedPackage, 40),
     services: cleanServices(raw.services, formType),
+    snowPropertySize: clean(raw.snowPropertySize, 80),
     hearAboutUs: clean(raw.hearAboutUs, 100),
     promoCode: raw.promoCode,
     attribution: clean(raw.attribution, 300),
@@ -257,6 +259,9 @@ module.exports = async (req, res) => {
     // Always the server's clock — the browser's can be wrong or faked.
     submittedAt: new Date().toISOString(),
   };
+
+  // A snow-area size only applies to Snow Removal signups.
+  if (body.services.indexOf("snow-removal") === -1) body.snowPropertySize = "";
 
   // A plan only applies to Bin Valet.
   if (body.services.indexOf("bin-valet") === -1) body.interestedPackage = "";
@@ -438,6 +443,18 @@ module.exports = async (req, res) => {
       }
     }
 
+    // Snow Removal area size — same graceful follow-up step.
+    if (body.snowPropertySize && insertedRows && insertedRows[0]) {
+      try {
+        await sql`UPDATE signups SET snow_property_size = ${body.snowPropertySize} WHERE id = ${insertedRows[0].id}`;
+      } catch (snowErr) {
+        console.warn(
+          "[streetside] Could not save snow_property_size — run the migration in schema.sql (ALTER TABLE signups ADD COLUMN IF NOT EXISTS snow_property_size TEXT;). The signup itself was saved.",
+          snowErr && snowErr.message
+        );
+      }
+    }
+
     // Best-effort mirror to Google Sheets — never blocks or breaks
     // the response if it fails; the database row above already saved.
     await syncToGoogleSheet({
@@ -456,6 +473,7 @@ module.exports = async (req, res) => {
       binStorageLocation: body.binStorageLocation,
       interestedPackage: body.interestedPackage,
       servicesInterested: servicesLabel(body.services),
+      snowPropertySize: body.snowPropertySize,
       promoCode: promoCode,
       attribution: body.attribution,
       hearAboutUs: body.hearAboutUs,

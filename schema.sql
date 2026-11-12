@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS signups (
   recycling_bin_count    INTEGER,
   bin_storage_location   TEXT,
   interested_package     TEXT,                    -- Bin Valet plan: 'curb', 'full', 'one-time', or 'not-sure' (NULL if Bin Valet wasn't chosen)
+  snow_property_size     TEXT,                    -- Snow Removal: size range they picked, e.g. '1,501–2,000 sq ft — about $120/visit'
   services_interested    TEXT,                    -- comma-separated: 'bin-valet', 'bin-cleaning', 'snow-removal'
   discount_type          TEXT,                    -- 'founder', 'friends-family', 'free-service', or NULL — set from the admin dashboard, never by the public form
   promo_code             TEXT,                    -- optional promo/referral code typed on the waitlist form (uppercased)
@@ -58,6 +59,7 @@ CREATE TABLE IF NOT EXISTS town_boundaries (
 --   ALTER TABLE signups ADD COLUMN IF NOT EXISTS promo_code TEXT;
 --   ALTER TABLE signups ADD COLUMN IF NOT EXISTS attribution TEXT;
 --   ALTER TABLE signups ADD COLUMN IF NOT EXISTS services_interested TEXT;
+--   ALTER TABLE signups ADD COLUMN IF NOT EXISTS snow_property_size TEXT;
 --   CREATE TABLE IF NOT EXISTS town_boundaries (
 --     town TEXT PRIMARY KEY, geojson JSONB, fetched_at TIMESTAMPTZ DEFAULT now()
 --   );

@@ -4,7 +4,40 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v46.0 — current
+## v46.4 — current
+
+**Snow Removal pricing: flat $0.05 per sq ft, $40 minimum (up to 800 sq ft).**
+The dropdown shows size ranges in 500 sq ft steps up to 10,000 sq ft ($50 at
+1,000, $100 at 2,000, $500 at 10,000), priced at the top of each range. Edit
+`snowRemoval` in `config/site-config.js` to change the rate, minimum or
+step size.
+
+## v46.3
+
+**Snow Removal step raised to 20%:** $40 up to 1,000 sq ft, then +20% per additional
+1,000 sq ft ($206 at 9,001–10,000 sq ft). Change `stepPercent` in
+`config/site-config.js` to adjust.
+
+## v46.2
+
+**Snow Removal pricing simplified:** $40 per visit for properties up to
+1,000 sq ft, going up 5% for each additional 1,000 sq ft (rounded to the
+nearest dollar; $62 at 9,001–10,000 sq ft). The estimator, signup form menu,
+FAQ and card text all follow. Edit `snowRemoval` in `config/site-config.js`
+to change the base price, step size or percent.
+
+## v46.1
+
+**Snow Removal pricing and price estimator** (original per-square-foot
+version).
+
+- Price estimator in the Our Services section; optional "about how big is the
+  area to clear?" menu on the signup form, saved with the signup and shown in
+  your alert email, the admin page and CSV.
+- **Database:** run `ALTER TABLE signups ADD COLUMN IF NOT EXISTS snow_property_size TEXT;`
+  in Neon (signups still save without it).
+
+## v46.0
 
 **Broader brand: Bin Valet + Bin Cleaning + Snow Removal.**
 

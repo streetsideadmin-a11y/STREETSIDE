@@ -915,3 +915,6 @@
 }
 .service-pick:has(input:focus-visible) { outline: 3px solid var(--color-accent); outline-offset: 2px; }
 [data-valet-plan][hidden] { display: none; }
+
+.field-hint { margin: 6px 0 0; font-size: 0.85rem; color: var(--color-ink-muted); }
+[data-snow-size][hidden] { display: none; }

@@ -389,8 +389,28 @@
     form.querySelectorAll('input[name="services"]').forEach(function (box) {
       box.addEventListener("change", sync);
     });
-    form.addEventListener("reset", function () { setTimeout(sync, 0); });
+    form.addEventListener("reset", function () { setTimeout(sync, 0); setTimeout(syncSnow, 0); });
     sync();
+
+    // Snow Removal: show the size menu only when Snow Removal is ticked.
+    var snow = form.querySelector('input[name="services"][value="snow-removal"]');
+    var snowWrap = form.querySelector("[data-snow-size]");
+    var snowSel = form.querySelector("#wl-snow-size");
+    function syncSnow() {
+      if (!snow || !snowWrap || !snowSel) return;
+      snowWrap.hidden = !snow.checked;
+      snowSel.disabled = !snow.checked;
+    }
+    if (snow && snowWrap && snowSel) {
+      (window.STREETSIDE_SNOW_OPTIONS || []).forEach(function (o) {
+        var opt = document.createElement("option");
+        opt.value = o.label + " \u2014 about $" + o.price.toLocaleString("en-US") + "/visit";
+        opt.textContent = o.label + " \u2014 $" + o.price.toLocaleString("en-US") + "/visit";
+        snowSel.appendChild(opt);
+      });
+      snow.addEventListener("change", syncSnow);
+      syncSnow();
+    }
   }
 
   function initForm(formSelector, statusSelector, formType) {

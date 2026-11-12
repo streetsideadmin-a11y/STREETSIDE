@@ -163,9 +163,10 @@
       card.appendChild(el("span", "service-card__badge" + (soon ? "" : " service-card__badge--live"), soon ? "Coming Soon" : "Signups Open"));
       card.appendChild(el("h3", null, service.name));
       card.appendChild(el("p", "service-card__desc", service.description));
+      if (service.priceNote) card.appendChild(el("p", "service-card__price", service.priceNote));
       var link = el("a", "service-card__cta", (service.cta || "I'm interested") + " \u2192");
-      link.href = "#waitlist";
-      link.setAttribute("data-pick-service", service.id);
+      link.href = service.ctaHref || "#waitlist";
+      if (!service.ctaHref) link.setAttribute("data-pick-service", service.id);
       link.setAttribute("aria-label", (service.cta || "I'm interested") + " \u2014 " + service.name);
       card.appendChild(link);
       mount.appendChild(card);
@@ -173,7 +174,7 @@
 
     // Tapping a card's button ticks that service on the signup form
     // (the page then scrolls to the form through the normal #waitlist link).
-    mount.addEventListener("click", function (e) {
+    document.addEventListener("click", function (e) {
       var a = e.target.closest ? e.target.closest("[data-pick-service]") : null;
       if (!a) return;
       var box = document.querySelector('#waitlist-form input[name="services"][value="' + a.getAttribute("data-pick-service") + '"]');
@@ -181,6 +182,74 @@
         box.checked = true;
         box.dispatchEvent(new Event("change", { bubbles: true }));
       }
+    });
+  }
+
+  // Snow Removal price estimator (sizes and prices come from site-config.js).
+  function renderSnowPricing() {
+    var mount = document.querySelector("[data-snow-pricing]");
+    var cfg = (window.STREETSIDE_CONFIG || {}).snowRemoval;
+    var options = window.STREETSIDE_SNOW_OPTIONS || [];
+    if (!mount || !cfg || !options.length) return;
+
+    var includes = (cfg.includes || [])
+      .map(function (i) { return "<li>" + i + "</li>"; })
+      .join("");
+
+    mount.innerHTML =
+      '<div class="snow-pricing__inner">' +
+        '<div class="snow-pricing__copy">' +
+          '<span class="eyebrow">Snow Removal Pricing</span>' +
+          "<h3>Priced by the size of your property.</h3>" +
+          "<p>$" + cfg.ratePerSqft.toFixed(2) + " per square foot, per visit, with a $" + cfg.minimumPrice + " minimum (covers up to " + cfg.minimumSqft.toLocaleString("en-US") + " sq ft).</p>" +
+          '<p class="snow-pricing__includes-label">Every visit includes:</p>' +
+          '<ul class="snow-pricing__includes">' + includes + "</ul>" +
+        "</div>" +
+        '<div class="snow-pricing__calc">' +
+          '<label for="snow-size">How big is the area to clear?</label>' +
+          '<select id="snow-size"><option value="">Select a size</option></select>' +
+          '<div class="snow-pricing__result" aria-live="polite">' +
+            '<span class="snow-pricing__result-label">Estimated price</span>' +
+            '<span class="snow-pricing__result-price" data-snow-price>&mdash;</span>' +
+            '<span class="snow-pricing__result-note" data-snow-note>Pick a size to see your price per visit.</span>' +
+          "</div>" +
+          '<p class="snow-pricing__fine">Estimate based on the size range you choose. Not sure how big your property is? Pick your best guess — we\'ll confirm before service begins.</p>' +
+          '<a class="btn btn-primary btn-block" href="#waitlist" data-pick-service="snow-removal">I\'m interested in Snow Removal</a>' +
+        "</div>" +
+      "</div>";
+
+    var select = mount.querySelector("#snow-size");
+    options.forEach(function (o, i) {
+      var opt = document.createElement("option");
+      opt.value = String(i);
+      opt.textContent = o.label;
+      select.appendChild(opt);
+    });
+
+    function money(n) { return "$" + n.toLocaleString("en-US"); }
+    select.addEventListener("change", function () {
+      var o = options[parseInt(select.value, 10)];
+      var priceEl = mount.querySelector("[data-snow-price]");
+      var noteEl = mount.querySelector("[data-snow-note]");
+      if (!o) {
+        priceEl.textContent = "\u2014";
+        noteEl.textContent = "Pick a size to see your price per visit.";
+      } else {
+        priceEl.innerHTML = money(o.price) + " <small>per visit</small>";
+        noteEl.textContent = o.minimum
+          ? "Minimum price. Salting included."
+          : "Based on the top of this size range at $" + parseFloat(cfg.ratePerSqft).toFixed(2) + " per sq ft. Salting included.";
+      }
+      // keep the signup form's size menu in step
+      var formSel = document.getElementById("wl-snow-size");
+      if (formSel && o) formSel.value = o.label + " \u2014 about " + money(o.price) + "/visit";
+    });
+
+    // "I'm interested" also carries their chosen size into the form
+    mount.querySelector("[data-pick-service]").addEventListener("click", function () {
+      var o = options[parseInt(select.value, 10)];
+      var formSel = document.getElementById("wl-snow-size");
+      if (formSel && o) formSel.value = o.label + " \u2014 about " + money(o.price) + "/visit";
     });
   }
 
@@ -337,6 +406,7 @@
   document.addEventListener("DOMContentLoaded", function () {
     renderPricing();
     renderServices();
+    renderSnowPricing();
     renderFAQ();
     renderHearAboutUs();
     renderFooterContact();

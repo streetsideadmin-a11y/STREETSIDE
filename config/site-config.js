@@ -143,6 +143,20 @@ window.STREETSIDE_CONFIG = {
     ],
   },
 
+  // Snow Removal pricing (per visit). Change the numbers here and the price
+  // estimator on the homepage and the signup form update automatically.
+  //   ratePerSqft = dollars per square foot
+  //   minimumPrice = lowest price, which covers up to minimumSqft
+  //   sizeStepSqft = how big each size choice in the dropdown is
+  snowRemoval: {
+    ratePerSqft: 0.05,
+    minimumPrice: 40,
+    minimumSqft: 800,
+    sizeStepSqft: 500,
+    maxSqft: 10000,
+    includes: ["Salting", "Driveways", "Sidewalks", "Walkways", "Steps", "Patios"],
+  },
+
   // The three things Streetside offers. Shown as cards in the "Our
   // Services" section and as checkboxes on the waitlist form.
   //   status: "available" -> normal card, "coming-soon" -> Coming Soon badge
@@ -166,8 +180,10 @@ window.STREETSIDE_CONFIG = {
       id: "snow-removal",
       name: "Snow Removal",
       status: "coming-soon",
-      description: "Driveways and walkways cleared so you can get out the door and your bins can get to the curb, even in winter weather.",
-      cta: "I'm interested",
+      description: "Snow cleared and salted so you can get out the door and your bins can get to the curb, even in winter weather.",
+      priceNote: "From $40 per visit",
+      cta: "See pricing",
+      ctaHref: "#snow-pricing",
     },
   ],
   faq: [
@@ -176,8 +192,8 @@ window.STREETSIDE_CONFIG = {
       a: "Bin Valet (we take your trash and recycling bins to the curb and back) is our core service. Bin Cleaning and Snow Removal are coming soon — pick the ones you're interested in when you join the waitlist and we'll reach out as each one becomes available in your area.",
     },
     {
-      q: "How much do Bin Cleaning and Snow Removal cost?",
-      a: "Pricing for Bin Cleaning and Snow Removal hasn't been announced yet. Tell us you're interested when you join the waitlist and we'll let you know as soon as it is.",
+      q: "How much does Snow Removal cost? What about Bin Cleaning?",
+      a: "Snow Removal is priced per visit by the size of the area to be cleared: $0.05 per square foot, with a $40 minimum (covers up to 800 sq ft). Salting is included. Use the price estimator in the Our Services section to see your price. Bin Cleaning pricing hasn't been announced yet — tell us you're interested when you join the waitlist and we'll let you know as soon as it is.",
     },
     {
       q: "What exactly does Streetside do?",
@@ -256,3 +272,24 @@ window.STREETSIDE_CONFIG = {
     },
   ],
 };
+
+
+// Builds the Snow Removal size/price choices from the numbers above.
+// Used by the homepage estimator and the signup form so they always agree.
+window.STREETSIDE_SNOW_OPTIONS = (function () {
+  var cfg = (window.STREETSIDE_CONFIG || {}).snowRemoval;
+  if (!cfg) return [];
+  function fmt(n) { return n.toLocaleString("en-US"); }
+  var out = [];
+  var sizes = [cfg.minimumSqft];
+  // 1,000 sq ft is the first full size choice after the minimum tier
+  for (var s = 1000; s <= cfg.maxSqft; s += cfg.sizeStepSqft) sizes.push(s);
+  var prev = 0;
+  sizes.forEach(function (upTo) {
+    var price = Math.max(cfg.minimumPrice, Math.round(upTo * cfg.ratePerSqft));
+    var label = prev === 0 ? "Up to " + fmt(upTo) + " sq ft" : fmt(prev + 1) + "\u2013" + fmt(upTo) + " sq ft";
+    out.push({ upTo: upTo, price: price, label: label, minimum: prev === 0 });
+    prev = upTo;
+  });
+  return out;
+})();

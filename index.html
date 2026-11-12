@@ -371,7 +371,7 @@ fbq('track', 'PageView');
       <div class="section-head reveal">
         <span class="eyebrow">Bin Valet Pricing</span>
         <h2>Simple, weekly subscription pricing.</h2>
-        <p>One plan for weekly service, plus a one-time option if that's all you need. Bin Cleaning and Snow Removal pricing will be announced when those services launch.</p>
+        <p>One plan for weekly service, plus a one-time option if that's all you need. Looking for Snow Removal pricing? <a href="#snow-pricing">See the estimator</a>.</p>
       </div>
 
       <div class="founding-offer reveal" data-founding-offer></div>
@@ -391,6 +391,7 @@ fbq('track', 'PageView');
         <p class="lede">Bin Valet is our core service. Bin Cleaning and Snow Removal are coming soon — tell us what you're interested in and you'll hear from us first.</p>
       </div>
       <div class="services__grid reveal-group" data-services></div>
+      <div class="snow-pricing reveal" id="snow-pricing" data-snow-pricing></div>
     </div>
   </section>
 
@@ -497,8 +498,16 @@ fbq('track', 'PageView');
             <legend class="visually-hidden">Services you're interested in (choose at least one)</legend>
             <label class="service-pick"><input type="checkbox" name="services" value="bin-valet" checked /><span><strong>Bin Valet</strong><small>Bins to the curb and back</small></span></label>
             <label class="service-pick"><input type="checkbox" name="services" value="bin-cleaning" /><span><strong>Bin Cleaning</strong><small>Coming soon</small></span></label>
-            <label class="service-pick"><input type="checkbox" name="services" value="snow-removal" /><span><strong>Snow Removal</strong><small>Coming soon</small></span></label>
+            <label class="service-pick"><input type="checkbox" name="services" value="snow-removal" /><span><strong>Snow Removal</strong><small>Coming soon &middot; from $40/visit</small></span></label>
           </fieldset>
+
+          <div class="field" data-snow-size hidden>
+            <label for="wl-snow-size">Snow Removal: about how big is the area to clear? <span class="optional">(optional)</span></label>
+            <select id="wl-snow-size" name="snowPropertySize" disabled>
+              <option value="">Not sure yet</option>
+            </select>
+            <p class="field-hint">Driveway, sidewalks, walkways, steps and patios. Pick your best guess — we'll confirm before service begins.</p>
+          </div>
 
           <div class="field-row cols-2">
             <div class="field" data-valet-plan>
