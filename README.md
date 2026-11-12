@@ -267,6 +267,19 @@ its description and the "Coming Soon" wording on the form checkboxes in
 (`services_interested` in the database — see the migration in
 `schema.sql`); the admin page shows it and can filter by it.
 
+## Promo codes
+
+Your valid promo codes live in `config/promo-codes.json` (currently
+SMOKEOUT60, F50 and SNOW5). To add or remove one, edit that file — one line
+per code, capital letters and numbers only. Whatever a customer types (or
+whatever is in a `?promo=` / `?ref=` link) is converted to capitals, so
+`snow5` works as SNOW5. A listed code shows a green "accepted" message on the
+signup form and is marked "(valid code)" in your owner alert email; any other
+code is still saved (it might be a friend's referral) but is marked "not a
+listed promo code". The code is saved with the signup and shown in the admin
+page. What each code is *worth* (the discount itself) is still applied by you
+when service starts — this system recognizes and records the codes.
+
 ## Seasonal themes
 
 `seasonalTheme` at the top of `config/site-config.js` switches the whole

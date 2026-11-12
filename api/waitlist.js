@@ -11,6 +11,17 @@
 
 const { neon } = require("@neondatabase/serverless");
 
+// The list of valid promo codes lives in config/promo-codes.json (the signup
+// form reads the same file), so there is one place to add or remove codes.
+let PROMO_CODES = [];
+try {
+  PROMO_CODES = require("../config/promo-codes.json").codes.map(function (c) {
+    return String(c.code || "").toUpperCase();
+  });
+} catch (e) {
+  console.warn("[streetside] Could not load config/promo-codes.json — codes will be saved but not checked.");
+}
+
 // ---------------------------------------------------------------
 // LIVE SERVICE AREAS
 // ---------------------------------------------------------------
@@ -492,7 +503,9 @@ module.exports = async (req, res) => {
         zip: body.zip,
         interestedPackage: body.interestedPackage,
         servicesLabel: servicesLabel(body.services),
-        promoCode: promoCode,
+        promoCode: promoCode
+          ? promoCode + (PROMO_CODES.indexOf(promoCode) !== -1 ? " (valid code)" : " (not a listed promo code — maybe a referral)")
+          : "",
         hearAboutUs: body.hearAboutUs,
         attribution: body.attribution,
       });

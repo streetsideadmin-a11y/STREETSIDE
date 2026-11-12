@@ -1,0 +1,8 @@
+{
+  "_readme": "Your promo codes. Add one per line in the list below. Codes are always capital letters and numbers (the website and server convert whatever people type to capitals, so 'snow5' works as SNOW5). A code listed here shows a green 'accepted' message on the signup form and is marked as valid in your owner alert email. Any other code someone types is still saved (it might be a friend's referral code) but is marked as not listed. Optional: appliesTo = the service(s) the code is meant for ('bin-valet', 'bin-cleaning', 'snow-removal').",
+  "codes": [
+    { "code": "SMOKEOUT60" },
+    { "code": "F50" },
+    { "code": "SNOW5", "appliesTo": ["snow-removal"] }
+  ]
+}

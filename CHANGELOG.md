@@ -4,7 +4,17 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v46.6 — current
+## v46.7 — current
+
+**Promo codes now work as a real list.** SMOKEOUT60, F50 and SNOW5 are set up in
+`config/promo-codes.json` (add more there any time). Codes are always capitals
+(typing `snow5` becomes SNOW5). The signup form shows a green "Code accepted"
+message for a listed code, a gentle "we don't recognize that code" note for
+anything else (it is still saved, since it could be a referral), and a hint
+that SNOW5 is meant for Snow Removal. Your owner alert email marks each code
+"(valid code)" or "(not a listed promo code)". Nothing new to run in Neon.
+
+## v46.6
 
 - **Snow Removal is now its own section** (dark band, big "$0.05 per sq ft",
   what's included, three steps, and the price estimator in a white card) and is

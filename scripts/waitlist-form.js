@@ -362,11 +362,55 @@
       input.value = input.value.toUpperCase().replace(/[^A-Z0-9_-]/g, "");
       try { input.setSelectionRange(pos, pos); } catch (e) { /* not supported on some inputs */ }
     });
+    // Show whether the code is one of ours. The list lives in
+    // config/promo-codes.json (the server reads the same file).
+    var statusEl = input.parentNode.querySelector("[data-promo-status]");
+    var known = null; // null until the list loads (or if it can't load)
+    function norm(v) { return String(v || "").toUpperCase().replace(/[^A-Z0-9_-]/g, ""); }
+    function showPromoStatus() {
+      if (!statusEl) return;
+      var code = norm(input.value);
+      if (!code || known === null) { statusEl.hidden = true; statusEl.className = "field-hint promo-status"; return; }
+      var match = null;
+      known.forEach(function (c) { if (norm(c.code) === code) match = c; });
+      statusEl.hidden = false;
+      if (match) {
+        var msg = "\u2713 Code " + code + " accepted.";
+        var picked = Array.prototype.map.call(
+          document.querySelectorAll('#waitlist-form input[name="services"]:checked'),
+          function (b) { return b.value; }
+        );
+        if (match.appliesTo && match.appliesTo.length &&
+            !match.appliesTo.some(function (s) { return picked.indexOf(s) !== -1; })) {
+          var names = { "bin-valet": "Bin Valet", "bin-cleaning": "Bin Cleaning", "snow-removal": "Snow Removal" };
+          msg += " This code is for " + match.appliesTo.map(function (s) { return names[s] || s; }).join(" / ") + " \u2014 tick it above to use it.";
+        }
+        statusEl.textContent = msg;
+        statusEl.className = "field-hint promo-status promo-status--ok";
+      } else if (code.length >= 2) {
+        statusEl.textContent = "We don't recognize that code. Double-check the spelling \u2014 or if a friend referred you, that's fine, we'll note it.";
+        statusEl.className = "field-hint promo-status promo-status--unknown";
+      } else {
+        statusEl.hidden = true;
+      }
+    }
+    input.addEventListener("input", showPromoStatus);
+    document.addEventListener("change", function (e) {
+      if (e.target && e.target.name === "services") showPromoStatus();
+    });
+    try {
+      fetch("config/promo-codes.json", { cache: "no-cache" })
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+        .then(function (data) { known = (data && data.codes) || []; showPromoStatus(); })
+        .catch(function () { /* list unavailable — no status message, form still works */ });
+    } catch (e) { /* fetch unavailable */ }
+
     try {
       var params = new URLSearchParams(window.location.search);
       var fromLink = params.get("ref") || params.get("promo");
       if (fromLink && !input.value) {
         input.value = fromLink.toUpperCase().replace(/[^A-Z0-9_-]/g, "").slice(0, 40);
+        showPromoStatus();
       }
     } catch (e) { /* URLSearchParams unavailable — field just stays blank */ }
   }

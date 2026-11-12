@@ -930,3 +930,9 @@
 
 /* "Get Signed Up" header button — plain unless a seasonal theme styles it */
 .btn-festive__leaf { display: none; }
+
+/* Promo code: always shown in capitals; status line under the field */
+#wl-promo { text-transform: uppercase; }
+#wl-promo::placeholder { text-transform: none; }
+.promo-status--ok { color: #1c6b34; font-weight: 700; }
+.promo-status--unknown { color: var(--color-ink-muted); }
