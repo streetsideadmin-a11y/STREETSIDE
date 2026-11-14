@@ -418,12 +418,14 @@
     var form = document.querySelector("#waitlist-form");
     if (!form) return;
     var valet = form.querySelector('input[name="services"][value="bin-valet"]');
-    var planWrap = form.querySelector("[data-valet-plan]");
+    var planWraps = form.querySelectorAll("[data-valet-plan]");
+    var binsBox = form.querySelector("#wl-bins");
     var plan = form.querySelector("#wl-package");
-    if (!valet || !planWrap || !plan) return;
+    if (!valet || !planWraps.length || !plan) return;
     function sync() {
       var on = valet.checked;
-      planWrap.hidden = !on;
+      Array.prototype.forEach.call(planWraps, function (w) { w.hidden = !on; });
+      if (binsBox) binsBox.disabled = !on;
       plan.required = false;
       plan.disabled = !on;
     }

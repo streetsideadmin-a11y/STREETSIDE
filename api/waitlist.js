@@ -271,6 +271,7 @@ module.exports = async (req, res) => {
     services: cleanServices(raw.services, formType),
     snowPropertySize: clean(raw.snowPropertySize, 80),
     valetEstimate: clean(raw.valetEstimate, 100),
+    binCount: toCount(raw.binCount),
     hearAboutUs: clean(raw.hearAboutUs, 100),
     promoCode: raw.promoCode,
     attribution: clean(raw.attribution, 300),
@@ -283,7 +284,12 @@ module.exports = async (req, res) => {
   if (body.services.indexOf("snow-removal") === -1) body.snowPropertySize = "";
 
   // A plan only applies to Bin Valet.
-  if (body.services.indexOf("bin-valet") === -1) { body.interestedPackage = ""; body.valetEstimate = ""; }
+  if (body.services.indexOf("bin-valet") === -1) { body.interestedPackage = ""; body.valetEstimate = ""; body.binCount = null; }
+
+  // No price estimate (plan left on "Not sure yet")? Still keep how many bins.
+  if (!body.valetEstimate && body.binCount) {
+    body.valetEstimate = body.binCount + (body.binCount === 1 ? " bin" : " bins");
+  }
 
   // The waitlist form's "Email or Phone" field means either one on its
   // own is a valid submission (requiring email specifically would

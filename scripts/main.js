@@ -160,9 +160,9 @@
     var cta = mount.querySelector("[data-bin-cta]");
     var hintEl = mount.querySelector("[data-bin-hint]");
 
-    var promoField = wirePromoField(mount, function () { update(); });
+    var promoField = wirePromoField(mount, function () { update(touched); });
 
-    function update() {
+    function update(push) {
       var n = Math.max(1, Math.min(10, parseInt(countEl.value, 10) || 1));
       bins = n;
       var total = current.base + (n - 1) * current.extra;
@@ -198,30 +198,68 @@
           (promo ? " \u00b7 with " + promoField.code() + " about $" + formatPrice(promo.price) : "");
       }
       cta.setAttribute("data-package", current.id);
-      var hidden = document.getElementById("wl-valet-estimate");
-      if (hidden) hidden.value = estimate;
-      var sel = document.getElementById("wl-package");
-      if (sel && Array.prototype.some.call(sel.options, function (o) { return o.value === current.id; })) sel.value = current.id;
+      lastEstimate = estimate;
+      if (push) pushToForm(); else if (touched) updateHidden();
     }
+
+    // ---- two-way link with the quote form (plan, bin count, estimate) ----
+    // Nothing is copied into the form until the customer actually uses the
+    // price box (or changes the form's own plan / bin boxes), so someone who
+    // never touches it isn't recorded as having picked a plan.
+    var touched = false;
+    var lastEstimate = "";
+    function planKnown(id) {
+      return plans.some(function (p) { return p.id === id; });
+    }
+    function updateHidden() {
+      var hidden = document.getElementById("wl-valet-estimate");
+      var sel = document.getElementById("wl-package");
+      if (hidden) hidden.value = sel && planKnown(sel.value) ? lastEstimate : "";
+    }
+    function pushToForm() {
+      var sel = document.getElementById("wl-package");
+      var binsBox = document.getElementById("wl-bins");
+      if (sel && Array.prototype.some.call(sel.options, function (o) { return o.value === current.id; })) sel.value = current.id;
+      if (binsBox) binsBox.value = String(bins);
+      updateHidden();
+    }
+    function userChanged() { touched = true; update(true); }
 
     mount.addEventListener("change", function (e) {
       if (e.target && e.target.name === "bin-plan") {
         current = plans.filter(function (p) { return p.id === e.target.value; })[0] || current;
-        update();
+        userChanged();
       }
     });
-    countEl.addEventListener("input", update);
-    mount.querySelector("[data-bin-minus]").addEventListener("click", function () { countEl.value = Math.max(1, bins - 1); update(); });
-    mount.querySelector("[data-bin-plus]").addEventListener("click", function () { countEl.value = Math.min(10, bins + 1); update(); });
-    var planSelect = document.getElementById("wl-package");
-    if (planSelect) {
-      planSelect.addEventListener("change", function () {
-        var hidden = document.getElementById("wl-valet-estimate");
-        if (hidden && planSelect.value !== current.id) hidden.value = "";
-      });
-    }
-    mount._binSync = update;
-    update();
+    countEl.addEventListener("input", userChanged);
+    mount.querySelector("[data-bin-minus]").addEventListener("click", function () { countEl.value = Math.max(1, bins - 1); userChanged(); });
+    mount.querySelector("[data-bin-plus]").addEventListener("click", function () { countEl.value = Math.min(10, bins + 1); userChanged(); });
+    cta.addEventListener("click", function () { userChanged(); });
+
+    // Changing the plan or bin count in the form updates this box too.
+    document.addEventListener("change", function (e) {
+      if (!e.target || e.target.id !== "wl-package") return;
+      var p = plans.filter(function (x) { return x.id === e.target.value; })[0];
+      if (p) {
+        current = p;
+        var radio = mount.querySelector('input[name="bin-plan"][value="' + p.id + '"]');
+        if (radio) radio.checked = true;
+      }
+      touched = true;
+      update(false);
+    });
+    document.addEventListener("input", function (e) {
+      if (!e.target || e.target.id !== "wl-bins") return;
+      var n = parseInt(e.target.value, 10);
+      if (n >= 1) {
+        countEl.value = String(Math.min(10, n));
+        touched = true;
+        update(false);
+      }
+    });
+
+    mount._binSync = function () { update(false); };
+    update(false);
   }
 
   function renderPricing() {

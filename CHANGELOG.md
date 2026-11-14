@@ -4,7 +4,20 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v46.9 — current
+## v46.10 — current
+
+- **Header "Get a Quote" button is now plain maroon** (no pumpkin), same in the mobile menu.
+- **The quote form now has a "How many bins?" box next to the plan menu.** Using the Bin Valet
+  price box fills in the plan, the bin count and the estimate; changing the plan or bins in the
+  form updates the price box too. Nothing is filled in until someone actually uses the price box,
+  so a visitor who skips it is not recorded as having chosen a plan. If the plan is "Not sure
+  yet", the bin count is still saved (e.g. "3 bins").
+- **How It Works pictures are now built into the page** (they follow the site color theme, and
+  can no longer show up as broken images). The three old picture files were removed.
+- "Year-round." no longer splits across two lines.
+- Colors double-checked page by page (maroon theme, pumpkin accents).
+
+## v46.9
 
 **Promo codes now change the price, and you manage them yourself.**
 - The Bin Valet and Snow Removal price boxes each have a promo code box. A good code
