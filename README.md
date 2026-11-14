@@ -269,8 +269,8 @@ its description and the "Coming Soon" wording on the form checkboxes in
 
 ## Promo codes
 
-Manage your promo codes on the **Promo Codes** admin page (`admin-promos.html`,
-or the "Promo Codes" button on the signups page; same password). You can add a
+Manage your promo codes on the **Promo Codes** tab of the admin page
+(`/admin.html`, same password; the old `admin-promos.html` link just forwards there). You can add a
 code, change its discount (percent off or dollars off), pick which services it
 works for (or leave it open to all), pause it, or remove it. Changes show on the
 website right away.
@@ -357,6 +357,10 @@ A few things worth knowing:
   appearing as real signups come in.
 
 ## Admin dashboard — viewing your real signup data
+
+The admin page has three tabs: **Overview** (new quote requests, who to call back,
+counts, route planner and map), **Quote Requests** (the full searchable list) and
+**Promo Codes**. It uses the same colors as the main site.
 
 There's a password-protected admin page at `/admin.html` that shows
 every real signup: name, contact info, address, which plan they're

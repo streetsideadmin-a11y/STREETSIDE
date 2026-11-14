@@ -4,7 +4,20 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v46.10 — current
+## v46.11 — current
+
+- **Admin page rebuilt with three tabs: Overview, Quote Requests, Promo Codes.** Same maroon
+  colors and fonts as the main site. Overview has a "Call back" list of new requests (tap
+  "Called" to check one off), summary counts, the route planner and the map. Quote Requests
+  is the full list with search, filters, CSV and delete. Promo Codes (formerly its own page)
+  is now a tab, with a count of how many people used each code. The old `admin-promos.html`
+  link forwards to the new tab. Nothing to change in the database.
+- **FAQ rewritten for all services and quotes** (12 questions): what we do, how to get
+  started (call or Get a Quote), Bin Valet and Snow Removal pricing, multiple bins, being away,
+  discount codes, availability. Timing, billing method and cancellation are still marked
+  "to be finalized" until you decide them.
+
+## v46.10
 
 - **Header "Get a Quote" button is now plain maroon** (no pumpkin), same in the mobile menu.
 - **The quote form now has a "How many bins?" box next to the plan menu.** Using the Bin Valet

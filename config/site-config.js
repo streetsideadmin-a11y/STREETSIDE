@@ -187,38 +187,49 @@ window.STREETSIDE_CONFIG = {
   ],
   faq: [
     {
-      q: "What exactly does Streetside do?",
-      a: "Streetside moves your trash and recycling bins from their normal storage spot to the curb before your regular collection day, then returns them to storage once they've been emptied.",
+      q: "What does Streetside do?",
+      a: "Streetside is a local home-services company for Southeastern Ohio. Right now we offer Bin Valet (we take your bins to the curb and bring them back, every week) and Snow Removal (driveways, sidewalks, steps and salting). Bin Cleaning is coming soon.",
+    },
+    {
+      q: "How do I get started?",
+      a: "The easiest way is to call us at (740) 640-6628. You can also tap Get a Quote, tell us a little about your home, and we'll reach out to you. There's nothing to sign up for until you've heard from us.",
     },
     {
       q: "Does Streetside collect my garbage?",
-      a: "No. Streetside does not collect, haul, or dispose of garbage. Your existing waste company still collects and empties your bins — we simply handle getting them to and from the curb.",
+      a: "No. Streetside does not collect, haul, or dispose of garbage. Your existing waste company still collects and empties your bins. We just handle getting them to and from the curb.",
     },
     {
-      q: "When do you take my bins out?",
-      a: "Before your scheduled collection day, based on the collection schedule you provide when you sign up.",
-      placeholder: "Exact timing windows (e.g. evening before vs. morning of) to be finalized before launch.",
+      q: "How much does Bin Valet cost?",
+      a: "Curb Service (to the curb) starts at $12.50 a month and Full Service (to the curb and back to storage) starts at $25 a month, for your first bin. Each additional bin is $10 a month. Use the price box in the Bin Valet section to see your total, then send it in with your quote request.",
     },
     {
-      q: "When do you bring them back?",
-      a: "After your waste company has emptied them on collection day.",
-      placeholder: "Exact same-day timing to be finalized before launch.",
+      q: "How much does Snow Removal cost?",
+      a: "Snow Removal is priced per visit, based on the size of the area we clear. Visits start at $40, and the price goes up with square footage. Type in your square footage in the Snow Removal section to see your estimate, then request a quote and we'll confirm it.",
     },
     {
-      q: "Can I register multiple bins?",
-      a: "Yes. Let us know how many trash and recycling bins you have when you sign up — your first bin is included in the base price, and each additional bin is $10/month, shown on the pricing plans above.",
+      q: "When do you take my bins out and bring them back?",
+      a: "We take them to the curb before your regular collection day and bring them back after your waste company has emptied them.",
+      placeholder: "Exact timing windows (evening before vs. morning of) to be finalized before launch.",
     },
     {
-      q: "Can Streetside handle my bins while I'm away?",
-      a: "Yes — this is one of the most common reasons neighbors use Streetside. Just make sure your account reflects your normal collection schedule.",
+      q: "Can I have more than one bin?",
+      a: "Yes. Tell us how many trash and recycling bins you have. Your first bin is included in the plan price and each additional bin is $10 a month.",
+    },
+    {
+      q: "Can you handle my bins while I'm away?",
+      a: "Yes. This is one of the most common reasons neighbors use us. As long as we know your normal collection schedule, your bins are taken care of whether you're home or not.",
+    },
+    {
+      q: "Do you have discount codes?",
+      a: "Yes. If you have a promo code, enter it in the price box or on the quote form and your price updates right away. Codes take a percentage or a set dollar amount off your first bill. Each code applies to certain services, and the box will tell you if it doesn't fit.",
     },
     {
       q: "Where is Streetside available?",
-      a: "Streetside serves Southeastern Ohio and is opening routes neighborhood by neighborhood. Call us or request a quote and we'll tell you whether we're in your area yet.",
+      a: "We serve Southeastern Ohio and are opening routes neighborhood by neighborhood. Call us or request a quote and we'll tell you whether we're in your area yet.",
     },
     {
       q: "How does billing work?",
-      a: "Billing is monthly, based on the plan you choose. Founding 250 members get 50% off their first month, then their regular rate for as long as they stay subscribed — locked in for 2 years.",
+      a: "Bin Valet is billed monthly based on the plan you choose. Snow Removal is priced per visit.",
       placeholder: "Exact payment method/processor not yet finalized.",
     },
     {

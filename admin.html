@@ -14,356 +14,203 @@
 <link rel="stylesheet" href="styles/components.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="styles/theme-halloween.css" />
+<link rel="stylesheet" href="styles/theme-thanksgiving.css" />
+<!-- Same seasonal colors as the main site (controlled by `seasonalTheme` in config/site-config.js). -->
+<script src="config/site-config.js"></script>
+<script>
+  (function () {
+    var t = window.STREETSIDE_CONFIG && window.STREETSIDE_CONFIG.seasonalTheme;
+    if (t) document.documentElement.setAttribute("data-theme", t);
+  })();
+</script>
 <style>
-  body { background: var(--color-bg); }
+  body { background: var(--color-bg); color: var(--color-ink); font-size: 16px; }
+  [hidden] { display: none !important; }
+
+  /* ---------- Sign in ---------- */
   .admin-wrap { max-width: 480px; margin: 0 auto; padding: var(--space-9) var(--space-5); }
-  .admin-wrap.is-wide { max-width: 1200px; }
   .admin-logo { display: flex; justify-content: center; margin-bottom: var(--space-6); }
-  .admin-logo img { height: 44px; width: auto; }
-  .admin-card {
-    background: var(--white);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    padding: var(--space-7);
-  }
-  .admin-card h1 { font-size: 1.4rem; margin-bottom: var(--space-2); }
-  .admin-card p { color: var(--color-ink-muted); margin-bottom: var(--space-5); font-size: 0.95rem; }
-  .admin-error {
-    background: #fbeaea;
-    color: var(--red-700);
-    border: 1px solid var(--red-600);
-    border-radius: var(--radius-sm);
-    padding: var(--space-3) var(--space-4);
-    font-size: 0.9rem;
-    margin-bottom: var(--space-4);
-    display: none;
-  }
-  .admin-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: var(--space-6);
-    flex-wrap: wrap;
-    gap: var(--space-3);
-  }
-  .admin-header h1 { font-size: 1.5rem; margin: 0; }
-  .admin-header__actions { display: flex; gap: var(--space-3); flex-wrap: wrap; }
-  .admin-header__actions .btn { padding: 10px 18px; font-size: 0.85rem; }
-  .admin-summary {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap: var(--space-4);
-    margin-bottom: var(--space-6);
-  }
-  .admin-summary__card {
-    background: var(--white);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    padding: var(--space-4);
-  }
-  .admin-summary__card strong { display: block; font-size: 1.8rem; color: var(--color-brand-strong); }
-  .admin-summary__card span { font-size: 0.82rem; color: var(--color-ink-muted); }
-
-  .admin-panel {
-    background: var(--white);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    padding: var(--space-5);
-    margin-bottom: var(--space-6);
-  }
-  .admin-panel h2 {
-    font-family: var(--font-display);
-    font-stretch: condensed;
-    font-weight: 800;
-    text-transform: uppercase;
-    font-size: 1rem;
-    margin-bottom: var(--space-4);
-    color: var(--color-brand-strong);
-  }
-  .admin-panel__header-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-    margin-bottom: var(--space-4);
-  }
-  .admin-panel__header-row h2 { margin-bottom: 0; }
-  .admin-toggle-group {
-    display: inline-flex;
-    border: 1px solid var(--color-border);
-    border-radius: 999px;
-    padding: 3px;
-    background: var(--off-white);
-  }
-  .admin-toggle-btn {
-    border: none;
-    background: transparent;
-    padding: 6px 14px;
-    border-radius: 999px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--color-ink-muted);
-    cursor: pointer;
-    transition: background 0.15s ease, color 0.15s ease;
-  }
-  .admin-toggle-btn:hover { color: var(--color-brand-strong); }
-  .admin-toggle-btn.is-active {
-    background: var(--color-brand-strong);
-    color: #fff;
-  }
-  .admin-city-list { display: flex; flex-wrap: wrap; gap: var(--space-3); }
-  .admin-city-list__item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    border-radius: 999px;
-    background: var(--off-white);
-    border: 1px solid var(--color-border);
-    font-size: 0.85rem;
-  }
-  .admin-city-list__item strong { color: var(--color-accent); }
-  .admin-promo-pill { font: inherit; font-size: 0.85rem; cursor: pointer; }
-  .admin-promo-pill:hover { border-color: var(--color-brand); background: var(--green-tint); }
-  .admin-city-list__empty { color: var(--color-ink-muted); font-size: 0.9rem; }
-
-  .admin-route-hint { font-size: 0.85rem; color: var(--color-ink-muted); margin-bottom: var(--space-4); }
-  .admin-route-list { list-style: none; padding: 0; margin: 0 0 var(--space-4); display: flex; flex-direction: column; gap: 8px; }
-  .admin-route-list li {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 12px;
-    background: var(--off-white);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    font-size: 0.88rem;
-  }
-  .admin-route-list .route-stop-num {
-    flex: 0 0 auto;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    background: var(--color-brand-strong);
-    color: var(--white);
-    font-size: 0.75rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .admin-route-list .route-stop-address { flex: 1 1 auto; }
-  .admin-route-list .route-stop-btns { display: flex; gap: 4px; flex: 0 0 auto; }
-  .admin-route-list button {
-    background: none;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    padding: 3px 8px;
-    font-size: 0.78rem;
-    cursor: pointer;
-  }
-  .admin-route-list button:hover { background: var(--white); }
-  .admin-route-list button.remove-stop { color: var(--red-700); border-color: var(--red-600); }
-  .admin-route-empty { color: var(--color-ink-muted); font-size: 0.9rem; margin-bottom: var(--space-4); }
-  .admin-route-actions { display: flex; gap: var(--space-3); flex-wrap: wrap; }
-  .admin-route-actions .btn { padding: 10px 18px; font-size: 0.85rem; }
-
-  .admin-route-sort { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin: var(--space-4) 0 var(--space-2); }
-  .admin-route-sort__label { font-size: 0.85rem; font-weight: 700; }
-  .admin-route-sort .btn { padding: 7px 14px; font-size: 0.8rem; }
-  .admin-route-sort .btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .admin-route-sort-note { font-size: 0.8rem; color: var(--color-ink-muted); margin: 0 0 var(--space-4); }
-
-  .admin-map-wrap {
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    border: 1px solid var(--color-border);
-  }
-  #admin-map-el { height: 550px; width: 100%; background: #dde5e0; }
-  .admin-map-town-label {
-    background: none;
-    border: none;
-    box-shadow: none;
-    font-family: var(--font-display);
-    font-stretch: condensed;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--color-ink);
-    text-shadow: 0 0 3px var(--white), 0 0 3px var(--white), 0 0 3px var(--white);
-    white-space: nowrap;
-  }
-  .admin-map-loading {
-    font-size: 0.85rem;
-    color: var(--color-brand);
-    font-weight: 700;
-    margin-bottom: var(--space-3);
-  }
-  .admin-map-loading-pulse {
-    background: none;
-    border: none;
-  }
-  .admin-map-loading-pulse__dot {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: rgba(200, 30, 44, 0.55);
-    animation: admin-map-pulse 1.3s ease-in-out infinite;
-  }
-  @keyframes admin-map-pulse {
-    0%, 100% { transform: scale(1); opacity: 0.6; }
-    50% { transform: scale(1.7); opacity: 0.15; }
-  }
-
-  .admin-filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-    margin-bottom: var(--space-3);
-  }
-  .admin-filter-search {
-    flex: 1 1 240px;
-    padding: 10px 14px;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    font-size: 0.9rem;
-  }
-  .admin-filter-select {
-    padding: 10px 14px;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    font-size: 0.9rem;
-    background: var(--white);
-  }
-  .admin-filter-clear { padding: 8px 16px; font-size: 0.85rem; }
-  .admin-filter-count { font-size: 0.85rem; color: var(--color-ink-muted); margin-bottom: var(--space-3); }
-  .admin-map-filter-active {
-    background: var(--green-tint);
-    border: 1px solid var(--green-600);
-    border-radius: var(--radius-sm);
-    padding: var(--space-3) var(--space-4);
-    margin-bottom: var(--space-3);
-    font-size: 0.9rem;
-    color: var(--color-brand-strong);
-  }
-  .admin-map-filter-active button {
-    margin-left: var(--space-3);
-    background: none;
-    border: 1px solid var(--color-brand-strong);
-    border-radius: var(--radius-sm);
-    padding: 3px 10px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    color: var(--color-brand-strong);
-    cursor: pointer;
-  }
-  .admin-map-filter-active button:hover { background: var(--white); }
-
-  .admin-table-wrap {
-    background: var(--white);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    overflow-x: auto;
-  }
-  table.admin-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; white-space: nowrap; }
-  table.admin-table th, table.admin-table td {
-    text-align: left;
-    padding: 10px 14px;
-    border-bottom: 1px solid var(--color-border);
-  }
-  table.admin-table th { background: var(--off-white); font-weight: 700; position: sticky; top: 0; }
-  table.admin-table tr:last-child td { border-bottom: none; }
-  table.admin-table tr.is-contacted { background: var(--green-tint); }
-  table.admin-table tbody tr:hover { background: var(--off-white); }
-  table.admin-table tbody tr.is-contacted:hover { background: var(--green-tint); filter: brightness(0.97); }
-  table.admin-table td a { color: var(--color-brand); text-decoration: underline; }
-  table.admin-table th.is-sortable { cursor: pointer; user-select: none; }
-  table.admin-table th.is-sortable:hover { color: var(--color-accent); }
-  table.admin-table th .sort-arrow { font-size: 0.7rem; margin-left: 3px; opacity: 0.6; }
-  .admin-loading { padding: var(--space-6); text-align: center; color: var(--color-ink-muted); }
-  .admin-contacted-toggle { display: flex; align-items: center; gap: 6px; cursor: pointer; }
-  .admin-discount-select {
-    font: inherit;
-    font-size: 0.82rem;
-    padding: 4px 6px;
-    border-radius: 6px;
-    border: 1px solid var(--color-border);
-    background: #fff;
-    color: var(--color-ink);
-    max-width: 150px;
-  }
-  .admin-discount-select:disabled { opacity: 0.6; }
-  .admin-delete-btn {
-    background: none;
-    border: 1px solid var(--red-600);
-    color: var(--red-700);
-    border-radius: var(--radius-sm);
-    padding: 4px 10px;
-    font-size: 0.78rem;
-    cursor: pointer;
-    font-weight: 700;
-  }
-  .admin-delete-btn:hover { background: #fbeaea; }
+  .admin-logo img { height: 48px; width: auto; }
+  .admin-card { background: var(--white); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-7); box-shadow: var(--shadow-md); }
+  .admin-card h1 { font-size: 1.5rem; margin-bottom: var(--space-2); color: var(--color-brand-strong); }
+  .admin-card p { color: var(--color-ink-muted); margin-bottom: var(--space-5); }
+  .admin-error { background: #fbeaea; color: var(--red-700); border: 1px solid var(--red-600); border-radius: var(--radius-sm); padding: var(--space-3) var(--space-4); font-size: 0.95rem; margin-bottom: var(--space-4); display: none; }
   #admin-dashboard { display: none; }
 
-  /* ---- v42 tidy-up ---- */
-  .admin-wrap.is-wide { max-width: 1320px; }
-  .admin-topbar {
-    position: sticky;
-    top: 0;
-    z-index: 30;
-    background: var(--color-bg);
-    padding: var(--space-3) 0;
-    margin-bottom: var(--space-4);
-    border-bottom: 1px solid var(--color-border);
-  }
-  .admin-topbar .admin-header { margin-bottom: 0; }
-  .admin-summary { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: var(--space-3); margin-bottom: var(--space-5); }
-  .admin-summary__card { padding: var(--space-3) var(--space-4); }
-  .admin-summary__card strong { font-size: 1.5rem; line-height: 1.1; }
-  .admin-panel { margin-bottom: var(--space-5); }
+  /* ---------- Top bar + tabs ---------- */
+  .adm-bar { position: sticky; top: 0; z-index: 40; background: var(--white); border-bottom: 3px solid var(--color-brand-strong); box-shadow: var(--shadow-md); }
+  .adm-bar__inner { max-width: 1320px; margin: 0 auto; padding: var(--space-3) var(--space-5); display: flex; align-items: center; gap: var(--space-5); flex-wrap: wrap; }
+  .adm-bar__brand { display: flex; align-items: center; gap: var(--space-3); text-decoration: none; color: var(--color-brand-strong); }
+  .adm-bar__brand img { height: 38px; width: auto; display: block; }
+  .adm-bar__brand span { font-family: var(--font-display); font-stretch: condensed; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; font-size: .9rem; border-left: 2px solid var(--color-border); padding-left: var(--space-3); }
+  .adm-tabs { display: flex; gap: var(--space-2); flex: 1 1 auto; overflow-x: auto; }
+  .adm-tab { appearance: none; border: 0; background: transparent; cursor: pointer; font: inherit; font-weight: 800; font-size: .88rem; letter-spacing: .06em; text-transform: uppercase; color: var(--color-ink-muted); padding: 10px 16px; border-radius: 999px; white-space: nowrap; display: inline-flex; align-items: center; gap: 8px; }
+  .adm-tab:hover { color: var(--color-brand-strong); background: var(--color-bg-alt); }
+  .adm-tab.is-active { background: var(--color-brand-strong); color: #fff; }
+  .adm-tab:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+  .adm-tab__count { background: var(--color-accent); color: #fff; font-size: .72rem; border-radius: 999px; padding: 1px 8px; letter-spacing: 0; }
+  .adm-bar__actions { display: flex; gap: var(--space-2); flex-wrap: wrap; }
+  .adm-bar__actions .btn { padding: 9px 16px; font-size: .78rem; }
+
+  .adm-main { max-width: 1320px; margin: 0 auto; padding: var(--space-6) var(--space-5) var(--space-9); }
+  .adm-view[hidden] { display: none; }
+  .adm-head { margin-bottom: var(--space-5); }
+  .adm-head h1 { font-size: 1.9rem; color: var(--color-brand-strong); margin: 0 0 4px; }
+  .adm-head p { color: var(--color-ink-muted); margin: 0; }
+
+  /* ---------- Panels and cards ---------- */
+  .admin-panel, .adm-card { background: var(--white); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-5); margin-bottom: var(--space-5); box-shadow: 0 1px 0 rgba(0,0,0,.02); }
+  .admin-panel h2, .adm-card h2 { font-family: var(--font-display); font-stretch: condensed; font-weight: 800; text-transform: uppercase; letter-spacing: .02em; font-size: 1.15rem; margin: 0 0 var(--space-3); color: var(--color-brand-strong); }
+  .admin-panel__header-row, .adm-panel__head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); margin-bottom: var(--space-4); }
+  .admin-panel__header-row h2, .adm-panel__head h2 { margin: 0; }
+  .admin-panel-sub, .adm-sub { font-size: .9rem; color: var(--color-ink-muted); margin: calc(var(--space-2) * -1) 0 var(--space-4); }
   .admin-panel-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-5); margin-bottom: var(--space-5); }
   .admin-panel-grid .admin-panel { margin-bottom: 0; }
   @media (min-width: 900px) { .admin-panel-grid { grid-template-columns: 3fr 2fr; } }
-  .admin-panel-sub { font-size: 0.8rem; color: var(--color-ink-muted); margin: calc(var(--space-2) * -1) 0 var(--space-4); }
-  .admin-route-hint { font-size: 0.8rem; margin-bottom: var(--space-3); }
-  #admin-map-el { height: 440px; }
-  details.admin-panel > summary {
-    cursor: pointer;
-    list-style: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-family: var(--font-display);
-    font-stretch: condensed;
-    font-weight: 800;
-    text-transform: uppercase;
-    font-size: 1rem;
-    color: var(--color-brand-strong);
-  }
+  .adm-link { appearance: none; background: none; border: 0; cursor: pointer; font: inherit; font-weight: 700; color: var(--color-accent); text-decoration: underline; padding: 0; }
+  .adm-pill { display: inline-block; font-family: var(--font-body); font-size: .8rem; font-weight: 800; letter-spacing: 0; background: var(--color-accent); color: #fff; border-radius: 999px; padding: 2px 10px; margin-left: 8px; vertical-align: middle; }
+
+  .admin-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-5); }
+  .admin-summary__card { background: var(--white); border: 1px solid var(--color-border); border-left: 5px solid var(--color-brand-strong); border-radius: var(--radius-md); padding: var(--space-4); }
+  .admin-summary__card strong { display: block; font-family: var(--font-display); font-weight: 800; font-size: 2rem; line-height: 1.05; color: var(--color-brand-strong); }
+  .admin-summary__card span { font-size: .88rem; color: var(--color-ink-muted); }
+
+  /* ---------- Call-back list ---------- */
+  .adm-callbacks { border-top: 5px solid var(--color-accent); }
+  .adm-callbacks__list { display: grid; gap: var(--space-3); }
+  .adm-cb { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-3) var(--space-5); align-items: center; padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-bg); }
+  @media (max-width: 760px) { .adm-cb { grid-template-columns: minmax(0, 1fr); } }
+  .adm-cb__name { font-weight: 800; font-size: 1.1rem; color: var(--color-brand-strong); }
+  .adm-cb__when { font-weight: 600; font-size: .85rem; color: var(--color-ink-muted); margin-left: 8px; }
+  .adm-cb__badges { margin: 6px 0; display: flex; flex-wrap: wrap; gap: 6px; }
+  .adm-cb__line { font-size: .92rem; color: var(--color-ink); margin: 2px 0; }
+  .adm-cb__line span { color: var(--color-ink-muted); }
+  .adm-cb__actions { display: flex; gap: var(--space-2); flex-wrap: wrap; align-items: center; }
+  .adm-cb__actions .btn { padding: 10px 16px; font-size: .8rem; }
+  .adm-empty { color: var(--color-ink-muted); text-align: center; padding: var(--space-6) var(--space-4); font-size: 1.05rem; }
+
+  /* ---------- Chips, toggles, badges ---------- */
+  .admin-toggle-group { display: inline-flex; border: 1px solid var(--color-border); border-radius: 999px; padding: 3px; background: var(--color-bg); }
+  .admin-toggle-btn { border: none; background: transparent; padding: 7px 15px; border-radius: 999px; font-size: .85rem; font-weight: 700; color: var(--color-ink-muted); cursor: pointer; }
+  .admin-toggle-btn:hover { color: var(--color-brand-strong); }
+  .admin-toggle-btn.is-active { background: var(--color-brand-strong); color: #fff; }
+  .admin-city-list { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+  .admin-city-list__item { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 999px; background: var(--color-bg); border: 1px solid var(--color-border); font-size: .92rem; }
+  .admin-city-list__item strong { color: var(--color-accent); }
+  .admin-promo-pill { font: inherit; font-size: .92rem; cursor: pointer; }
+  .admin-promo-pill:hover { border-color: var(--color-brand); background: var(--green-tint); }
+  .admin-city-list__empty { color: var(--color-ink-muted); }
+  .admin-badge { display: inline-block; font-size: .76rem; font-weight: 800; padding: 3px 9px; border-radius: 999px; background: var(--green-tint); color: var(--color-brand-strong); border: 1px solid var(--color-border); }
+  .admin-badge.is-check { background: var(--color-bg); color: var(--color-ink-muted); }
+  .admin-badge.is-promo { background: #fff3d6; color: #6e4300; border-color: #e5b25d; font-family: ui-monospace, Menlo, Consolas, monospace; letter-spacing: .03em; }
+  .admin-consent-no { color: var(--red-700); font-weight: 700; }
+
+  /* ---------- Route planner ---------- */
+  details.admin-panel > summary { cursor: pointer; list-style: none; display: flex; align-items: center; justify-content: space-between; font-family: var(--font-display); font-stretch: condensed; font-weight: 800; text-transform: uppercase; font-size: 1.15rem; color: var(--color-brand-strong); }
   details.admin-panel > summary::-webkit-details-marker { display: none; }
-  details.admin-panel > summary::after { content: "Show ▾"; font-family: var(--font-body); font-size: 0.75rem; font-weight: 600; text-transform: none; color: var(--color-ink-muted); }
-  details.admin-panel[open] > summary::after { content: "Hide ▴"; }
+  details.admin-panel > summary::after { content: "Show \25BE"; font-family: var(--font-body); font-size: .8rem; font-weight: 600; text-transform: none; color: var(--color-ink-muted); }
+  details.admin-panel[open] > summary::after { content: "Hide \25B4"; }
   details.admin-panel[open] > summary { margin-bottom: var(--space-4); }
-  .admin-route-count { font-family: var(--font-body); font-size: 0.75rem; font-weight: 700; background: var(--color-brand-strong); color: #fff; border-radius: 999px; padding: 2px 9px; margin-left: var(--space-3); }
+  .admin-route-count { font-family: var(--font-body); font-size: .78rem; font-weight: 800; background: var(--color-accent); color: #fff; border-radius: 999px; padding: 2px 9px; margin-left: 10px; }
+  .admin-route-hint { font-size: .9rem; color: var(--color-ink-muted); margin-bottom: var(--space-3); }
+  .admin-route-list { list-style: none; padding: 0; margin: 0 0 var(--space-4); display: flex; flex-direction: column; gap: 8px; }
+  .admin-route-list li { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: var(--color-bg); border: 1px solid var(--color-border); border-radius: var(--radius-sm); font-size: .92rem; }
+  .admin-route-list .route-stop-num { flex: 0 0 auto; width: 24px; height: 24px; border-radius: 50%; background: var(--color-brand-strong); color: #fff; font-size: .78rem; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .admin-route-list .route-stop-address { flex: 1 1 auto; }
+  .admin-route-list .route-stop-btns { display: flex; gap: 4px; flex: 0 0 auto; }
+  .admin-route-list button { background: none; border: 1px solid var(--color-border); border-radius: var(--radius-sm); padding: 3px 9px; font-size: .8rem; cursor: pointer; }
+  .admin-route-list button:hover { background: var(--white); }
+  .admin-route-list button.remove-stop { color: var(--red-700); border-color: var(--red-600); }
+  .admin-route-empty { color: var(--color-ink-muted); margin-bottom: var(--space-4); }
+  .admin-route-actions { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+  .admin-route-actions .btn { padding: 10px 18px; font-size: .82rem; }
+  .admin-route-sort { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin: var(--space-4) 0 var(--space-2); }
+  .admin-route-sort__label { font-size: .9rem; font-weight: 700; }
+  .admin-route-sort .btn { padding: 7px 14px; font-size: .78rem; }
+  .admin-route-sort .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .admin-route-sort-note { font-size: .85rem; color: var(--color-ink-muted); margin: 0 0 var(--space-4); }
 
-  .admin-filters { align-items: center; padding: var(--space-3); background: var(--white); border: 1px solid var(--color-border); border-radius: var(--radius-md); }
-  .admin-filters .admin-filter-select, .admin-filters .admin-filter-search { padding: 8px 12px; font-size: 0.85rem; }
-  .admin-filter-count { margin: var(--space-3) 0 var(--space-2); }
+  /* ---------- Map ---------- */
+  .admin-map-wrap { border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--color-border); }
+  #admin-map-el { height: 460px; width: 100%; background: var(--color-bg-alt); }
+  .admin-map-town-label { background: none; border: none; box-shadow: none; font-family: var(--font-display); font-stretch: condensed; font-size: 11px; font-weight: 700; color: var(--color-ink); text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff; white-space: nowrap; }
+  .admin-map-loading { font-size: .9rem; color: var(--color-brand); font-weight: 700; margin-bottom: var(--space-3); }
+  .admin-map-loading-pulse { background: none; border: none; }
+  .admin-map-loading-pulse__dot { width: 14px; height: 14px; border-radius: 50%; background: rgba(200, 30, 44, .55); animation: admin-map-pulse 1.3s ease-in-out infinite; }
+  @keyframes admin-map-pulse { 0%, 100% { transform: scale(1); opacity: .6; } 50% { transform: scale(1.7); opacity: .15; } }
 
-  .admin-table-wrap { max-height: 72vh; overflow: auto; }
-  table.admin-table { white-space: normal; }
-  table.admin-table th { z-index: 2; box-shadow: 0 1px 0 var(--color-border); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--color-ink-muted); white-space: nowrap; }
-  table.admin-table th, table.admin-table td { padding: 8px 12px; vertical-align: top; }
+  /* ---------- Filters + table ---------- */
+  .admin-filters { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); padding: var(--space-4); background: var(--white); border: 1px solid var(--color-border); border-radius: var(--radius-md); margin-bottom: var(--space-3); }
+  .admin-filter-search { flex: 1 1 260px; padding: 10px 14px; border: 2px solid var(--color-border); border-radius: var(--radius-sm); font-size: .95rem; background: #fff; }
+  .admin-filter-select { padding: 10px 12px; border: 2px solid var(--color-border); border-radius: var(--radius-sm); font-size: .9rem; background: #fff; }
+  .admin-filter-search:focus, .admin-filter-select:focus { outline: none; border-color: var(--color-brand); }
+  .admin-filter-clear { padding: 9px 16px; font-size: .8rem; }
+  .admin-filter-count { font-size: .92rem; color: var(--color-ink-muted); margin: var(--space-3) 0 var(--space-2); }
+  .admin-map-filter-active { background: var(--green-tint); border: 1px solid var(--green-600); border-radius: var(--radius-sm); padding: var(--space-3) var(--space-4); margin-bottom: var(--space-3); font-size: .95rem; color: var(--color-brand-strong); }
+  .admin-map-filter-active button { margin-left: var(--space-3); background: none; border: 1px solid var(--color-brand-strong); border-radius: var(--radius-sm); padding: 3px 10px; font-size: .8rem; font-weight: 700; color: var(--color-brand-strong); cursor: pointer; }
+  .admin-table-wrap { background: var(--white); border: 1px solid var(--color-border); border-radius: var(--radius-md); max-height: 74vh; overflow: auto; }
+  table.admin-table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  table.admin-table th, table.admin-table td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--color-border); vertical-align: top; }
+  table.admin-table th { background: var(--color-brand-strong); color: #fff; font-weight: 800; position: sticky; top: 0; z-index: 2; font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
+  table.admin-table th.is-sortable { cursor: pointer; user-select: none; }
+  table.admin-table th.is-sortable:hover { color: var(--harvest-gold, #f6b93b); }
+  table.admin-table th .sort-arrow { font-size: .7rem; margin-left: 3px; opacity: .8; }
+  table.admin-table tr:last-child td { border-bottom: none; }
+  table.admin-table tbody tr:nth-child(even) { background: rgba(0,0,0,.015); }
+  table.admin-table tbody tr:hover { background: var(--color-bg); }
+  table.admin-table tr.is-contacted { background: var(--green-tint); }
+  table.admin-table tbody tr.is-contacted:hover { filter: brightness(.97); }
+  table.admin-table td a { color: var(--color-brand); text-decoration: underline; }
   table.admin-table td.nowrap { white-space: nowrap; }
-  table.admin-table td .sub { display: block; font-size: 0.78rem; color: var(--color-ink-muted); margin-top: 2px; }
+  table.admin-table td .sub { display: block; font-size: .82rem; color: var(--color-ink-muted); margin-top: 3px; white-space: normal; max-width: 300px; }
   table.admin-table td .sub a { color: var(--color-ink-muted); }
   table.admin-table td.col-center, table.admin-table th.col-center { text-align: center; }
-  .admin-badge { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--green-tint); color: var(--color-brand-strong); border: 1px solid var(--green-600); white-space: nowrap; }
-  .admin-badge.is-check { background: var(--off-white); color: var(--color-ink-muted); border-color: var(--color-border); }
-  .admin-badge.is-promo { background: #fff6e5; color: #7a4b00; border-color: #e5b25d; font-family: monospace; letter-spacing: 0.03em; }
-  .admin-consent-no { color: var(--red-700); font-weight: 700; }
-  .admin-delete-btn { padding: 2px 8px; line-height: 1.4; }
+  table.admin-table input[type="checkbox"] { width: 20px; height: 20px; accent-color: var(--color-brand-strong); }
+  .admin-loading { padding: var(--space-6); text-align: center; color: var(--color-ink-muted); }
+  .admin-discount-select { font: inherit; font-size: .85rem; padding: 5px 6px; border-radius: 6px; border: 1px solid var(--color-border); background: #fff; color: var(--color-ink); max-width: 160px; }
+  .admin-discount-select:disabled { opacity: .6; }
+  .admin-delete-btn { background: none; border: 1px solid var(--red-600); color: var(--red-700); border-radius: var(--radius-sm); padding: 3px 9px; font-size: .8rem; cursor: pointer; font-weight: 700; line-height: 1.4; }
+  .admin-delete-btn:hover { background: #fbeaea; }
+
+  /* ---------- Promo codes tab ---------- */
+  .pc-error, .pc-ok { border-radius: var(--radius-sm); padding: var(--space-3) var(--space-4); font-size: .95rem; margin-bottom: var(--space-4); display: none; }
+  .pc-error { background: #fbeaea; color: var(--red-700); border: 1px solid var(--red-600); }
+  .pc-ok { background: #e8f4ea; color: #1c6b34; border: 1px solid #9ccaa6; }
+  .pc-grid { display: grid; gap: var(--space-4); grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); align-items: end; }
+  .pc-grid .field { margin: 0; }
+  .pc-amount { display: flex; gap: var(--space-2); }
+  .pc-amount select { flex: 0 0 auto; width: auto; }
+  .pc-amount input { min-width: 0; width: 100%; }
+  .pc-services { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); margin-top: var(--space-3); }
+  .pc-services label { display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; }
+  .pc-services input, .pc-active input { width: 20px; height: 20px; accent-color: var(--color-brand-strong); }
+  .pc-hint { font-size: .9rem; color: var(--color-ink-muted); margin: var(--space-2) 0 0; }
+  .pc-list { display: grid; gap: var(--space-4); }
+  .pc-row { border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: var(--space-4); background: var(--white); }
+  .pc-row.is-paused { background: var(--color-bg-alt); opacity: .88; }
+  .pc-row__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-2); }
+  .pc-code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 1.3rem; font-weight: 800; letter-spacing: .04em; color: var(--color-brand-strong); }
+  .pc-badge { display: inline-block; font-size: .75rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; background: #e8f4ea; color: #1c6b34; margin-left: var(--space-2); }
+  .pc-badge.is-off { background: #eee; color: #666; }
+  .pc-used { font-size: .88rem; color: var(--color-ink-muted); margin-left: var(--space-3); font-weight: 600; }
+  .pc-row__summary { font-weight: 700; margin: 0 0 var(--space-3); }
+  .pc-row__actions { display: flex; gap: var(--space-3); flex-wrap: wrap; margin-top: var(--space-4); align-items: center; }
+  .pc-row__actions .btn { padding: 10px 18px; font-size: .82rem; }
+  .pc-danger { color: var(--red-700); border-color: var(--red-600); }
+  .pc-danger:hover { background: #fbeaea; }
+  .pc-active { display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; }
+  .pc-empty { color: var(--color-ink-muted); text-align: center; padding: var(--space-6); }
+
+  @media (max-width: 760px) {
+    .adm-bar__inner { padding: var(--space-3) var(--space-4); gap: var(--space-3); }
+    .adm-main { padding: var(--space-5) var(--space-4) var(--space-8); }
+    .adm-bar__actions { width: 100%; }
+    .adm-bar__actions .btn { flex: 1 1 auto; }
+    .adm-head h1 { font-size: 1.6rem; }
+    .adm-tab { padding: 9px 12px; font-size: .8rem; }
+    .adm-bar__brand span { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -375,7 +222,7 @@
   </div>
   <div class="admin-card">
     <h1>Admin Login</h1>
-    <p>Sign in to view real signup data.</p>
+    <p>Sign in to see your quote requests.</p>
     <div class="admin-error" id="admin-login-error"></div>
     <form id="admin-login-form">
       <div class="field">
@@ -388,138 +235,223 @@
 </div>
 
 <!-- ============ DASHBOARD ============ -->
-<div class="admin-wrap is-wide" id="admin-dashboard">
-  <div class="admin-topbar">
-    <div class="admin-header">
-      <h1>Signups</h1>
-      <div class="admin-header__actions">
-        <a href="admin-promos.html" class="btn btn-outline-brand">Promo Codes</a>
+<div id="admin-dashboard">
+  <header class="adm-bar">
+    <div class="adm-bar__inner">
+      <a class="adm-bar__brand" href="admin.html" aria-label="Streetside admin home">
+        <img src="images/streetside-logo-horizontal.png" alt="Streetside" /><span>Admin</span>
+      </a>
+      <nav class="adm-tabs" id="adm-tabs" role="tablist" aria-label="Admin sections">
+        <button type="button" class="adm-tab is-active" role="tab" data-tab="overview" aria-selected="true">Overview <span class="adm-tab__count" id="adm-new-count" hidden></span></button>
+        <button type="button" class="adm-tab" role="tab" data-tab="signups" aria-selected="false">Signups</button>
+        <button type="button" class="adm-tab" role="tab" data-tab="promos" aria-selected="false">Promo Codes</button>
+      </nav>
+      <div class="adm-bar__actions">
         <button type="button" class="btn btn-outline-brand" id="admin-refresh-btn">Refresh</button>
         <button type="button" class="btn btn-outline-brand" id="admin-export-btn">Export CSV</button>
         <button type="button" class="btn btn-outline-brand" id="admin-logout-btn">Log Out</button>
       </div>
     </div>
-  </div>
+  </header>
 
-  <div class="admin-summary" id="admin-summary"></div>
+  <main class="adm-main">
 
-  <div class="admin-panel-grid">
-  <div class="admin-panel">
-    <div class="admin-panel__header-row">
-      <h2>Interest by City</h2>
-      <div class="admin-toggle-group" id="admin-city-breakdown-toggle" role="group" aria-label="City breakdown source">
-        <button type="button" class="admin-toggle-btn is-active" data-breakdown-type="waitlist">Signups</button>
-        <button type="button" class="admin-toggle-btn" data-breakdown-type="address-check">Address Checks</button>
+    <!-- ===== Overview ===== -->
+    <section class="adm-view" id="view-overview" data-view="overview" role="tabpanel">
+      <div class="adm-head">
+        <h1>Overview</h1>
+        <p>What needs your attention right now.</p>
       </div>
-    </div>
-    <div class="admin-city-list" id="admin-city-list"></div>
-  </div>
 
-  <div class="admin-panel">
-    <div class="admin-panel__header-row">
-      <h2>Promo &amp; Referral Codes</h2>
-    </div>
-    <p class="admin-panel-sub">Waitlist signups only. Click a code to filter the table.</p>
-    <div class="admin-city-list" id="admin-promo-list"></div>
-  </div>
-  </div>
+      <div class="admin-panel adm-callbacks">
+        <div class="adm-panel__head">
+          <h2>Needs a call-back <span class="adm-pill" id="adm-callback-count" hidden></span></h2>
+          <button type="button" class="adm-link" data-goto="signups">See all signups &rarr;</button>
+        </div>
+        <div class="adm-callbacks__list" id="adm-callback-list"><div class="adm-empty">Loading&hellip;</div></div>
+      </div>
 
-  <div class="admin-panel">
-    <h2>Waitlist Interest Map</h2>
-    <p class="admin-route-hint">Warmer = more waitlist signups. Click a town to filter the table. Address checks aren't counted.</p>
-    <p class="admin-map-loading" id="admin-map-loading" style="display: none;">Loading real boundaries…</p>
-    <div class="admin-map-wrap">
-      <div id="admin-map-el"></div>
-    </div>
-  </div>
+      <div class="admin-summary" id="admin-summary"></div>
 
-  <details class="admin-panel" id="admin-route-panel">
-    <summary>Plan Today's Route <span class="admin-route-count" id="admin-route-count" style="display:none;"></span></summary>
-    <p class="admin-route-hint">Tick "Route" on rows in the table below to add them here — up to 9 stops per trip (Google Maps' limit).</p>
-    <div class="field" style="max-width: 420px;">
-      <label for="admin-route-origin">Starting Address <span class="optional">(optional — required to use sorting below)</span></label>
-      <input type="text" id="admin-route-origin" placeholder="Include a recognized town, e.g. 123 Main St, Lancaster" />
-    </div>
+      <div class="admin-panel-grid">
+        <div class="admin-panel">
+          <div class="admin-panel__header-row">
+            <h2>Interest by City</h2>
+            <div class="admin-toggle-group" id="admin-city-breakdown-toggle" role="group" aria-label="City breakdown source">
+              <button type="button" class="admin-toggle-btn is-active" data-breakdown-type="waitlist">Quote requests</button>
+              <button type="button" class="admin-toggle-btn" data-breakdown-type="address-check">Address checks</button>
+            </div>
+          </div>
+          <div class="admin-city-list" id="admin-city-list"></div>
+        </div>
 
-    <div class="admin-route-sort">
-      <span class="admin-route-sort__label">Sort stops by distance from start:</span>
-      <button type="button" class="btn btn-outline-brand" id="admin-route-sort-close" disabled>Closest → Furthest</button>
-      <button type="button" class="btn btn-outline-brand" id="admin-route-sort-far" disabled>Furthest → Closest</button>
-    </div>
-    <p class="admin-route-sort-note" id="admin-route-sort-note">Type a starting address with a recognized nearby town to enable sorting.</p>
+        <div class="admin-panel">
+          <div class="admin-panel__header-row">
+            <h2>Promo Codes Used</h2>
+          </div>
+          <p class="admin-panel-sub">Quote requests only. Click a code to filter the signups.</p>
+          <div class="admin-city-list" id="admin-promo-list"></div>
+        </div>
+      </div>
 
-    <ol class="admin-route-list" id="admin-route-list"></ol>
-    <p class="admin-route-empty" id="admin-route-empty">No stops selected yet.</p>
-    <div class="admin-route-actions">
-      <button type="button" class="btn btn-primary" id="admin-route-open">Open Route in Google Maps</button>
-      <button type="button" class="btn btn-outline-brand" id="admin-route-clear">Clear Route</button>
-    </div>
-  </details>
+      <div class="admin-panel">
+        <h2>Interest Map</h2>
+        <p class="admin-route-hint">Warmer = more quote requests. Click a town to filter the signups. Address checks aren't counted.</p>
+        <p class="admin-map-loading" id="admin-map-loading" style="display: none;">Loading real boundaries…</p>
+        <div class="admin-map-wrap">
+          <div id="admin-map-el"></div>
+        </div>
+      </div>
+    </section>
 
-  <p class="admin-map-filter-active" id="admin-map-filter-active" style="display: none;">
-    Filtered by map: <strong id="admin-map-filter-town"></strong>
-    <button type="button" id="admin-map-filter-clear-btn">Clear</button>
-  </p>
+    <!-- ===== Signups ===== -->
+    <section class="adm-view" id="view-signups" data-view="signups" role="tabpanel" hidden>
+      <div class="adm-head">
+        <h1>Signups</h1>
+        <p>Every quote request and address check. Tick &ldquo;Contacted&rdquo; once you've called them.</p>
+      </div>
 
-  <div class="admin-filters" id="admin-filters">
-    <input type="text" id="admin-filter-search" aria-label="Search signups" placeholder="Search name, email, phone, address, city, code…" class="admin-filter-search" />
-    <select id="admin-filter-type" aria-label="Filter by form type" class="admin-filter-select">
-      <option value="">All types</option>
-      <option value="waitlist">Waitlist</option>
-      <option value="address-check">Address check</option>
-    </select>
-    <select id="admin-filter-service" aria-label="Filter by service" class="admin-filter-select">
-      <option value="">All services</option>
-      <option value="bin-valet">Bin Valet</option>
-      <option value="bin-cleaning">Bin Cleaning</option>
-      <option value="snow-removal">Snow Removal</option>
-    </select>
-    <select id="admin-filter-package" aria-label="Filter by plan" class="admin-filter-select">
-      <option value="">All plans</option>
-      <option value="curb">Curb Service</option>
-      <option value="full">Full Service</option>
-      <option value="one-time">One-Time Service</option>
-      <option value="not-sure">Not sure yet</option>
-      <option value="__none__">Not specified</option>
-    </select>
-    <select id="admin-filter-city" aria-label="Filter by city" class="admin-filter-select">
-      <option value="">All cities</option>
-    </select>
-    <select id="admin-filter-discount" aria-label="Filter by discount" class="admin-filter-select">
-      <option value="">All discounts</option>
-      <option value="founder">Founder Discount</option>
-      <option value="friends-family">Friends &amp; Family</option>
-      <option value="free-service">Free Service</option>
-      <option value="__none__">No discount</option>
-    </select>
-    <select id="admin-filter-promo" aria-label="Filter by promo code" class="admin-filter-select">
-      <option value="">All promo codes</option>
-      <option value="__none__">No code</option>
-    </select>
-    <button type="button" class="btn btn-outline-brand admin-filter-clear" id="admin-filter-clear">Clear</button>
-  </div>
-  <p class="admin-filter-count" id="admin-filter-count"></p>
+      <details class="admin-panel" id="admin-route-panel">
+        <summary>Plan Today's Route <span class="admin-route-count" id="admin-route-count" style="display:none;"></span></summary>
+        <p class="admin-route-hint">Tick "Route" on rows in the table below to add them here — up to 9 stops per trip (Google Maps' limit).</p>
+        <div class="field" style="max-width: 420px;">
+          <label for="admin-route-origin">Starting Address <span class="optional">(optional — required to use sorting below)</span></label>
+          <input type="text" id="admin-route-origin" placeholder="Include a recognized town, e.g. 123 Main St, Lancaster" />
+        </div>
 
-  <div class="admin-table-wrap">
-    <div class="admin-loading" id="admin-table-loading">Loading…</div>
-    <table class="admin-table" id="admin-table" style="display:none;">
-      <thead>
-        <tr>
-          <th class="is-sortable" data-sort-key="submitted_at">Submitted</th>
-          <th class="is-sortable" data-sort-key="last_name">Name</th>
-          <th>Contact</th>
-          <th class="is-sortable" data-sort-key="city">Address</th>
-          <th class="is-sortable" data-sort-key="services_interested">Interested in</th>
-          <th class="is-sortable" data-sort-key="promo_code">Promo</th>
-          <th class="is-sortable" data-sort-key="discount_type">Discount</th>
-          <th class="is-sortable col-center" data-sort-key="contacted">Contacted</th>
-          <th class="col-center">Route</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody id="admin-table-body"></tbody>
-    </table>
-  </div>
+        <div class="admin-route-sort">
+          <span class="admin-route-sort__label">Sort stops by distance from start:</span>
+          <button type="button" class="btn btn-outline-brand" id="admin-route-sort-close" disabled>Closest → Furthest</button>
+          <button type="button" class="btn btn-outline-brand" id="admin-route-sort-far" disabled>Furthest → Closest</button>
+        </div>
+        <p class="admin-route-sort-note" id="admin-route-sort-note">Type a starting address with a recognized nearby town to enable sorting.</p>
+
+        <ol class="admin-route-list" id="admin-route-list"></ol>
+        <p class="admin-route-empty" id="admin-route-empty">No stops selected yet.</p>
+        <div class="admin-route-actions">
+          <button type="button" class="btn btn-primary" id="admin-route-open">Open Route in Google Maps</button>
+          <button type="button" class="btn btn-outline-brand" id="admin-route-clear">Clear Route</button>
+        </div>
+      </details>
+
+      <p class="admin-map-filter-active" id="admin-map-filter-active" style="display: none;">
+        Filtered by map: <strong id="admin-map-filter-town"></strong>
+        <button type="button" id="admin-map-filter-clear-btn">Clear</button>
+      </p>
+
+      <div class="admin-filters" id="admin-filters">
+        <input type="text" id="admin-filter-search" aria-label="Search signups" placeholder="Search name, email, phone, address, city, code…" class="admin-filter-search" />
+        <select id="admin-filter-type" aria-label="Filter by form type" class="admin-filter-select">
+          <option value="">All types</option>
+          <option value="waitlist">Quote requests</option>
+          <option value="address-check">Address checks</option>
+        </select>
+        <select id="admin-filter-service" aria-label="Filter by service" class="admin-filter-select">
+          <option value="">All services</option>
+          <option value="bin-valet">Bin Valet</option>
+          <option value="bin-cleaning">Bin Cleaning</option>
+          <option value="snow-removal">Snow Removal</option>
+        </select>
+        <select id="admin-filter-package" aria-label="Filter by plan" class="admin-filter-select">
+          <option value="">All plans</option>
+          <option value="curb">Curb Service</option>
+          <option value="full">Full Service</option>
+          <option value="one-time">One-Time Service</option>
+          <option value="not-sure">Not sure yet</option>
+          <option value="__none__">Not specified</option>
+        </select>
+        <select id="admin-filter-city" aria-label="Filter by city" class="admin-filter-select">
+          <option value="">All cities</option>
+        </select>
+        <select id="admin-filter-discount" aria-label="Filter by discount" class="admin-filter-select">
+          <option value="">All discounts</option>
+          <option value="founder">Founder Discount</option>
+          <option value="friends-family">Friends &amp; Family</option>
+          <option value="free-service">Free Service</option>
+          <option value="__none__">No discount</option>
+        </select>
+        <select id="admin-filter-promo" aria-label="Filter by promo code" class="admin-filter-select">
+          <option value="">All promo codes</option>
+          <option value="__none__">No code</option>
+        </select>
+        <button type="button" class="btn btn-outline-brand admin-filter-clear" id="admin-filter-clear">Clear</button>
+      </div>
+      <p class="admin-filter-count" id="admin-filter-count"></p>
+
+      <div class="admin-table-wrap">
+        <div class="admin-loading" id="admin-table-loading">Loading…</div>
+        <table class="admin-table" id="admin-table" style="display:none;">
+          <thead>
+            <tr>
+              <th class="is-sortable" data-sort-key="submitted_at">Submitted</th>
+              <th class="is-sortable" data-sort-key="last_name">Name</th>
+              <th>Contact</th>
+              <th class="is-sortable" data-sort-key="city">Address</th>
+              <th class="is-sortable" data-sort-key="services_interested">Interested in</th>
+              <th class="is-sortable" data-sort-key="promo_code">Promo</th>
+              <th class="is-sortable" data-sort-key="discount_type">Discount</th>
+              <th class="is-sortable col-center" data-sort-key="contacted">Contacted</th>
+              <th class="col-center">Route</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="admin-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== Promo codes ===== -->
+    <section class="adm-view" id="view-promos" data-view="promos" role="tabpanel" hidden>
+      <div class="adm-head">
+        <h1>Promo Codes</h1>
+        <p>Add, change, pause or remove discount codes. Changes show on the website right away.</p>
+      </div>
+
+      <div class="pc-error" id="pc-error" role="alert"></div>
+      <div class="pc-ok" id="pc-ok" role="status"></div>
+
+      <div class="adm-card">
+        <h2>Add a code</h2>
+        <p class="adm-sub">Customers type the code into the price boxes or the quote form and see the new price right away.</p>
+        <form id="pc-add-form" novalidate>
+          <div class="pc-grid">
+            <div class="field">
+              <label for="pc-new-code">Code</label>
+              <input id="pc-new-code" type="text" maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="e.g. SPRING20" style="text-transform: uppercase;" />
+            </div>
+            <div class="field">
+              <label for="pc-new-label">Name <span class="optional">(for you, optional)</span></label>
+              <input id="pc-new-label" type="text" maxlength="60" autocomplete="off" placeholder="e.g. Spring sale" />
+            </div>
+            <div class="field">
+              <label for="pc-new-amount">Discount</label>
+              <div class="pc-amount">
+                <select id="pc-new-kind" aria-label="Type of discount">
+                  <option value="percent">% off</option>
+                  <option value="dollars">$ off</option>
+                </select>
+                <input id="pc-new-amount" type="number" inputmode="decimal" min="0" step="any" placeholder="e.g. 20" />
+              </div>
+            </div>
+          </div>
+          <div class="pc-services" id="pc-new-services" role="group" aria-label="Which services this code works for">
+            <label><input type="checkbox" value="bin-valet" /> Bin Valet</label>
+            <label><input type="checkbox" value="bin-cleaning" /> Bin Cleaning</label>
+            <label><input type="checkbox" value="snow-removal" /> Snow Removal</label>
+          </div>
+          <p class="pc-hint">Leave all services unticked and the code works for any service. The discount comes off the first bill only (the first month of a monthly plan, a one-time service, or the first snow visit).</p>
+          <button type="submit" class="btn btn-primary" style="margin-top: var(--space-4);">Add Code</button>
+        </form>
+      </div>
+
+      <div class="adm-card">
+        <h2>Your codes</h2>
+        <p class="adm-sub">Change the amount, then press Save. Untick &ldquo;Active&rdquo; to pause a code without deleting it.</p>
+        <div class="pc-list" id="pc-list"><div class="pc-empty">Loading&hellip;</div></div>
+      </div>
+    </section>
+
+  </main>
 </div>
 
 <script>
@@ -724,7 +656,7 @@
     if (entries.length === 0) {
       el.innerHTML =
         '<span class="admin-city-list__empty">No ' +
-        (cityBreakdownType === "waitlist" ? "signups" : "address checks") +
+        (cityBreakdownType === "waitlist" ? "quote requests" : "address checks") +
         " yet.</span>";
       return;
     }
@@ -762,12 +694,12 @@
     var countEl = document.getElementById("admin-filter-count");
 
     countEl.textContent =
-      allSignups.length === 0 ? "" : "Showing " + rows.length + " of " + allSignups.length + " signups";
+      allSignups.length === 0 ? "" : "Showing " + rows.length + " of " + allSignups.length + " entries";
 
     if (rows.length === 0) {
       tableEl.style.display = "none";
       loadingEl.style.display = "block";
-      loadingEl.textContent = allSignups.length === 0 ? "No signups yet." : "No signups match those filters.";
+      loadingEl.textContent = allSignups.length === 0 ? "Nothing here yet." : "Nothing matches those filters.";
       return;
     }
 
@@ -787,7 +719,7 @@
         return (
           '<tr data-row-id="' + row.id + '"' + (row.contacted ? ' class="is-contacted"' : "") + ">" +
           '<td class="nowrap">' + formatDate(row.submitted_at) +
-            '<span class="sub"><span class="admin-badge' + (isCheck ? " is-check" : "") + '">' + (isCheck ? "Address check" : "Waitlist") + "</span></span>" +
+            '<span class="sub"><span class="admin-badge' + (isCheck ? " is-check" : "") + '">' + (isCheck ? "Address check" : "Quote request") + "</span></span>" +
             (row.attribution ? '<span class="sub" title="Where this person came from (ad / campaign link)">via ' + escapeHtml(row.attribution.replace(/&/g, " · ")) + "</span>" : "") + "</td>" +
           "<td>" + escapeHtml(name) +
             (row.consent ? "" : '<span class="sub admin-consent-no">No consent</span>') + "</td>" +
@@ -919,8 +851,9 @@
     var pill = e.target.closest("[data-promo]");
     if (!pill) return;
     document.getElementById("admin-filter-promo").value = pill.getAttribute("data-promo");
+    showTab("signups");
     applyFilters();
-    document.getElementById("admin-filters").scrollIntoView({ behavior: "smooth", block: "center" });
+    window.scrollTo({ top: 0 });
   });
 
   function clearAllFilters() {
@@ -1084,7 +1017,8 @@
     }
     applyFilters();
     if (town) {
-      document.getElementById("admin-filters").scrollIntoView({ behavior: "smooth", block: "center" });
+      showTab("signups");
+      window.scrollTo({ top: 0 });
     }
   }
 
@@ -1455,6 +1389,7 @@
         if (row) row.contacted = contacted;
         applyFilters();
         renderCityBreakdown();
+        renderCallbacks();
       } catch (err) {
         console.error("[streetside] Failed to update contacted status:", err);
         checkbox.checked = !contacted;
@@ -1512,6 +1447,7 @@
         applyFilters();
         renderCityBreakdown();
         renderAdminMap();
+        renderCallbacks();
       } catch (err) {
         console.error("[streetside] Failed to delete row:", err);
         alert("Couldn't delete that — check your connection and try again.");
@@ -1520,6 +1456,303 @@
       }
     });
   }
+
+  // --- Tabs ---------------------------------------------------------
+  var TABS = ["overview", "signups", "promos"];
+  var tabsReady = false;
+  var promosLoaded = false;
+
+  function showTab(name) {
+    if (TABS.indexOf(name) === -1) name = "overview";
+    document.querySelectorAll(".adm-view").forEach(function (v) {
+      v.hidden = v.getAttribute("data-view") !== name;
+    });
+    document.querySelectorAll(".adm-tab").forEach(function (t) {
+      var on = t.getAttribute("data-tab") === name;
+      t.classList.toggle("is-active", on);
+      t.setAttribute("aria-selected", on ? "true" : "false");
+    });
+    exportBtn.style.display = name === "signups" || name === "overview" ? "" : "none";
+    if (history.replaceState) history.replaceState(null, "", "#" + name);
+    if (name === "overview" && leafletMap) setTimeout(function () { leafletMap.invalidateSize(); }, 50);
+    if (name === "promos") loadPromos(!promosLoaded);
+  }
+
+  function initTabs() {
+    if (tabsReady) return;
+    tabsReady = true;
+    document.getElementById("adm-tabs").addEventListener("click", function (e) {
+      var t = e.target.closest("[data-tab]");
+      if (t) { showTab(t.getAttribute("data-tab")); window.scrollTo({ top: 0 }); }
+    });
+    document.addEventListener("click", function (e) {
+      var g = e.target.closest("[data-goto]");
+      if (g) { showTab(g.getAttribute("data-goto")); window.scrollTo({ top: 0 }); }
+    });
+    window.addEventListener("hashchange", function () {
+      showTab((location.hash || "").replace("#", ""));
+    });
+    showTab((location.hash || "").replace("#", ""));
+  }
+
+  // --- "Needs a call-back" list (Overview) --------------------------
+  function timeAgo(iso) {
+    var ms = Date.now() - new Date(iso).getTime();
+    if (!isFinite(ms) || ms < 0) return "";
+    var m = Math.round(ms / 60000);
+    if (m < 2) return "just now";
+    if (m < 60) return m + " min ago";
+    var h = Math.round(m / 60);
+    if (h < 24) return h + (h === 1 ? " hour ago" : " hours ago");
+    var d = Math.round(h / 24);
+    return d + (d === 1 ? " day ago" : " days ago");
+  }
+
+  function renderCallbacks() {
+    var listEl = document.getElementById("adm-callback-list");
+    var countEl = document.getElementById("adm-callback-count");
+    var tabCount = document.getElementById("adm-new-count");
+    if (!listEl) return;
+    var waiting = allSignups
+      .filter(function (r) { return r.form_type === "waitlist" && !r.contacted; })
+      .sort(function (a, b) { return new Date(b.submitted_at) - new Date(a.submitted_at); });
+    countEl.hidden = waiting.length === 0;
+    countEl.textContent = waiting.length;
+    tabCount.hidden = waiting.length === 0;
+    tabCount.textContent = waiting.length;
+
+    if (!waiting.length) {
+      listEl.innerHTML = '<div class="adm-empty">All caught up. No quote requests are waiting for a call.</div>';
+      return;
+    }
+    var MAX = 8;
+    listEl.innerHTML = waiting.slice(0, MAX).map(function (row) {
+      var name = [row.first_name, row.last_name].filter(Boolean).join(" ") || "No name";
+      var badges = serviceNames(row).map(function (n) { return '<span class="admin-badge">' + escapeHtml(n) + "</span>"; }).join("");
+      if (row.promo_code) badges += '<span class="admin-badge is-promo">' + escapeHtml(row.promo_code) + "</span>";
+      var details = [];
+      if (serviceIds(row).indexOf("bin-valet") !== -1) {
+        details.push(row.valet_estimate
+          ? "<span>Bin Valet:</span> " + escapeHtml(row.valet_estimate)
+          : "<span>Bin Valet plan:</span> " + escapeHtml(packageLabel(row.interested_package)));
+      }
+      if (row.snow_property_size) details.push("<span>Snow:</span> " + escapeHtml(row.snow_property_size));
+      var addr = [row.street_address, titleCaseCity(row.city), row.zip].filter(Boolean).join(", ");
+      var acts = "";
+      if (row.phone) {
+        acts += '<a class="btn btn-primary" href="tel:' + escapeHtml(row.phone) + '">Call ' + escapeHtml(formatPhoneDisplay(row.phone)) + "</a>";
+        acts += '<a class="btn btn-outline-brand" href="sms:' + escapeHtml(row.phone) + '">Text</a>';
+      }
+      if (row.email) acts += '<a class="btn btn-outline-brand" href="mailto:' + escapeHtml(row.email) + '">Email</a>';
+      acts += '<button type="button" class="btn btn-outline-brand" data-cb-done="' + row.id + '">Mark contacted</button>';
+      return '<div class="adm-cb">' +
+        "<div>" +
+          '<div><span class="adm-cb__name">' + escapeHtml(name) + '</span><span class="adm-cb__when">' + escapeHtml(timeAgo(row.submitted_at)) + "</span></div>" +
+          '<div class="adm-cb__badges">' + badges + "</div>" +
+          details.map(function (d) { return '<div class="adm-cb__line">' + d + "</div>"; }).join("") +
+          (addr ? '<div class="adm-cb__line"><span>Address:</span> ' + escapeHtml(addr) + "</div>" : "") +
+          (!row.phone && row.email ? '<div class="adm-cb__line"><span>Email only</span></div>' : "") +
+        "</div>" +
+        '<div class="adm-cb__actions">' + acts + "</div>" +
+      "</div>";
+    }).join("") + (waiting.length > MAX
+      ? '<div class="adm-empty"><button type="button" class="adm-link" data-goto="signups">+ ' + (waiting.length - MAX) + " more in Signups</button></div>"
+      : "");
+  }
+
+  document.getElementById("adm-callback-list").addEventListener("click", async function (e) {
+    var btn = e.target.closest("[data-cb-done]");
+    if (!btn) return;
+    var id = parseInt(btn.getAttribute("data-cb-done"), 10);
+    btn.disabled = true;
+    btn.textContent = "Saving…";
+    try {
+      var res = await fetch("/api/admin-update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify({ id: id, contacted: true }),
+      });
+      if (!res.ok) throw new Error("Update failed");
+      var row = allSignups.find(function (r) { return r.id === id; });
+      if (row) row.contacted = true;
+      renderCallbacks();
+      applyFilters();
+    } catch (err) {
+      console.error("[streetside] Failed to mark contacted:", err);
+      btn.disabled = false;
+      btn.textContent = "Mark contacted";
+      alert("Couldn't save that — check your connection and try again.");
+    }
+  });
+
+  // --- Promo codes tab ----------------------------------------------
+  var PC_SERVICES = [["bin-valet", "Bin Valet"], ["bin-cleaning", "Bin Cleaning"], ["snow-removal", "Snow Removal"]];
+  var pcCodes = [];
+  var pcList = document.getElementById("pc-list");
+  var pcError = document.getElementById("pc-error");
+  var pcOk = document.getElementById("pc-ok");
+
+  function pcMoney(n) {
+    var f = Number(n).toFixed(2);
+    return "$" + (f.slice(-3) === ".00" ? f.slice(0, -3) : f);
+  }
+  function pcSummary(c) {
+    var amt = Number(c.amount) || 0;
+    var what = c.kind === "dollars" ? pcMoney(amt) + " off" : amt + "% off";
+    var where = c.appliesTo && c.appliesTo.length
+      ? c.appliesTo.map(function (id) { return SERVICE_LABELS[id] || id; }).join(" / ")
+      : "any service";
+    return what + " the first bill · " + where;
+  }
+  function pcShowError(msg) {
+    pcOk.style.display = "none";
+    pcError.textContent = msg;
+    pcError.style.display = msg ? "block" : "none";
+    if (msg) window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  function pcShowOk(msg) {
+    pcError.style.display = "none";
+    pcOk.textContent = msg;
+    pcOk.style.display = "block";
+    clearTimeout(pcShowOk._t);
+    pcShowOk._t = setTimeout(function () { pcOk.style.display = "none"; }, 4000);
+  }
+  function pcUsedCount(code) {
+    return allSignups.filter(function (r) { return r.form_type === "waitlist" && r.promo_code === code; }).length;
+  }
+
+  function renderPromos() {
+    if (!pcCodes.length) {
+      pcList.innerHTML = '<div class="pc-empty">No codes yet. Add your first one above.</div>';
+      return;
+    }
+    pcList.innerHTML = pcCodes.map(function (c) {
+      var svc = PC_SERVICES.map(function (sv) {
+        var on = c.appliesTo.indexOf(sv[0]) !== -1;
+        return '<label><input type="checkbox" data-svc value="' + sv[0] + '"' + (on ? " checked" : "") + " /> " + sv[1] + "</label>";
+      }).join("");
+      var used = pcUsedCount(c.code);
+      return '<div class="pc-row' + (c.active ? "" : " is-paused") + '" data-code="' + escapeHtml(c.code) + '">' +
+        '<div class="pc-row__head">' +
+          "<div>" +
+            '<span class="pc-code">' + escapeHtml(c.code) + "</span>" +
+            '<span class="pc-badge' + (c.active ? "" : " is-off") + '">' + (c.active ? "Active" : "Paused") + "</span>" +
+            '<span class="pc-used">Used by ' + used + (used === 1 ? " person" : " people") + "</span>" +
+          "</div>" +
+          '<label class="pc-active"><input type="checkbox" data-active' + (c.active ? " checked" : "") + " /> Active</label>" +
+        "</div>" +
+        '<p class="pc-row__summary">' + escapeHtml(pcSummary(c)) + "</p>" +
+        '<div class="pc-grid">' +
+          '<div class="field"><label>Name</label><input type="text" data-label maxlength="60" value="' + escapeHtml(c.label) + '" /></div>' +
+          '<div class="field"><label>Discount</label><div class="pc-amount">' +
+            '<select data-kind aria-label="Type of discount"><option value="percent"' + (c.kind === "percent" ? " selected" : "") + '>% off</option><option value="dollars"' + (c.kind === "dollars" ? " selected" : "") + ">$ off</option></select>" +
+            '<input type="number" inputmode="decimal" min="0" step="any" data-amount value="' + escapeHtml(c.amount) + '" /></div></div>' +
+        "</div>" +
+        '<div class="pc-services" role="group" aria-label="Works for">' + svc + "</div>" +
+        '<div class="pc-row__actions">' +
+          '<button type="button" class="btn btn-primary" data-save>Save</button>' +
+          '<button type="button" class="btn btn-outline-brand pc-danger" data-delete>Remove</button>' +
+        "</div>" +
+      "</div>";
+    }).join("");
+  }
+
+  async function pcApi(method, body) {
+    var res = await fetch("/api/admin-promos", {
+      method: method,
+      headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    var data = await res.json().catch(function () { return {}; });
+    if (res.status === 401) {
+      dashboard.style.display = "none";
+      loginView.style.display = "block";
+      throw new Error("signed-out");
+    }
+    if (!res.ok) throw new Error(data.error || "Something went wrong.");
+    return data;
+  }
+
+  async function loadPromos(first) {
+    try {
+      var data = await pcApi("GET");
+      pcCodes = data.codes || [];
+      promosLoaded = true;
+      renderPromos();
+    } catch (err) {
+      if (err.message !== "signed-out") { pcShowError(err.message); pcList.innerHTML = ""; }
+    }
+  }
+
+  document.getElementById("pc-add-form").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    pcShowError("");
+    var code = document.getElementById("pc-new-code").value.toUpperCase().replace(/[^A-Z0-9_-]/g, "");
+    var svc = Array.prototype.map.call(document.querySelectorAll("#pc-new-services input:checked"), function (b) { return b.value; });
+    if (pcCodes.some(function (c) { return c.code === code; }) &&
+        !confirm("The code " + code + " already exists. Replace it with these settings?")) return;
+    try {
+      var data = await pcApi("POST", {
+        action: "save",
+        code: code,
+        label: document.getElementById("pc-new-label").value,
+        kind: document.getElementById("pc-new-kind").value,
+        amount: document.getElementById("pc-new-amount").value,
+        appliesTo: svc,
+        active: true,
+      });
+      pcCodes = data.codes; renderPromos();
+      e.target.reset();
+      pcShowOk("Added " + code + ".");
+    } catch (err) { if (err.message !== "signed-out") pcShowError(err.message); }
+  });
+  document.getElementById("pc-new-code").addEventListener("input", function (e) {
+    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9_-]/g, "");
+  });
+
+  function pcRowData(row) {
+    return {
+      action: "save",
+      code: row.getAttribute("data-code"),
+      label: row.querySelector("[data-label]").value,
+      kind: row.querySelector("[data-kind]").value,
+      amount: row.querySelector("[data-amount]").value,
+      appliesTo: Array.prototype.map.call(row.querySelectorAll("[data-svc]:checked"), function (b) { return b.value; }),
+      active: row.querySelector("[data-active]").checked,
+    };
+  }
+  async function pcSaveRow(row, okMsg) {
+    pcShowError("");
+    try {
+      var data = await pcApi("POST", pcRowData(row));
+      pcCodes = data.codes; renderPromos();
+      pcShowOk(okMsg);
+    } catch (err) { if (err.message !== "signed-out") pcShowError(err.message); }
+  }
+  pcList.addEventListener("click", async function (e) {
+    var row = e.target.closest(".pc-row");
+    if (!row) return;
+    var code = row.getAttribute("data-code");
+    if (e.target.closest("[data-save]")) {
+      pcSaveRow(row, "Saved " + code + ".");
+    } else if (e.target.closest("[data-delete]")) {
+      if (!confirm("Remove " + code + "? Customers won't be able to use it any more.")) return;
+      pcShowError("");
+      try {
+        var data = await pcApi("POST", { action: "delete", code: code });
+        pcCodes = data.codes; renderPromos();
+        pcShowOk("Removed " + code + ".");
+      } catch (err) { if (err.message !== "signed-out") pcShowError(err.message); }
+    }
+  });
+  pcList.addEventListener("change", function (e) {
+    if (e.target && e.target.hasAttribute("data-active")) {
+      var row = e.target.closest(".pc-row");
+      pcSaveRow(row, (e.target.checked ? "Turned on " : "Paused ") + row.getAttribute("data-code") + ".");
+    }
+  });
 
   // --- Loading the dashboard -----------------------------------------
   async function fetchAndRender() {
@@ -1535,8 +1768,8 @@
     var summaryEl = document.getElementById("admin-summary");
     var s = data.summary;
     var cards = [
-      { label: "Total signups", value: s.total },
-      { label: "Waitlist", value: s.waitlist },
+      { label: "Total entries", value: s.total },
+      { label: "Quote requests", value: s.waitlist },
       { label: "Address checks", value: s.addressCheck },
     ];
     Object.keys(s.byService || {}).forEach(function (id) {
@@ -1558,6 +1791,7 @@
     renderPromoBreakdown();
     applyFilters();
     renderAdminMap();
+    renderCallbacks();
     return true;
   }
 
@@ -1567,6 +1801,7 @@
     try {
       var ok = await fetchAndRender();
       if (ok) {
+        initTabs();
         initFilters();
         initRowActions();
         initSorting();
@@ -1617,6 +1852,7 @@
     refreshBtn.textContent = "Refreshing…";
     try {
       await fetchAndRender();
+      if (promosLoaded) await loadPromos();
     } catch (err) {
       console.error("[streetside] Refresh failed:", err);
     } finally {
