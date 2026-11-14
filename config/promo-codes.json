@@ -1,8 +1,8 @@
 {
-  "_readme": "Your promo codes. Add one per line in the list below. Codes are always capital letters and numbers (the website and server convert whatever people type to capitals, so 'snow5' works as SNOW5). A code listed here shows a green 'accepted' message on the signup form and is marked as valid in your owner alert email. Any other code someone types is still saved (it might be a friend's referral code) but is marked as not listed. Optional: appliesTo = the service(s) the code is meant for ('bin-valet', 'bin-cleaning', 'snow-removal').",
+  "_readme": "STARTER promo codes. The live list is managed on the admin page (admin-promos.html) once you open it; this file is only the starting set and the backup the site uses if the database can't be reached. kind: 'percent' = percent off the first bill (first month of a monthly plan, one-time service, or first snow visit); 'dollars' = dollars off the first bill. appliesTo: 'bin-valet', 'bin-cleaning', 'snow-removal' (leave empty for any).",
   "codes": [
-    { "code": "SMOKEOUT60" },
-    { "code": "F50" },
-    { "code": "SNOW5", "appliesTo": ["snow-removal"] }
+    { "code": "SMOKEOUT60", "label": "SmokeOut 60", "kind": "percent", "amount": 60, "appliesTo": ["bin-valet"] },
+    { "code": "F50", "label": "Founding 250", "kind": "percent", "amount": 50, "appliesTo": ["bin-valet"] },
+    { "code": "SNOW5", "label": "Snow $5 off", "kind": "dollars", "amount": 5, "appliesTo": ["snow-removal"] }
   ]
 }

@@ -269,16 +269,25 @@ its description and the "Coming Soon" wording on the form checkboxes in
 
 ## Promo codes
 
-Your valid promo codes live in `config/promo-codes.json` (currently
-SMOKEOUT60, F50 and SNOW5). To add or remove one, edit that file — one line
-per code, capital letters and numbers only. Whatever a customer types (or
-whatever is in a `?promo=` / `?ref=` link) is converted to capitals, so
-`snow5` works as SNOW5. A listed code shows a green "accepted" message on the
-signup form and is marked "(valid code)" in your owner alert email; any other
-code is still saved (it might be a friend's referral) but is marked "not a
-listed promo code". The code is saved with the signup and shown in the admin
-page. What each code is *worth* (the discount itself) is still applied by you
-when service starts — this system recognizes and records the codes.
+Manage your promo codes on the **Promo Codes** admin page (`admin-promos.html`,
+or the "Promo Codes" button on the signups page; same password). You can add a
+code, change its discount (percent off or dollars off), pick which services it
+works for (or leave it open to all), pause it, or remove it. Changes show on the
+website right away.
+
+A discount comes off the **first bill** only: the first month of a monthly Bin
+Valet plan, a one-time service, or the first Snow Removal visit. Customers type
+a code into the Bin Valet or Snow Removal price box (or the quote form) and see
+the discounted price. Codes are converted to capitals, so `snow5` works as SNOW5,
+and a `?promo=` / `?ref=` link fills the code in. A listed code shows a green
+"accepted" message; any other code is still saved (it might be a friend's
+referral) and marked "not a listed promo code" in your alert email. The estimate
+is a preview: you still confirm the final price with the customer.
+
+Codes are stored in the database (`promo_codes` table). The admin page creates
+the table and adds the starter codes (SMOKEOUT60 60% off, F50 50% off, SNOW5 $5
+off) the first time you open it. `config/promo-codes.json` holds that starter
+list and is the backup the site uses if the database can't be reached.
 
 ## Seasonal themes
 

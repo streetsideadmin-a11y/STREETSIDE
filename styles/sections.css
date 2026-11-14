@@ -1113,7 +1113,7 @@
 @media (max-width: 760px) {
   .snow-section { padding: var(--space-8) 0; }
   .snow-pricing__calc { padding: var(--space-5); }
-  .snow-pricing__inner { grid-template-columns: 1fr; gap: var(--space-6); }
+  .snow-pricing__inner { grid-template-columns: minmax(0, 1fr); gap: var(--space-6); }
 }
 
 /* ---- SNOW: SQUARE-FOOT INPUT AND MEASURING HELPER ---- */
@@ -1237,3 +1237,108 @@
   justify-content: center;
 }
 .snow-steps strong { color: #fff; }
+
+/* ---- HERO: one button, phone number beside it ---- */
+.hero__cta { flex-wrap: wrap; gap: var(--space-4); }
+.hero__call { margin: 0; color: #fff; font-weight: 600; font-size: 1.05rem; }
+.hero__call a { color: #fff; font-weight: 800; text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 720px) {
+  .hero__cta { flex-direction: column; align-items: stretch; text-align: center; }
+}
+
+/* ---- How It Works: three steps for all services ---- */
+@media (min-width: 900px) {
+  .steps-grid.steps-grid--3 { grid-template-columns: repeat(3, 1fr); }
+}
+.step-card p a { color: var(--color-brand-strong); font-weight: 700; white-space: nowrap; }
+
+/* ---- Call-us lines under quote buttons / form header ---- */
+.waitlist-panel__call { margin-top: var(--space-3); font-size: 1.1rem; font-weight: 600; }
+.waitlist-panel__call a { color: var(--color-brand-strong); font-weight: 800; white-space: nowrap; }
+.snow-pricing__call { margin-top: var(--space-3); text-align: center; font-weight: 600; }
+.snow-pricing__call a { color: var(--color-brand-strong); font-weight: 800; white-space: nowrap; }
+
+/* ---- Bin Valet price estimator (same look as the Snow Removal one) ---- */
+.bin-pricing {
+  display: block;
+  background: var(--color-brand-strong);
+  color: #fff;
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--space-7);
+  margin-top: var(--space-6);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+}
+.bin-pricing .snow-pricing__includes-label { color: #fff; }
+.bin-plans { border: 0; padding: 0; margin: 0 0 var(--space-4); }
+.bin-plans legend { font-weight: 700; margin-bottom: 8px; padding: 0; }
+.bin-plan {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-2) !important;
+  padding: var(--space-3) var(--space-4);
+  border: 2px solid var(--color-border, #d9d4c7);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 400 !important;
+  background: #fff;
+}
+.bin-plan input { width: 22px; height: 22px; flex: none; accent-color: var(--color-brand-strong); }
+.bin-plan__body { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.bin-plan__body strong { font-size: 1.05rem; }
+.bin-plan__body small { color: var(--color-ink-muted); font-size: 0.9rem; }
+.bin-plan__price { font-weight: 800; font-size: 1.25rem; white-space: nowrap; }
+.bin-plan__price small { font-size: 0.8rem; font-weight: 600; color: var(--color-ink-muted); }
+.bin-plan__tag {
+  position: absolute; top: -10px; right: 12px;
+  background: var(--color-accent, #cc1f2b); color: #fff;
+  font-size: 0.7rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 999px;
+}
+.bin-plan:has(input:checked) { border-color: var(--color-brand-strong); background: var(--color-bg-alt); box-shadow: 0 0 0 1px var(--color-brand-strong); }
+.bin-plan:has(input:focus-visible) { outline: 3px solid var(--color-accent, #cc1f2b); outline-offset: 2px; }
+.bin-stepper { display: flex; align-items: stretch; gap: var(--space-2); max-width: 240px; }
+.bin-stepper input {
+  width: 80px; text-align: center; font-size: 1.4rem; font-weight: 800;
+  border: 2px solid var(--color-border, #d9d4c7); border-radius: var(--radius-md); padding: 8px; min-width: 0;
+}
+.bin-stepper__btn {
+  width: 56px; font-size: 1.8rem; font-weight: 800; line-height: 1;
+  border: 2px solid var(--color-brand-strong); background: #fff; color: var(--color-brand-strong);
+  border-radius: var(--radius-md); cursor: pointer;
+}
+.bin-stepper__btn:hover { background: var(--color-bg-alt); }
+@media (max-width: 720px) { .bin-pricing { padding: var(--space-5) var(--space-4); } }
+.snow-pricing__copy, .snow-pricing__calc { min-width: 0; }
+@media (max-width: 400px) {
+  .bin-pricing { padding: var(--space-4) var(--space-3); }
+  .bin-pricing .snow-pricing__calc { padding: var(--space-4) var(--space-3); }
+  .bin-plan { padding: var(--space-3); gap: var(--space-2); }
+}
+
+/* ---- Promo code box inside the price estimators ---- */
+.est-promo {
+  display: block;
+  width: 100%;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border: 2px solid var(--color-border, #d9d4c7);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  margin-top: 2px;
+  background: #fff;
+}
+.est-promo::placeholder { text-transform: none; letter-spacing: 0; font-weight: 400; }
+.snow-pricing__calc .promo-status { margin-top: 6px; margin-bottom: 0; }
+.snow-pricing__calc .est-promo + .promo-status { margin-bottom: var(--space-2); }
+.snow-pricing__calc label + .est-promo { margin-bottom: 0; }
+.snow-pricing__calc .est-promo { margin-top: 4px; }
+.snow-pricing__calc [data-est-promo-note] + .snow-pricing__result { margin-top: var(--space-3); }
+.snow-pricing__calc label[for="bin-promo"],
+.snow-pricing__calc label[for="snow-promo"] { margin-top: var(--space-4); }
+.snow-pricing__calc label[for$="-promo"] .optional { font-weight: 400; color: var(--color-ink-muted); }
+.bin-hint { margin: var(--space-2) 0 0; font-size: 0.95rem; color: var(--color-ink); }
+.bin-hint strong { color: var(--color-brand-strong); }

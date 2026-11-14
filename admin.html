@@ -393,6 +393,7 @@
     <div class="admin-header">
       <h1>Signups</h1>
       <div class="admin-header__actions">
+        <a href="admin-promos.html" class="btn btn-outline-brand">Promo Codes</a>
         <button type="button" class="btn btn-outline-brand" id="admin-refresh-btn">Refresh</button>
         <button type="button" class="btn btn-outline-brand" id="admin-export-btn">Export CSV</button>
         <button type="button" class="btn btn-outline-brand" id="admin-logout-btn">Log Out</button>
@@ -794,6 +795,7 @@
           "<td>" + escapeHtml(row.street_address || "—") + '<span class="sub">' + escapeHtml(cityZip || "—") + "</span></td>" +
           '<td class="nowrap">' + (serviceNames(row).length ? serviceNames(row).map(function (n) { return '<span class="admin-badge">' + escapeHtml(n) + "</span>"; }).join(" ") : "—") +
             (serviceIds(row).indexOf("bin-valet") !== -1 ? '<span class="sub">Plan: ' + escapeHtml(packageLabel(row.interested_package)) + "</span>" : "") +
+            (row.valet_estimate ? '<span class="sub">Estimate: ' + escapeHtml(row.valet_estimate) + "</span>" : "") +
             (row.snow_property_size ? '<span class="sub">Snow: ' + escapeHtml(row.snow_property_size) + "</span>" : "") + "</td>" +
           '<td class="nowrap">' + (row.promo_code ? '<span class="admin-badge is-promo">' + escapeHtml(row.promo_code) + "</span>" : "—") + "</td>" +
           "<td>" + discountSelectHtml(row) + "</td>" +
@@ -959,7 +961,7 @@
   function exportCsv() {
     var headers = [
       "Submitted", "Type", "First Name", "Last Name", "Email", "Phone",
-      "Street Address", "City", "ZIP", "Services Interested", "Bin Valet Plan", "Snow Area Size", "Promo Code", "Discount", "Consent", "Contacted", "Came From",
+      "Street Address", "City", "ZIP", "Services Interested", "Bin Valet Plan", "Bin Valet Estimate", "Snow Area Size", "Promo Code", "Discount", "Consent", "Contacted", "Came From",
     ];
     var lines = [headers.join(",")];
     currentFiltered.forEach(function (row) {
@@ -976,6 +978,7 @@
           row.zip || "",
           serviceNames(row).join(" + "),
           serviceIds(row).indexOf("bin-valet") !== -1 ? packageLabel(row.interested_package) : "",
+          row.valet_estimate || "",
           row.snow_property_size || "",
           row.promo_code || "",
           discountLabel(row.discount_type),

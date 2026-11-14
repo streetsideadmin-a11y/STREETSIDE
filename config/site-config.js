@@ -166,7 +166,7 @@ window.STREETSIDE_CONFIG = {
       name: "Bin Valet",
       status: "available",
       description: "We take your trash and recycling bins to the curb before collection and bring them back afterward — every week.",
-      cta: "Join the waitlist",
+      cta: "Get a quote",
     },
     {
       id: "bin-cleaning",
@@ -187,24 +187,12 @@ window.STREETSIDE_CONFIG = {
   ],
   faq: [
     {
-      q: "What services does Streetside offer?",
-      a: "Bin Valet (we take your trash and recycling bins to the curb and back) and Snow Removal (driveways, sidewalks, walkways, steps and patios cleared and salted) are open for signups. Bin Cleaning is coming soon — pick the services you're interested in when you join the waitlist and we'll reach out as each one becomes available in your area.",
-    },
-    {
-      q: "How much does Snow Removal cost? What about Bin Cleaning?",
-      a: "Snow Removal is priced per visit by the size of the area to be cleared: $0.05 per square foot, with a $40 minimum (covers up to 800 sq ft). Salting is included. Use the price estimator in the Our Services section to see your price. Bin Cleaning pricing hasn't been announced yet — tell us you're interested when you join the waitlist and we'll let you know as soon as it is.",
-    },
-    {
       q: "What exactly does Streetside do?",
       a: "Streetside moves your trash and recycling bins from their normal storage spot to the curb before your regular collection day, then returns them to storage once they've been emptied.",
     },
     {
       q: "Does Streetside collect my garbage?",
       a: "No. Streetside does not collect, haul, or dispose of garbage. Your existing waste company still collects and empties your bins — we simply handle getting them to and from the curb.",
-    },
-    {
-      q: "Does Streetside replace my current waste company?",
-      a: "No. You keep your existing trash and recycling provider. Streetside works alongside them, not instead of them.",
     },
     {
       q: "When do you take my bins out?",
@@ -217,30 +205,8 @@ window.STREETSIDE_CONFIG = {
       placeholder: "Exact same-day timing to be finalized before launch.",
     },
     {
-      q: "Can you handle recycling?",
-      a: "Yes — recycling bins work the same as trash bins. Your first bin (trash or recycling) is included in your plan's base price, and each additional bin is +$10/month (or +$10 for one-time service).",
-    },
-    {
       q: "Can I register multiple bins?",
       a: "Yes. Let us know how many trash and recycling bins you have when you sign up — your first bin is included in the base price, and each additional bin is $10/month, shown on the pricing plans above.",
-    },
-    {
-      q: "Where should I leave my bins?",
-      a: "You tell us where your bins are normally stored (for example, the side yard or garage) when you sign up, and we return them to that same spot.",
-    },
-    {
-      q: "What happens if trash collection is delayed?",
-      a: null,
-      placeholder: "Policy for delayed collection days (weather, provider delays, etc.) not yet finalized.",
-    },
-    {
-      q: "What happens during holiday collection schedules?",
-      a: null,
-      placeholder: "Holiday schedule policy not yet finalized.",
-    },
-    {
-      q: "What if my collection day changes?",
-      a: "Let us know and we'll update your account to match your new collection day.",
     },
     {
       q: "Can Streetside handle my bins while I'm away?",
@@ -248,16 +214,7 @@ window.STREETSIDE_CONFIG = {
     },
     {
       q: "Where is Streetside available?",
-      a: "Streetside is launching in Southeastern Ohio and is opening routes neighborhood by neighborhood based on signups.",
-    },
-    {
-      q: "What if my neighborhood isn't available?",
-      a: "Join the waitlist with your address. Routes open once enough neighbors in an area have signed up, so every signup helps bring Streetside closer.",
-    },
-    {
-      q: "How will I know my bins were serviced?",
-      a: null,
-      placeholder: "Service confirmation method (e.g. text/email notification) not yet finalized.",
+      a: "Streetside serves Southeastern Ohio and is opening routes neighborhood by neighborhood. Call us or request a quote and we'll tell you whether we're in your area yet.",
     },
     {
       q: "How does billing work?",

@@ -1,0 +1,13 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="td">
+<title id="td">Home with bin and snow icon</title>
+<rect width="200" height="200" rx="0" fill="#F1F0EA"/>
+<path d="M40 100 L90 58 L140 100" fill="none" stroke="#1B3A1D" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="52" y="100" width="76" height="60" fill="#FFFFFF" stroke="#1B3A1D" stroke-width="4"/>
+<rect x="78" y="124" width="24" height="36" fill="#1B3A1D"/>
+<rect x="138" y="122" width="28" height="38" rx="3" fill="#1B3A1D"/>
+<rect x="135" y="116" width="34" height="8" rx="2" fill="#1B3A1D"/>
+<circle cx="152" cy="141" r="8" fill="#CC1F2B"/>
+<path d="M148 141 L151 144 L156 138" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<g stroke="#1B3A1D" stroke-width="3" stroke-linecap="round" opacity=".55"><path d="M150 50v16M142 58h16M144 52l12 12M156 52l-12 12"/></g>
+<line x1="30" y1="160" x2="176" y2="160" stroke="#1B3A1D" stroke-width="4" stroke-linecap="round"/>
+</svg>

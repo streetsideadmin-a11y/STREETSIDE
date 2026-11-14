@@ -231,7 +231,7 @@
         caption.textContent =
           plotted > 0
             ? "Warmer colors show more neighbor interest so far."
-            : "Be the first neighbor to light up your town — join the waitlist above.";
+            : "Be the first neighbor to light up your town — get a quote above.";
       }
     } catch (err) {
       console.warn("[streetside] Could not load interest map data:", err);

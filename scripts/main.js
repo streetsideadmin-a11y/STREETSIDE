@@ -26,6 +26,204 @@
     return fixed.endsWith(".00") ? fixed.slice(0, -3) : fixed;
   }
 
+  // Promo-code box inside a price estimator. It mirrors the "Promo or Referral
+  // Code" box in the quote form (typing in one fills the other), and calls
+  // `onChange` whenever the code or the code list changes so the price updates.
+  function promoFieldHtml(id) {
+    return '<label for="' + id + '">Promo code <span class="optional">(optional)</span></label>' +
+      '<input id="' + id + '" class="est-promo" data-est-promo type="text" maxlength="40" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Have a code? Enter it here" />' +
+      '<p class="field-hint promo-status" data-est-promo-note hidden></p>';
+  }
+
+  function wirePromoField(mount, onChange) {
+    var box = mount.querySelector("[data-est-promo]");
+    var formBox = function () { return document.getElementById("wl-promo"); };
+    var P = window.STREETSIDE_PROMO;
+    function norm(v) { return P ? P.norm(v) : String(v || "").toUpperCase().replace(/[^A-Z0-9_-]/g, ""); }
+    if (!box) return { code: function () { return ""; }, note: function () {} };
+    if (formBox() && formBox().value) box.value = norm(formBox().value);
+
+    box.addEventListener("input", function () {
+      var clean = norm(box.value);
+      if (box.value !== clean) box.value = clean;
+      var f = formBox();
+      if (f && f.value !== clean) {
+        f.value = clean;
+        f.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+      onChange();
+    });
+    // The form's box (or a ?promo= link) fills this one too.
+    document.addEventListener("input", function (e) {
+      if (e.target && e.target.id === "wl-promo") {
+        var clean = norm(e.target.value);
+        if (box.value !== clean) box.value = clean;
+        onChange();
+      }
+    });
+    document.addEventListener("streetside:promos", onChange);
+
+    return {
+      code: function () { return norm(box.value); },
+      // Shows a short message under the box.
+      note: function (text, ok) {
+        var el = mount.querySelector("[data-est-promo-note]");
+        if (!el) return;
+        el.hidden = !text;
+        el.textContent = text || "";
+        el.className = "field-hint promo-status" + (text ? (ok ? " promo-status--ok" : " promo-status--unknown") : "");
+      },
+    };
+  }
+
+  // Works out the promo for one service and tells the box what to say.
+  // Returns { match, applies, price, saved } or null.
+  function promoFor(field, service, amount, serviceName) {
+    var P = window.STREETSIDE_PROMO;
+    var code = field.code();
+    var res = P && code ? P.apply(code, service, amount) : null;
+    if (!code || !P || P.codes === null) {
+      field.note("");
+    } else if (!res) {
+      field.note(code.length >= 2 ? "We don't recognize that code. Double-check the spelling, or call us and we'll help." : "");
+    } else if (!res.applies) {
+      field.note(code + " is for " + res.match.appliesTo.map(function (s) { return P.names[s] || s; }).join(" / ") + ", not " + serviceName + ".", false);
+    } else {
+      field.note("✓ " + code + " accepted: " + P.words(res.match) + " your first bill.", true);
+    }
+    return res && res.applies ? res : null;
+  }
+
+  // Bin Valet price estimator — pick a plan and a number of bins, see the
+  // price, then jump to the quote form with those choices filled in.
+  // All numbers come from config/site-config.js (pricingTiers / oneTimeService).
+  function renderBinEstimator(mount, tiers, oneTime, founding) {
+    var EXTRA = 10;
+    var plans = tiers.map(function (t) {
+      return { id: t.id, name: t.name, base: t.price, extra: EXTRA, monthly: true, blurb: t.id === "full" ? "To the curb and back" : "To the curb", featured: !!t.featured };
+    });
+    if (oneTime) {
+      plans.push({ id: "one-time", name: oneTime.name, base: oneTime.price, extra: oneTime.additionalBinPrice != null ? oneTime.additionalBinPrice : EXTRA, monthly: false, blurb: "Just once, no subscription", featured: false });
+    }
+    var current = plans.filter(function (p) { return p.featured; })[0] || plans[0];
+    var bins = 1;
+    var founderPct = founding && founding.enabled ? founding.discountPercent : 0;
+    var lowest = Math.min.apply(null, plans.filter(function (p) { return p.monthly; }).map(function (p) { return p.base; }));
+
+    var planHtml = plans.map(function (p) {
+      return '<label class="bin-plan' + (p.featured ? " is-popular" : "") + '">' +
+        '<input type="radio" name="bin-plan" value="' + p.id + '"' + (p === current ? " checked" : "") + " />" +
+        '<span class="bin-plan__body"><strong>' + p.name + "</strong><small>" + p.blurb + "</small></span>" +
+        '<span class="bin-plan__price">$' + formatPrice(p.base) + "<small>" + (p.monthly ? "/mo" : " once") + "</small></span>" +
+        (p.featured ? '<span class="bin-plan__tag">Most popular</span>' : "") +
+        "</label>";
+    }).join("");
+
+    mount.className = "snow-pricing bin-pricing reveal";
+    mount.innerHTML =
+      '<div class="snow-pricing__inner">' +
+        '<div class="snow-pricing__copy">' +
+          '<div class="snow-stat"><span class="snow-stat__big">$' + formatPrice(lowest) + '</span><span class="snow-stat__unit">per month to start</span></div>' +
+          "<p>One bin is included in every plan. Each extra bin (trash or recycling) is $" + EXTRA + ".</p>" +
+          '<p class="snow-pricing__includes-label">Every plan includes:</p>' +
+          '<ul class="snow-pricing__includes"><li>Weekly service</li><li>Trash and recycling bins</li><li>Works while you\'re away</li></ul>' +
+          '<ol class="snow-steps">' +
+            "<li><strong>Pick your plan.</strong> Choose a plan and your number of bins.</li>" +
+            "<li><strong>Get your quote.</strong> Send us your details below, or call (740) 640-6628.</li>" +
+            "<li><strong>We confirm.</strong> We go over the price and start date with you first.</li>" +
+          "</ol>" +
+        "</div>" +
+        '<div class="snow-pricing__calc">' +
+          '<fieldset class="bin-plans"><legend>Choose your plan</legend>' + planHtml + "</fieldset>" +
+          '<label for="bin-count">How many bins?</label>' +
+          '<div class="bin-stepper">' +
+            '<button type="button" class="bin-stepper__btn" data-bin-minus aria-label="One fewer bin">&minus;</button>' +
+            '<input id="bin-count" type="number" inputmode="numeric" min="1" max="10" step="1" value="1" />' +
+            '<button type="button" class="bin-stepper__btn" data-bin-plus aria-label="One more bin">+</button>' +
+          "</div>" +
+          '<p class="bin-hint" data-bin-hint></p>' +
+          promoFieldHtml("bin-promo") +
+          '<div class="snow-pricing__result" aria-live="polite">' +
+            '<span class="snow-pricing__result-label">Estimated price</span>' +
+            '<span class="snow-pricing__result-price" data-bin-price></span>' +
+            '<span class="snow-pricing__result-note" data-bin-note></span>' +
+          "</div>" +
+          '<p class="snow-pricing__fine">This is an estimate. We\'ll confirm the plan, price, and start date with you before service begins.</p>' +
+          '<a class="btn btn-primary btn-block" href="#waitlist" data-pick-service="bin-valet" data-bin-cta>Get a Quote</a>' +
+          '<p class="snow-pricing__call">or call <a href="tel:+17406406628">(740) 640-6628</a></p>' +
+        "</div>" +
+      "</div>";
+
+    var countEl = mount.querySelector("#bin-count");
+    var priceEl = mount.querySelector("[data-bin-price]");
+    var noteEl = mount.querySelector("[data-bin-note]");
+    var cta = mount.querySelector("[data-bin-cta]");
+    var hintEl = mount.querySelector("[data-bin-hint]");
+
+    var promoField = wirePromoField(mount, function () { update(); });
+
+    function update() {
+      var n = Math.max(1, Math.min(10, parseInt(countEl.value, 10) || 1));
+      bins = n;
+      var total = current.base + (n - 1) * current.extra;
+      var binWord = n + (n === 1 ? " bin" : " bins");
+      var promo = promoFor(promoField, "bin-valet", total, "Bin Valet");
+      var extraN = n - 1;
+      var extraTxt = extraN + " extra bin" + (extraN === 1 ? "" : "s");
+      hintEl.innerHTML = "Your first bin is included. <strong>Each extra bin adds $" + formatPrice(current.extra) + (current.monthly ? " per month" : "") + ".</strong>";
+      // e.g. "$25 plan + 2 extra bins x $10 = $45"
+      var parts = extraN > 0
+        ? "$" + formatPrice(current.base) + " plan + " + extraTxt + " \u00d7 $" + formatPrice(current.extra) + " = $" + formatPrice(total) + (current.monthly ? " / month" : "") + "."
+        : binWord + " included.";
+      var estimate;
+      if (current.monthly) {
+        if (promo) {
+          priceEl.textContent = "$" + formatPrice(promo.price) + " first month";
+          noteEl.textContent = parts + " " + promoField.code() + " takes " + window.STREETSIDE_PROMO.words(promo.match) + " the first month, then $" + formatPrice(total) + " / month.";
+        } else {
+          priceEl.textContent = "$" + formatPrice(total) + " / month";
+          noteEl.textContent = parts;
+        }
+        estimate = current.name + " \u00b7 " + binWord + " \u00b7 about $" + formatPrice(total) + "/month" +
+          (promo ? " \u00b7 with " + promoField.code() + " about $" + formatPrice(promo.price) + " first month" : "");
+      } else {
+        if (promo) {
+          priceEl.textContent = "$" + formatPrice(promo.price) + " one time";
+          noteEl.textContent = parts + " " + promoField.code() + " takes " + window.STREETSIDE_PROMO.words(promo.match) + ".";
+        } else {
+          priceEl.textContent = "$" + formatPrice(total) + " one time";
+          noteEl.textContent = parts + " No subscription.";
+        }
+        estimate = current.name + " \u00b7 " + binWord + " \u00b7 about $" + formatPrice(total) + " one time" +
+          (promo ? " \u00b7 with " + promoField.code() + " about $" + formatPrice(promo.price) : "");
+      }
+      cta.setAttribute("data-package", current.id);
+      var hidden = document.getElementById("wl-valet-estimate");
+      if (hidden) hidden.value = estimate;
+      var sel = document.getElementById("wl-package");
+      if (sel && Array.prototype.some.call(sel.options, function (o) { return o.value === current.id; })) sel.value = current.id;
+    }
+
+    mount.addEventListener("change", function (e) {
+      if (e.target && e.target.name === "bin-plan") {
+        current = plans.filter(function (p) { return p.id === e.target.value; })[0] || current;
+        update();
+      }
+    });
+    countEl.addEventListener("input", update);
+    mount.querySelector("[data-bin-minus]").addEventListener("click", function () { countEl.value = Math.max(1, bins - 1); update(); });
+    mount.querySelector("[data-bin-plus]").addEventListener("click", function () { countEl.value = Math.min(10, bins + 1); update(); });
+    var planSelect = document.getElementById("wl-package");
+    if (planSelect) {
+      planSelect.addEventListener("change", function () {
+        var hidden = document.getElementById("wl-valet-estimate");
+        if (hidden && planSelect.value !== current.id) hidden.value = "";
+      });
+    }
+    mount._binSync = update;
+    update();
+  }
+
   function renderPricing() {
     var mount = document.querySelector("[data-pricing-grid]");
     var config = window.STREETSIDE_CONFIG || {};
@@ -34,83 +232,7 @@
     var founding = config.foundingOffer;
     if (!mount || !tiers.length) return;
 
-    tiers.forEach(function (tier) {
-      var classes = "price-card reveal-item reveal-item--from-right";
-      if (tier.featured) classes += " price-card--featured";
-      var card = el("div", classes);
-
-      if (tier.featured) {
-        card.appendChild(el("span", "price-card__tag", "Most popular"));
-      }
-
-      if (founding && founding.enabled && tier.price !== null && tier.price !== undefined) {
-        var ribbonClip = el(
-          "div",
-          "price-card__ribbon-clip",
-          '<span class="price-card__save">Save ' + founding.discountPercent + '%</span>'
-        );
-        card.appendChild(ribbonClip);
-      }
-
-      card.appendChild(el("h3", null, tier.name));
-      card.appendChild(el("p", "price-card__desc", tier.description));
-
-      if (tier.price === null || tier.price === undefined) {
-        card.appendChild(el("div", "price-card__value", "TBD"));
-      } else if (founding && founding.enabled) {
-        var discounted = formatPrice(tier.price * (1 - founding.discountPercent / 100));
-        var valueEl = el(
-          "div",
-          "price-card__value price-card__value--deal",
-          '<span class="price-card__big">$' + discounted + '</span>' +
-            '<span class="price-card__strike">$' + formatPrice(tier.price) + '</span>' +
-            '<span class="unit">first month</span>'
-        );
-        card.appendChild(valueEl);
-        card.appendChild(el("p", "price-card__then", "Then $" + formatPrice(tier.price) + " / " + tier.billingUnit + " — rate locked for " + founding.lockYears + " years"));
-      } else {
-        card.appendChild(
-          el("div", "price-card__value", "$" + formatPrice(tier.price) + ' <span class="unit">/ ' + tier.billingUnit + "</span>")
-        );
-      }
-
-      var list = el("ul");
-      tier.features.forEach(function (f) {
-        list.appendChild(el("li", null, checkIcon() + "<span>" + f + "</span>"));
-      });
-      card.appendChild(list);
-
-      var cta = el("a", "btn btn-primary btn-block", "Join the Waitlist");
-      cta.setAttribute("href", "#waitlist");
-      cta.setAttribute("data-package", tier.id);
-      card.appendChild(cta);
-
-      mount.appendChild(card);
-    });
-
-    // --- One-time service card ---
-    if (oneTime) {
-      var otCard = el("div", "price-card reveal-item reveal-item--from-right");
-      otCard.appendChild(el("h3", null, oneTime.name));
-      otCard.appendChild(el("p", "price-card__desc", oneTime.description));
-
-      var priceText = oneTime.price != null ? "$" + formatPrice(oneTime.price) : "TBD";
-      otCard.appendChild(el("div", "price-card__value", priceText));
-
-      var otList = el("ul");
-      (oneTime.features || ["No subscription required", "Great for a one-off need", "Same reliable service"]).forEach(
-        function (f) {
-          otList.appendChild(el("li", null, checkIcon() + "<span>" + f + "</span>"));
-        }
-      );
-      otCard.appendChild(otList);
-
-      var otCta = el("a", "btn btn-primary btn-block", "Join the Waitlist");
-      otCta.setAttribute("href", "#waitlist");
-      otCta.setAttribute("data-package", "one-time");
-      otCard.appendChild(otCta);
-      mount.appendChild(otCard);
-    }
+    renderBinEstimator(mount, tiers, oneTime, founding);
 
     // --- Founding 250 promo banner, rendered separately above/below the cards ---
     var bannerMount = document.querySelector("[data-founding-offer]");
@@ -137,7 +259,7 @@
               '<div class="founding-offer__spots"><strong data-spots-remaining>' + total + '</strong><span>of ' + total + ' founding spots left</span></div>' +
               '<div class="founding-offer__bar" role="presentation"><span data-spots-bar></span></div>' +
               '<p class="founding-offer__note" data-spots-note></p>' +
-              '<a href="#waitlist" class="btn btn-accent btn-block">Claim my founding spot <span class="btn-icon" aria-hidden="true">→</span></a>' +
+              '<a href="#waitlist" class="btn btn-accent btn-block">Get a quote &amp; claim my spot <span class="btn-icon" aria-hidden="true">→</span></a>' +
             '</div>'
           : '') ;
       bannerMount.style.display = "grid";
@@ -208,7 +330,7 @@
           '<ul class="snow-pricing__includes">' + includes + "</ul>" +
           '<ol class="snow-steps">' +
             "<li><strong>Enter your size.</strong> Type your square feet or use the measuring helper.</li>" +
-            "<li><strong>Tell us you're in.</strong> Join the list and choose Snow Removal.</li>" +
+            "<li><strong>Get your quote.</strong> Send us your details below, or call (740) 640-6628.</li>" +
             "<li><strong>We confirm.</strong> We check the size and price with you before service begins.</li>" +
           "</ol>" +
         "</div>" +
@@ -222,13 +344,15 @@
             '<button type="button" class="snow-measure__add" data-measure-add>+ Add another area</button>' +
             '<p class="snow-measure__total">Measured total: <strong data-measure-total>0 sq ft</strong></p>' +
           "</details>" +
+          promoFieldHtml("snow-promo") +
           '<div class="snow-pricing__result" aria-live="polite">' +
             '<span class="snow-pricing__result-label">Estimated price</span>' +
             '<span class="snow-pricing__result-price" data-snow-price>&mdash;</span>' +
             '<span class="snow-pricing__result-note" data-snow-note>Enter your square feet to see your price per visit.</span>' +
           "</div>" +
           '<p class="snow-pricing__fine">This is an estimate based on the square footage you enter. We\'ll confirm the size and price before service begins.</p>' +
-          '<a class="btn btn-primary btn-block" href="#waitlist" data-pick-service="snow-removal">I\'m interested in Snow Removal</a>' +
+          '<a class="btn btn-primary btn-block" href="#waitlist" data-pick-service="snow-removal">Get a Snow Removal Quote</a>' +
+          '<p class="snow-pricing__call">or call <a href="tel:+17406406628">(740) 640-6628</a></p>' +
         "</div>" +
       "</div>";
 
@@ -238,6 +362,7 @@
     var priceEl = mount.querySelector("[data-snow-price]");
     var noteEl = mount.querySelector("[data-snow-note]");
     var formInput = function () { return document.getElementById("wl-snow-sqft"); };
+    var promoField = wirePromoField(mount, function () { updateResult(); });
 
     function updateResult() {
       var sqft = parseFloat(input.value);
@@ -245,11 +370,19 @@
       if (price === null) {
         priceEl.innerHTML = "&mdash;";
         noteEl.textContent = "Enter your square feet to see your price per visit.";
+        promoFor(promoField, "snow-removal", 0, "Snow Removal");
       } else {
-        priceEl.innerHTML = snow.money(price) + " <small>per visit</small>";
-        noteEl.textContent = sqft * cfg.ratePerSqft < cfg.minimumPrice
+        var promo = promoFor(promoField, "snow-removal", price, "Snow Removal");
+        var base = sqft * cfg.ratePerSqft < cfg.minimumPrice
           ? "Minimum price applies. Salting included."
           : Math.round(sqft).toLocaleString("en-US") + " sq ft \u00d7 $" + cfg.ratePerSqft.toFixed(2) + ". Salting included.";
+        if (promo) {
+          priceEl.innerHTML = snow.money(promo.price) + " <small>first visit</small>";
+          noteEl.textContent = "Then " + snow.money(price) + " per visit. " + promoField.code() + " takes " + window.STREETSIDE_PROMO.words(promo.match) + " the first visit. " + base;
+        } else {
+          priceEl.innerHTML = snow.money(price) + " <small>per visit</small>";
+          noteEl.textContent = base;
+        }
       }
       var f = formInput();
       if (f && f.value !== input.value) {
@@ -406,7 +539,7 @@
     if (yearEl) yearEl.textContent = new Date().getFullYear();
   }
 
-  // When someone clicks "Join the Waitlist" from a specific pricing
+  // When someone clicks "Get a Quote" from a specific pricing
   // card, pre-select that plan in the waitlist form below — one less
   // thing for them to fill in, and gives you real data on which plan
   // people are actually interested in.
@@ -446,7 +579,7 @@
       return "$" + formatPrice(price) + "/mo";
     }
 
-    var options = ['<option value="" disabled selected>Select a plan</option>'];
+    var options = [];
 
     tiers.forEach(function (tier) {
       options.push(
@@ -459,7 +592,7 @@
       options.push('<option value="one-time">' + oneTime.name + " — " + otPrice + "</option>");
     }
 
-    options.push('<option value="not-sure">Not sure yet</option>');
+    options.push('<option value="not-sure" selected>Not sure yet</option>');
 
     select.innerHTML = options.join("");
   }
@@ -472,6 +605,8 @@
     renderHearAboutUs();
     renderFooterContact();
     renderPackageOptions();
+    var binMount = document.querySelector("[data-pricing-grid]");
+    if (binMount && binMount._binSync) binMount._binSync();
     setYear();
     initPackagePreselect();
   });

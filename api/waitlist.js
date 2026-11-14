@@ -11,15 +11,21 @@
 
 const { neon } = require("@neondatabase/serverless");
 
-// The list of valid promo codes lives in config/promo-codes.json (the signup
-// form reads the same file), so there is one place to add or remove codes.
-let PROMO_CODES = [];
-try {
-  PROMO_CODES = require("../config/promo-codes.json").codes.map(function (c) {
-    return String(c.code || "").toUpperCase();
-  });
-} catch (e) {
-  console.warn("[streetside] Could not load config/promo-codes.json — codes will be saved but not checked.");
+// Promo codes are managed on the admin page (admin-promos.html) and stored in
+// the database; api/_promo.js falls back to config/promo-codes.json if needed.
+const { loadActiveCodes, describe: describePromo } = require("./_promo");
+
+// "SNOW5 (valid: $5 off the first bill)" or a note that it isn't one of ours.
+async function promoNote(sql, code) {
+  try {
+    const list = await loadActiveCodes(sql);
+    const match = list.filter(function (c) { return c.code === code; })[0];
+    return match
+      ? code + " (valid: " + describePromo(match) + ")"
+      : code + " (not a listed promo code — maybe a referral)";
+  } catch (e) {
+    return code;
+  }
 }
 
 // ---------------------------------------------------------------
@@ -185,6 +191,7 @@ async function notifyOwner(info) {
     ["Address", [info.streetAddress, info.city, info.zip].filter(Boolean).join(", ")],
     ["Interested in", info.servicesLabel],
     ["Bin Valet plan", info.interestedPackage],
+    ["Bin Valet estimate", info.valetEstimate],
     ["Snow area size", info.snowPropertySize],
     ["Promo code", info.promoCode],
     ["Heard about us", info.hearAboutUs],
@@ -263,6 +270,7 @@ module.exports = async (req, res) => {
     interestedPackage: clean(raw.interestedPackage, 40),
     services: cleanServices(raw.services, formType),
     snowPropertySize: clean(raw.snowPropertySize, 80),
+    valetEstimate: clean(raw.valetEstimate, 100),
     hearAboutUs: clean(raw.hearAboutUs, 100),
     promoCode: raw.promoCode,
     attribution: clean(raw.attribution, 300),
@@ -275,7 +283,7 @@ module.exports = async (req, res) => {
   if (body.services.indexOf("snow-removal") === -1) body.snowPropertySize = "";
 
   // A plan only applies to Bin Valet.
-  if (body.services.indexOf("bin-valet") === -1) body.interestedPackage = "";
+  if (body.services.indexOf("bin-valet") === -1) { body.interestedPackage = ""; body.valetEstimate = ""; }
 
   // The waitlist form's "Email or Phone" field means either one on its
   // own is a valid submission (requiring email specifically would
@@ -466,6 +474,18 @@ module.exports = async (req, res) => {
       }
     }
 
+    // Bin Valet price estimate (plan + bins) — same graceful follow-up step.
+    if (body.valetEstimate && insertedRows && insertedRows[0]) {
+      try {
+        await sql`UPDATE signups SET valet_estimate = ${body.valetEstimate} WHERE id = ${insertedRows[0].id}`;
+      } catch (valetErr) {
+        console.warn(
+          "[streetside] Could not save valet_estimate — run the migration in schema.sql (ALTER TABLE signups ADD COLUMN IF NOT EXISTS valet_estimate TEXT;). The signup itself was saved.",
+          valetErr && valetErr.message
+        );
+      }
+    }
+
     // Best-effort mirror to Google Sheets — never blocks or breaks
     // the response if it fails; the database row above already saved.
     await syncToGoogleSheet({
@@ -485,6 +505,7 @@ module.exports = async (req, res) => {
       interestedPackage: body.interestedPackage,
       servicesInterested: servicesLabel(body.services),
       snowPropertySize: body.snowPropertySize,
+      valetEstimate: body.valetEstimate,
       promoCode: promoCode,
       attribution: body.attribution,
       hearAboutUs: body.hearAboutUs,
@@ -502,10 +523,9 @@ module.exports = async (req, res) => {
         city: body.city,
         zip: body.zip,
         interestedPackage: body.interestedPackage,
+        valetEstimate: body.valetEstimate,
         servicesLabel: servicesLabel(body.services),
-        promoCode: promoCode
-          ? promoCode + (PROMO_CODES.indexOf(promoCode) !== -1 ? " (valid code)" : " (not a listed promo code — maybe a referral)")
-          : "",
+        promoCode: promoCode ? await promoNote(sql, promoCode) : "",
         hearAboutUs: body.hearAboutUs,
         attribution: body.attribution,
       });

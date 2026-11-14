@@ -57,7 +57,7 @@
     var noteEl = document.querySelector("[data-spots-note]");
     if (!noteEl) return;
     if (remaining <= 0) {
-      noteEl.textContent = "Founding spots are full — join the regular waitlist!";
+      noteEl.textContent = "Founding spots are full — get a quote anyway!";
     } else if (remaining <= 25) {
       noteEl.textContent = "Almost gone — lock in your rate now.";
     } else {

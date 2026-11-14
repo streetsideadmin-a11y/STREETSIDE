@@ -4,7 +4,43 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v46.7 — current
+## v46.9 — current
+
+**Promo codes now change the price, and you manage them yourself.**
+- The Bin Valet and Snow Removal price boxes each have a promo code box. A good code
+  shows the discounted first bill with the regular price underneath
+  ("$12.50 first month. Then $25 / month."). It copies into the quote form and back.
+- Starter codes: **SMOKEOUT60** = 60% off, **F50** (Founding 250) = 50% off (both Bin Valet),
+  **SNOW5** = $5 off (Snow Removal). Discounts take money off the *first bill* only: the first
+  month of a monthly plan, a one-time service, or the first snow visit.
+- **New admin page `admin-promos.html`** (button "Promo Codes" on the signups page, same
+  password): add a code, change its percent or dollar amount, choose which services it works
+  for, pause it, or remove it. Changes show on the website right away.
+- Codes are stored in the database. The page creates its own table and adds the three starter
+  codes the first time you open it (nothing to run by hand). If the database can't be reached,
+  the site falls back to the starter list in `config/promo-codes.json`.
+- The Bin Valet box now shows the extra-bin charge ("Each extra bin adds $10 per month") and a price breakdown
+  ("$25 plan + 2 extra bins x $10 = $45 / month").
+- Your signup alert email now says what a code does, e.g. "F50 (valid: 50% off the first bill)".
+
+## v46.8
+
+**Simpler, "call or get a quote" site.**
+- Removed "Why Streetside" and "Built for Neighborhoods"; FAQ cut to 9 questions;
+  hero is now one headline, one sentence, a "Get a Quote" button and your phone number;
+  top menu is Services / How It Works / Pricing / FAQ.
+- Every button now says **Get a Quote** (header, hero, mobile bar, pricing, services,
+  thank-you bar, Terms/Privacy/404), with "or call (740) 640-6628" next to the main ones.
+  The form is now a quote request ("Tell us what you need"); plan is optional.
+- **How It Works now covers all services** in 3 steps: Call or Get a Quote -> We Confirm
+  the Details -> We Take Care of It.
+- **New Bin Valet price box** (same look as Snow Removal): pick Curb / Full / One-Time and
+  the number of bins (extra bins $10), see the price, then "Get a Quote" fills the form
+  with the plan and estimate. Prices come from `config/site-config.js`.
+- Run once in Neon (optional, signups still save without it):
+  `ALTER TABLE signups ADD COLUMN IF NOT EXISTS valet_estimate TEXT;`
+
+## v46.7
 
 **Promo codes now work as a real list.** SMOKEOUT60, F50 and SNOW5 are set up in
 `config/promo-codes.json` (add more there any time). Codes are always capitals

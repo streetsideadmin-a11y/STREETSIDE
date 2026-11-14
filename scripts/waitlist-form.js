@@ -104,14 +104,14 @@
     if (existing) existing.remove();
 
     var shareText =
-      "I just joined the waitlist for Streetside — they take your trash & recycling bins to the curb and back every week so you don't have to. The more neighbors who join, the sooner a route opens!";
+      "I just asked Streetside for a quote — they take your bins to the curb and back, clear your snow, and more. The more neighbors who sign up, the sooner a route opens!";
     var shareUrl = "https://streetsideoh.com/#waitlist";
 
     var wrap = document.createElement("div");
     wrap.className = "neighbor-share";
     wrap.setAttribute("data-neighbor-share", "");
     wrap.innerHTML =
-      "<p class=\"neighbor-share__prompt\">Know a neighbor who'd want this too? Routes open faster with more signups nearby.</p>" +
+      "<p class=\"neighbor-share__prompt\">Know a neighbor who'd want this too? Routes open faster with more neighbors nearby.</p>" +
       "<button type=\"button\" class=\"btn btn-outline-brand neighbor-share__btn\">Share With a Neighbor</button>" +
       "<p class=\"neighbor-share__copied\" data-copied-msg hidden>Link copied — paste it in a text!</p>";
 
@@ -236,7 +236,7 @@
         if (data.available === true) {
           showStatus(
             statusEl,
-            "Good news — Streetside already serves your area! We'll be in touch to get you set up.",
+            "Good news — Streetside already serves your area! Call (740) 640-6628 or request a quote below and we'll get you set up.",
             "success"
           );
         } else {
@@ -249,20 +249,20 @@
             nearby > 0
               ? nearby +
                 (nearby === 1 ? " neighbor" : " neighbors") +
-                " near you already joined the waitlist, but that's not quite enough yet to open a route."
+                " near you have already asked about service, but that's not quite enough yet to open a route."
               : "There aren't any routes in your area yet.";
 
           statusEl.innerHTML =
             intro +
-            " <strong>Add your contact info below</strong> and we'll reach out as soon as one opens near you. " +
+             " <strong>Call (740) 640-6628 or request a quote below</strong> and we'll reach out as soon as one opens near you. " +
             '<a href="#waitlist-form" class="form-status__link">Jump to the form &darr;</a>';
         }
       } else {
         showStatus(
           statusEl,
           data.duplicate
-            ? "You're already on the list — no need to sign up again! We'll be in touch as soon as there's news for your neighborhood."
-            : "You're on the list! We'll be in touch about Streetside service in your neighborhood.",
+            ? "We already have your request — no need to send it again! We'll be in touch soon."
+            : "Thanks — we got your request! We'll call or email you with your quote soon.",
           "success"
         );
         showNeighborShare(form);
@@ -283,7 +283,7 @@
       console.error("[streetside] Waitlist submission failed:", err);
       showStatus(
         statusEl,
-        "Something went wrong sending that — please try again, or reach out to us directly.",
+        "Something went wrong sending that — please try again, or just call us at (740) 640-6628.",
         "error"
       );
     } finally {
@@ -362,28 +362,27 @@
       input.value = input.value.toUpperCase().replace(/[^A-Z0-9_-]/g, "");
       try { input.setSelectionRange(pos, pos); } catch (e) { /* not supported on some inputs */ }
     });
-    // Show whether the code is one of ours. The list lives in
-    // config/promo-codes.json (the server reads the same file).
+    // Show whether the code is one of ours. The list comes from
+    // scripts/promo-codes.js (live list from the admin page).
     var statusEl = input.parentNode.querySelector("[data-promo-status]");
-    var known = null; // null until the list loads (or if it can't load)
+    var P = window.STREETSIDE_PROMO;
     function norm(v) { return String(v || "").toUpperCase().replace(/[^A-Z0-9_-]/g, ""); }
     function showPromoStatus() {
       if (!statusEl) return;
       var code = norm(input.value);
+      var known = P ? P.codes : null; // null until the list loads (or if it can't load)
       if (!code || known === null) { statusEl.hidden = true; statusEl.className = "field-hint promo-status"; return; }
-      var match = null;
-      known.forEach(function (c) { if (norm(c.code) === code) match = c; });
+      var match = P.find(code);
       statusEl.hidden = false;
       if (match) {
-        var msg = "\u2713 Code " + code + " accepted.";
+        var msg = "\u2713 Code " + code + " accepted: " + P.words(match) + " your first bill.";
         var picked = Array.prototype.map.call(
           document.querySelectorAll('#waitlist-form input[name="services"]:checked'),
           function (b) { return b.value; }
         );
         if (match.appliesTo && match.appliesTo.length &&
             !match.appliesTo.some(function (s) { return picked.indexOf(s) !== -1; })) {
-          var names = { "bin-valet": "Bin Valet", "bin-cleaning": "Bin Cleaning", "snow-removal": "Snow Removal" };
-          msg += " This code is for " + match.appliesTo.map(function (s) { return names[s] || s; }).join(" / ") + " \u2014 tick it above to use it.";
+          msg += " This code is for " + match.appliesTo.map(function (s) { return P.names[s] || s; }).join(" / ") + " \u2014 tick it above to use it.";
         }
         statusEl.textContent = msg;
         statusEl.className = "field-hint promo-status promo-status--ok";
@@ -398,12 +397,8 @@
     document.addEventListener("change", function (e) {
       if (e.target && e.target.name === "services") showPromoStatus();
     });
-    try {
-      fetch("config/promo-codes.json", { cache: "no-cache" })
-        .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
-        .then(function (data) { known = (data && data.codes) || []; showPromoStatus(); })
-        .catch(function () { /* list unavailable — no status message, form still works */ });
-    } catch (e) { /* fetch unavailable */ }
+    document.addEventListener("streetside:promos", showPromoStatus);
+    showPromoStatus();
 
     try {
       var params = new URLSearchParams(window.location.search);
@@ -411,6 +406,8 @@
       if (fromLink && !input.value) {
         input.value = fromLink.toUpperCase().replace(/[^A-Z0-9_-]/g, "").slice(0, 40);
         showPromoStatus();
+        // lets the price boxes pick the code up too
+        input.dispatchEvent(new Event("input", { bubbles: true }));
       }
     } catch (e) { /* URLSearchParams unavailable — field just stays blank */ }
   }
@@ -427,7 +424,7 @@
     function sync() {
       var on = valet.checked;
       planWrap.hidden = !on;
-      plan.required = on;
+      plan.required = false;
       plan.disabled = !on;
     }
     form.querySelectorAll('input[name="services"]').forEach(function (box) {

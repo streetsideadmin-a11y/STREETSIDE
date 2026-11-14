@@ -1,0 +1,11 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tc">
+<title id="tc">Phone call or quote request icon</title>
+<rect width="200" height="200" rx="0" fill="#F1F0EA"/>
+<rect x="64" y="34" width="72" height="132" rx="12" fill="#FFFFFF" stroke="#1B3A1D" stroke-width="4"/>
+<line x1="88" y1="48" x2="112" y2="48" stroke="#1B3A1D" stroke-width="4" stroke-linecap="round"/>
+<rect x="76" y="62" width="48" height="12" rx="3" fill="#1B3A1D" opacity=".15"/>
+<rect x="76" y="80" width="34" height="12" rx="3" fill="#1B3A1D" opacity=".15"/>
+<circle cx="100" cy="142" r="8" fill="none" stroke="#1B3A1D" stroke-width="3"/>
+<circle cx="140" cy="132" r="26" fill="#CC1F2B"/>
+<path d="M131 122c0 12 8 20 20 20l3-6-7-4-3 3c-4-2-6-5-8-8l3-3-4-7z" fill="#FFFFFF"/>
+</svg>
