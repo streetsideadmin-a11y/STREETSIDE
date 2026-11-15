@@ -4,7 +4,20 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v46.11 — current
+## v46.12 — current
+
+- **You can now edit every detail of a quote request from the admin page.** On the Quote
+  Requests tab each row has an **Edit** button: change the name, phone, email, address, bins,
+  collection day, services, plan, estimate, promo code, discount, and contacted/consent. Saving
+  updates the signup and the counts right away.
+- **Private notes** on each request (only visible in the admin page, searchable). The notes
+  column is added to your database automatically the first time you save a note, so there is
+  nothing to run by hand. If a save ever says a column is missing, it tells you the one line to
+  paste into Neon.
+- **+ Add request** button for people who phone in: fill in what they told you and it shows up
+  in the list, the call-back list and the map like any other request.
+
+## v46.11
 
 - **Admin page rebuilt with three tabs: Overview, Quote Requests, Promo Codes.** Same maroon
   colors and fonts as the main site. Overview has a "Call back" list of new requests (tap

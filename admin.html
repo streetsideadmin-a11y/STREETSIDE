@@ -172,6 +172,28 @@
   .admin-discount-select:disabled { opacity: .6; }
   .admin-delete-btn { background: none; border: 1px solid var(--red-600); color: var(--red-700); border-radius: var(--radius-sm); padding: 3px 9px; font-size: .8rem; cursor: pointer; font-weight: 700; line-height: 1.4; }
   .admin-delete-btn:hover { background: #fbeaea; }
+  .admin-edit-btn { background: none; border: 1px solid var(--color-brand-strong); color: var(--color-brand-strong); border-radius: var(--radius-sm); padding: 3px 9px; font-size: .8rem; cursor: pointer; font-weight: 700; line-height: 1.4; margin-right: 4px; }
+  .admin-edit-btn:hover { background: var(--color-brand-strong); color: #fff; }
+  .admin-actions { white-space: nowrap; }
+  .admin-note { display: block; margin-top: 4px; font-size: .8rem; color: var(--color-ink-muted); font-style: italic; max-width: 220px; white-space: normal; }
+  .adm-head--row { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; }
+  dialog.ed-dialog { border: none; border-radius: var(--radius-md); padding: 0; width: min(720px, calc(100vw - 24px)); max-height: calc(100vh - 24px); box-shadow: 0 20px 60px rgba(0,0,0,.35); color: var(--color-ink); background: var(--white); }
+  dialog.ed-dialog::backdrop { background: rgba(30, 10, 12, .55); }
+  .ed-form { display: flex; flex-direction: column; max-height: calc(100vh - 24px); }
+  .ed-head { background: var(--color-brand-strong); color: #fff; padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .ed-head h2 { margin: 0; font-family: var(--font-display); font-stretch: condensed; text-transform: uppercase; letter-spacing: .03em; font-size: 1.15rem; color: #fff; }
+  .ed-close { background: none; border: none; color: #fff; font-size: 1.6rem; line-height: 1; cursor: pointer; padding: 0 4px; }
+  .ed-body { padding: 18px 20px; overflow-y: auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 14px; }
+  .ed-body .field { margin: 0; min-width: 0; }
+  .ed-body .field.full { grid-column: 1 / -1; }
+  .ed-body h3 { grid-column: 1 / -1; margin: 6px 0 -2px; font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--color-ink-muted); border-top: 1px solid var(--color-border); padding-top: 12px; }
+  .ed-body h3:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+  .ed-body input[type=text], .ed-body input[type=email], .ed-body input[type=tel], .ed-body input[type=number], .ed-body select, .ed-body textarea { width: 100%; box-sizing: border-box; }
+  .ed-checks { display: flex; gap: 8px 18px; flex-wrap: wrap; }
+  .ed-checks label { display: inline-flex; gap: 7px; align-items: center; font-weight: 600; cursor: pointer; }
+  .ed-foot { padding: 12px 20px; border-top: 1px solid var(--color-border); display: flex; gap: 10px; justify-content: flex-end; align-items: center; flex-wrap: wrap; background: var(--color-bg); }
+  .ed-error { color: var(--red-700); font-weight: 700; margin-right: auto; font-size: .9rem; }
+  @media (max-width: 560px) { .ed-body { grid-template-columns: minmax(0, 1fr); } }
 
   /* ---------- Promo codes tab ---------- */
   .pc-error, .pc-ok { border-radius: var(--radius-sm); padding: var(--space-3) var(--space-4); font-size: .95rem; margin-bottom: var(--space-4); display: none; }
@@ -306,9 +328,12 @@
 
     <!-- ===== Signups ===== -->
     <section class="adm-view" id="view-signups" data-view="signups" role="tabpanel" hidden>
-      <div class="adm-head">
-        <h1>Signups</h1>
-        <p>Every quote request and address check. Tick &ldquo;Contacted&rdquo; once you've called them.</p>
+      <div class="adm-head adm-head--row">
+        <div>
+          <h1>Quote Requests</h1>
+          <p>Every quote request and address check. Tap &ldquo;Edit&rdquo; to change any detail, or add someone who phoned in.</p>
+        </div>
+        <button type="button" class="btn btn-primary" id="ed-add">+ Add request</button>
       </div>
 
       <details class="admin-panel" id="admin-route-panel">
@@ -453,6 +478,73 @@
 
   </main>
 </div>
+
+<dialog class="ed-dialog" id="ed-dialog" aria-labelledby="ed-title">
+  <form class="ed-form" id="ed-form" method="dialog" novalidate>
+    <div class="ed-head">
+      <h2 id="ed-title">Edit request</h2>
+      <button type="button" class="ed-close" id="ed-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="ed-body">
+      <h3>Contact</h3>
+      <div class="field"><label for="ed-firstName">First name</label><input type="text" id="ed-firstName" autocomplete="off" /></div>
+      <div class="field"><label for="ed-lastName">Last name</label><input type="text" id="ed-lastName" autocomplete="off" /></div>
+      <div class="field"><label for="ed-phone">Phone</label><input type="tel" id="ed-phone" autocomplete="off" /></div>
+      <div class="field"><label for="ed-email">Email</label><input type="email" id="ed-email" autocomplete="off" /></div>
+
+      <h3>Address</h3>
+      <div class="field full"><label for="ed-street">Street address</label><input type="text" id="ed-street" autocomplete="off" /></div>
+      <div class="field"><label for="ed-city">City</label><input type="text" id="ed-city" autocomplete="off" /></div>
+      <div class="field"><label for="ed-zip">ZIP</label><input type="text" id="ed-zip" autocomplete="off" /></div>
+
+      <h3>Services</h3>
+      <div class="field full">
+        <div class="ed-checks" id="ed-services">
+          <label><input type="checkbox" value="bin-valet" /> Bin Valet</label>
+          <label><input type="checkbox" value="bin-cleaning" /> Bin Cleaning</label>
+          <label><input type="checkbox" value="snow-removal" /> Snow Removal</label>
+        </div>
+      </div>
+      <div class="field"><label for="ed-package">Bin Valet plan</label>
+        <select id="ed-package">
+          <option value="">Not specified</option>
+          <option value="curb">Curb Service</option>
+          <option value="full">Full Service</option>
+          <option value="one-time">One-Time Service</option>
+          <option value="not-sure">Not sure yet</option>
+        </select>
+      </div>
+      <div class="field"><label for="ed-valetEstimate">Bin Valet estimate</label><input type="text" id="ed-valetEstimate" placeholder="e.g. Full Service · 3 bins · about $45/month" /></div>
+      <div class="field"><label for="ed-trashBins">Trash bins</label><input type="number" id="ed-trashBins" min="0" max="99" inputmode="numeric" /></div>
+      <div class="field"><label for="ed-recyclingBins">Recycling bins</label><input type="number" id="ed-recyclingBins" min="0" max="99" inputmode="numeric" /></div>
+      <div class="field"><label for="ed-collectionDay">Collection day</label><input type="text" id="ed-collectionDay" placeholder="e.g. Tuesday" /></div>
+      <div class="field"><label for="ed-wasteProvider">Waste company</label><input type="text" id="ed-wasteProvider" /></div>
+      <div class="field full"><label for="ed-binStorage">Where the bins are kept</label><input type="text" id="ed-binStorage" /></div>
+      <div class="field full"><label for="ed-snowSize">Snow Removal size / estimate</label><input type="text" id="ed-snowSize" placeholder="e.g. 1,800 sq ft — about $90/visit" /></div>
+
+      <h3>Discount &amp; notes</h3>
+      <div class="field"><label for="ed-promoCode">Promo code</label><input type="text" id="ed-promoCode" autocapitalize="characters" autocomplete="off" /></div>
+      <div class="field"><label for="ed-discountType">Discount</label>
+        <select id="ed-discountType">
+          <option value="">— None —</option>
+          <option value="founder">Founder Discount</option>
+          <option value="friends-family">Friends &amp; Family</option>
+          <option value="free-service">Free Service</option>
+        </select>
+      </div>
+      <div class="field full"><label for="ed-notes">Private notes <span class="optional">(only you see these)</span></label><textarea id="ed-notes" rows="3" maxlength="2000"></textarea></div>
+      <div class="field full ed-checks">
+        <label><input type="checkbox" id="ed-contacted" /> Contacted</label>
+        <label><input type="checkbox" id="ed-consent" /> OK to contact them</label>
+      </div>
+    </div>
+    <div class="ed-foot">
+      <span class="ed-error" id="ed-error" role="alert" hidden></span>
+      <button type="button" class="btn btn-outline-brand" id="ed-cancel">Cancel</button>
+      <button type="submit" class="btn btn-primary" id="ed-save">Save changes</button>
+    </div>
+  </form>
+</dialog>
 
 <script>
 (function () {
@@ -722,7 +814,8 @@
             '<span class="sub"><span class="admin-badge' + (isCheck ? " is-check" : "") + '">' + (isCheck ? "Address check" : "Quote request") + "</span></span>" +
             (row.attribution ? '<span class="sub" title="Where this person came from (ad / campaign link)">via ' + escapeHtml(row.attribution.replace(/&/g, " · ")) + "</span>" : "") + "</td>" +
           "<td>" + escapeHtml(name) +
-            (row.consent ? "" : '<span class="sub admin-consent-no">No consent</span>') + "</td>" +
+            (row.consent ? "" : '<span class="sub admin-consent-no">No consent</span>') +
+            (row.admin_notes ? '<span class="admin-note" title="Your private note">' + escapeHtml(row.admin_notes) + "</span>" : "") + "</td>" +
           "<td>" + contactHtml + "</td>" +
           "<td>" + escapeHtml(row.street_address || "—") + '<span class="sub">' + escapeHtml(cityZip || "—") + "</span></td>" +
           '<td class="nowrap">' + (serviceNames(row).length ? serviceNames(row).map(function (n) { return '<span class="admin-badge">' + escapeHtml(n) + "</span>"; }).join(" ") : "—") +
@@ -733,7 +826,7 @@
           "<td>" + discountSelectHtml(row) + "</td>" +
           '<td class="col-center"><input type="checkbox" data-action="toggle-contacted" data-id="' + row.id + '"' + (row.contacted ? " checked" : "") + ' aria-label="Contacted" /></td>' +
           '<td class="col-center"><input type="checkbox" data-action="route-select" data-id="' + row.id + '"' + (routeStopIds.has(row.id) ? " checked" : "") + ' aria-label="Add to route" /></td>' +
-          '<td><button type="button" class="admin-delete-btn" data-action="delete-row" data-id="' + row.id + '" title="Delete this row" aria-label="Delete">✕</button></td>' +
+          '<td class="admin-actions"><button type="button" class="admin-edit-btn" data-action="edit-row" data-id="' + row.id + '" title="Edit this entry" aria-label="Edit">Edit</button><button type="button" class="admin-delete-btn" data-action="delete-row" data-id="' + row.id + '" title="Delete this row" aria-label="Delete">✕</button></td>' +
           "</tr>"
         );
       })
@@ -783,7 +876,7 @@
       if (mapTownFilter && matchedTownFor(row) !== mapTownFilter) return false;
 
       if (search) {
-        var haystack = [row.first_name, row.last_name, row.email, row.phone, row.street_address, row.city, row.zip, row.promo_code]
+        var haystack = [row.first_name, row.last_name, row.email, row.phone, row.street_address, row.city, row.zip, row.promo_code, row.admin_notes]
           .filter(Boolean)
           .join(" ")
           .toLowerCase();
@@ -1457,6 +1550,102 @@
     });
   }
 
+  // --- Edit / add a request ---------------------------------------
+  var edDialog = document.getElementById("ed-dialog");
+  var edForm = document.getElementById("ed-form");
+  var edEditingId = null; // null = adding a new one
+  var ED_TEXT = ["firstName", "lastName", "phone", "email", "street", "city", "zip", "valetEstimate",
+    "trashBins", "recyclingBins", "collectionDay", "wasteProvider", "binStorage", "snowSize", "promoCode", "notes"];
+  var ED_COLUMN = { firstName: "first_name", lastName: "last_name", phone: "phone", email: "email", street: "street_address",
+    city: "city", zip: "zip", valetEstimate: "valet_estimate", trashBins: "trash_bin_count", recyclingBins: "recycling_bin_count",
+    collectionDay: "collection_day", wasteProvider: "waste_provider", binStorage: "bin_storage_location",
+    snowSize: "snow_property_size", promoCode: "promo_code", notes: "admin_notes" };
+
+  function edEl(id) { return document.getElementById("ed-" + id); }
+
+  function openEditor(row) {
+    edEditingId = row ? row.id : null;
+    document.getElementById("ed-title").textContent = row ? "Edit request" : "Add a request";
+    document.getElementById("ed-save").textContent = row ? "Save changes" : "Add request";
+    ED_TEXT.forEach(function (k) {
+      var v = row ? row[ED_COLUMN[k]] : "";
+      edEl(k).value = v === null || v === undefined ? "" : v;
+    });
+    var ids = row ? serviceIds(row) : [];
+    document.querySelectorAll("#ed-services input").forEach(function (c) { c.checked = ids.indexOf(c.value) !== -1; });
+    edEl("package").value = row && row.interested_package ? row.interested_package : "";
+    edEl("discountType").value = row && row.discount_type ? row.discount_type : "";
+    edEl("contacted").checked = row ? !!row.contacted : false;
+    edEl("consent").checked = row ? !!row.consent : true; // someone who phoned us asked us to follow up
+    var err = edEl("error"); err.hidden = true; err.textContent = "";
+    edDialog.showModal();
+    edEl(row ? "firstName" : "firstName").focus();
+  }
+
+  function closeEditor() { if (edDialog.open) edDialog.close(); }
+
+  function collectEditorFields() {
+    var f = {};
+    ED_TEXT.forEach(function (k) { f[k] = edEl(k).value; });
+    f.services = Array.prototype.map.call(document.querySelectorAll("#ed-services input:checked"), function (c) { return c.value; });
+    f.package = edEl("package").value;
+    f.discountType = edEl("discountType").value;
+    f.contacted = edEl("contacted").checked;
+    f.consent = edEl("consent").checked;
+    return f;
+  }
+
+  async function saveEditor(e) {
+    e.preventDefault();
+    var errEl = edEl("error");
+    errEl.hidden = true;
+    var f = collectEditorFields();
+    if (!edEditingId && !(f.firstName.trim() || f.lastName.trim() || f.phone.trim() || f.email.trim())) {
+      errEl.textContent = "Add at least a name, phone or email.";
+      errEl.hidden = false;
+      return;
+    }
+    var saveBtn = edEl("save");
+    var label = saveBtn.textContent;
+    saveBtn.disabled = true;
+    saveBtn.textContent = "Saving…";
+    try {
+      var res = await fetch("/api/admin-update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        body: JSON.stringify(edEditingId ? { id: edEditingId, fields: f } : { create: true, fields: f }),
+      });
+      var data = await res.json().catch(function () { return {}; });
+      if (res.status === 401) { closeEditor(); location.reload(); return; }
+      if (!res.ok) throw new Error(data.error || "Couldn't save that — try again.");
+      closeEditor();
+      await fetchAndRender();
+    } catch (err) {
+      errEl.textContent = err.message || "Couldn't save that — check your connection and try again.";
+      errEl.hidden = false;
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = label;
+    }
+  }
+
+  function initEditor() {
+    document.getElementById("ed-add").addEventListener("click", function () { openEditor(null); });
+    document.getElementById("ed-close").addEventListener("click", closeEditor);
+    document.getElementById("ed-cancel").addEventListener("click", closeEditor);
+    edForm.addEventListener("submit", saveEditor);
+    tableBody.addEventListener("click", function (e) {
+      var btn = e.target.closest('[data-action="edit-row"]');
+      if (!btn) return;
+      var id = parseInt(btn.getAttribute("data-id"), 10);
+      var row = allSignups.find(function (r) { return r.id === id; });
+      if (row) openEditor(row);
+    });
+    // Clicking the dark area outside the window closes it.
+    edDialog.addEventListener("mousedown", function (e) { if (e.target === edDialog) closeEditor(); });
+  }
+
   // --- Tabs ---------------------------------------------------------
   var TABS = ["overview", "signups", "promos"];
   var tabsReady = false;
@@ -1804,6 +1993,7 @@
         initTabs();
         initFilters();
         initRowActions();
+        initEditor();
         initSorting();
         initRouteControls();
       }

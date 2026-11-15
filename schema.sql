@@ -30,6 +30,7 @@ CREATE TABLE IF NOT EXISTS signups (
   hear_about_us          TEXT,
   consent                BOOLEAN DEFAULT FALSE,
   contacted              BOOLEAN DEFAULT FALSE,   -- set from the admin dashboard
+  admin_notes            TEXT,                    -- your private notes, edited on the admin page (added automatically if missing)
   submitted_at           TIMESTAMPTZ DEFAULT now()
 );
 
@@ -75,6 +76,7 @@ CREATE TABLE IF NOT EXISTS promo_codes (
 --   ALTER TABLE signups ADD COLUMN IF NOT EXISTS services_interested TEXT;
 --   ALTER TABLE signups ADD COLUMN IF NOT EXISTS snow_property_size TEXT;
 --   ALTER TABLE signups ADD COLUMN IF NOT EXISTS valet_estimate TEXT;
+--   ALTER TABLE signups ADD COLUMN IF NOT EXISTS admin_notes TEXT;   (the admin page also adds this on its own the first time you save a note)
 --   CREATE TABLE IF NOT EXISTS town_boundaries (
 --     town TEXT PRIMARY KEY, geojson JSONB, fetched_at TIMESTAMPTZ DEFAULT now()
 --   );

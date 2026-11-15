@@ -359,7 +359,7 @@ A few things worth knowing:
 ## Admin dashboard — viewing your real signup data
 
 The admin page has three tabs: **Overview** (new quote requests, who to call back,
-counts, route planner and map), **Quote Requests** (the full searchable list) and
+counts, route planner and map), **Quote Requests** (the full searchable list; tap **Edit** on any row to change its details or add a private note, or **+ Add request** for someone who phoned in) and
 **Promo Codes**. It uses the same colors as the main site.
 
 There's a password-protected admin page at `/admin.html` that shows
