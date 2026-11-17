@@ -119,7 +119,7 @@
         "</label>";
     }).join("");
 
-    mount.className = "snow-pricing bin-pricing reveal";
+    mount.className = "snow-pricing bin-pricing";
     mount.innerHTML =
       '<div class="snow-pricing__inner">' +
         '<div class="snow-pricing__copy">' +
@@ -345,8 +345,21 @@
     });
   }
 
-  // Snow Removal price estimator. Customers type their total square feet,
-  // or open "Help me measure" and add each area as length x width.
+  // Snow Removal price estimator. The easy way: tap what you want cleared and
+  // pick the closest size (no measuring). Or type your own total, or enter a
+  // length and width for any area.
+  var SNOW_AREAS = [
+    { id: "driveway", name: "Driveway", sizes: [
+      ["Short, 1 car", 300], ["Regular, 2 cars", 500], ["Wide, 3 cars", 750], ["Long driveway", 1500] ] },
+    { id: "walk", name: "Front walk / sidewalk", sizes: [
+      ["Short front walk", 100], ["Walk out to the street", 200], ["Whole front of the house", 350] ] },
+    { id: "steps", name: "Steps / porch", sizes: [
+      ["A few steps", 30], ["Steps and a porch", 80], ["Large porch or deck", 150] ] },
+    { id: "patio", name: "Patio / back area", sizes: [
+      ["Small", 100], ["Medium", 200], ["Large", 400] ] },
+    { id: "other", name: "Something else", sizes: [] },
+  ];
+
   function renderSnowPricing() {
     var mount = document.querySelector("[data-snow-pricing]");
     var snow = window.STREETSIDE_SNOW;
@@ -357,8 +370,11 @@
       .map(function (i) { return "<li>" + i + "</li>"; })
       .join("");
 
-    var areaTypes = ["Driveway", "Sidewalk", "Walkway", "Patio", "Steps", "Other"];
+    var chipsHtml = SNOW_AREAS.map(function (a) {
+      return '<label class="snow-chip"><input type="checkbox" value="' + a.id + '" /><span>' + a.name + "</span></label>";
+    }).join("");
 
+    mount.className = "snow-pricing";
     mount.innerHTML =
       '<div class="snow-pricing__inner">' +
         '<div class="snow-pricing__copy">' +
@@ -367,36 +383,33 @@
           '<p class="snow-pricing__includes-label">Every visit includes:</p>' +
           '<ul class="snow-pricing__includes">' + includes + "</ul>" +
           '<ol class="snow-steps">' +
-            "<li><strong>Enter your size.</strong> Type your square feet or use the measuring helper.</li>" +
+            "<li><strong>Tap what you want cleared.</strong> Pick the closest size. No measuring needed.</li>" +
             "<li><strong>Get your quote.</strong> Send us your details below, or call (740) 640-6628.</li>" +
             "<li><strong>We confirm.</strong> We check the size and price with you before service begins.</li>" +
           "</ol>" +
         "</div>" +
         '<div class="snow-pricing__calc">' +
-          '<label for="snow-sqft">Total square feet to clear</label>' +
+          '<fieldset class="snow-pick"><legend>What would you like cleared?</legend>' +
+            '<p class="snow-pick__help">Tap everything that applies, then pick the closest size.</p>' +
+            '<div class="snow-chips">' + chipsHtml + "</div>" +
+            '<div class="snow-areas" data-snow-areas></div>' +
+          "</fieldset>" +
+          '<label for="snow-sqft">Total square feet <span class="optional">(filled in for you, or type your own)</span></label>' +
           '<div class="snow-pricing__input"><input id="snow-sqft" type="number" inputmode="numeric" min="1" max="1000000" step="1" placeholder="e.g. 1,800" /><span>sq ft</span></div>' +
-          '<details class="snow-measure">' +
-            "<summary>Not sure? Help me measure</summary>" +
-            '<p class="snow-measure__help">Add each area you want cleared — driveway, sidewalk, walkway, patio, steps. Enter its length and width in feet (a rough guess is fine, a step or stride is about 2.5 ft). We\'ll add it up for you.</p>' +
-            '<div class="snow-measure__rows" data-measure-rows></div>' +
-            '<button type="button" class="snow-measure__add" data-measure-add>+ Add another area</button>' +
-            '<p class="snow-measure__total">Measured total: <strong data-measure-total>0 sq ft</strong></p>' +
-          "</details>" +
           promoFieldHtml("snow-promo") +
           '<div class="snow-pricing__result" aria-live="polite">' +
             '<span class="snow-pricing__result-label">Estimated price</span>' +
             '<span class="snow-pricing__result-price" data-snow-price>&mdash;</span>' +
-            '<span class="snow-pricing__result-note" data-snow-note>Enter your square feet to see your price per visit.</span>' +
+            '<span class="snow-pricing__result-note" data-snow-note>Tap what you want cleared to see your price per visit.</span>' +
           "</div>" +
-          '<p class="snow-pricing__fine">This is an estimate based on the square footage you enter. We\'ll confirm the size and price before service begins.</p>' +
+          '<p class="snow-pricing__fine">Sizes are typical estimates. We\'ll confirm the size and price before service begins.</p>' +
           '<a class="btn btn-primary btn-block" href="#waitlist" data-pick-service="snow-removal">Get a Snow Removal Quote</a>' +
           '<p class="snow-pricing__call">or call <a href="tel:+17406406628">(740) 640-6628</a></p>' +
         "</div>" +
       "</div>";
 
     var input = mount.querySelector("#snow-sqft");
-    var rowsEl = mount.querySelector("[data-measure-rows]");
-    var totalEl = mount.querySelector("[data-measure-total]");
+    var areasEl = mount.querySelector("[data-snow-areas]");
     var priceEl = mount.querySelector("[data-snow-price]");
     var noteEl = mount.querySelector("[data-snow-note]");
     var formInput = function () { return document.getElementById("wl-snow-sqft"); };
@@ -407,13 +420,13 @@
       var price = snow.price(sqft);
       if (price === null) {
         priceEl.innerHTML = "&mdash;";
-        noteEl.textContent = "Enter your square feet to see your price per visit.";
+        noteEl.textContent = "Tap what you want cleared to see your price per visit.";
         promoFor(promoField, "snow-removal", 0, "Snow Removal");
       } else {
         var promo = promoFor(promoField, "snow-removal", price, "Snow Removal");
         var base = sqft * cfg.ratePerSqft < cfg.minimumPrice
           ? "Minimum price applies. Salting included."
-          : Math.round(sqft).toLocaleString("en-US") + " sq ft \u00d7 $" + cfg.ratePerSqft.toFixed(2) + ". Salting included.";
+          : Math.round(sqft).toLocaleString("en-US") + " sq ft × $" + cfg.ratePerSqft.toFixed(2) + ". Salting included.";
         if (promo) {
           priceEl.innerHTML = snow.money(promo.price) + " <small>first visit</small>";
           noteEl.textContent = "Then " + snow.money(price) + " per visit. " + promoField.code() + " takes " + window.STREETSIDE_PROMO.words(promo.match) + " the first visit. " + base;
@@ -438,44 +451,90 @@
       }
     });
 
-    function addRow() {
-      var row = el("div", "snow-measure__row");
-      var opts = areaTypes.map(function (t) { return "<option>" + t + "</option>"; }).join("");
+    // --- Area picker --------------------------------------------------
+    function areaById(id) { return SNOW_AREAS.filter(function (a) { return a.id === id; })[0]; }
+
+    function rowArea(row) {
+      var sel = row.querySelector("select");
+      var custom = row.querySelector(".snow-area__custom");
+      if (!sel || sel.value === "custom") {
+        var nums = custom.querySelectorAll("input");
+        return Math.max(0, (parseFloat(nums[0].value) || 0) * (parseFloat(nums[1].value) || 0));
+      }
+      return parseFloat(sel.value) || 0;
+    }
+
+    function buildRow(area) {
+      var row = el("div", "snow-area");
+      row.setAttribute("data-area", area.id);
+      var opts = area.sizes.map(function (sz) {
+        return '<option value="' + sz[1] + '">' + sz[0] + " — about " + sz[1].toLocaleString("en-US") + " sq ft</option>";
+      }).join("");
+      var hasPresets = area.sizes.length > 0;
       row.innerHTML =
-        '<select aria-label="Area type">' + opts + "</select>" +
-        '<input type="number" inputmode="decimal" min="0" step="any" placeholder="Length" aria-label="Length in feet" />' +
-        '<span class="snow-measure__x">&times;</span>' +
-        '<input type="number" inputmode="decimal" min="0" step="any" placeholder="Width" aria-label="Width in feet" />' +
-        '<span class="snow-measure__ft">ft</span>' +
-        '<span class="snow-measure__sub">0 sq ft</span>' +
-        '<button type="button" class="snow-measure__remove" aria-label="Remove this area">&times;</button>';
-      row.querySelector(".snow-measure__remove").addEventListener("click", function () {
-        row.remove();
-        recalc();
-      });
+        '<div class="snow-area__title"><strong>' + area.name + "</strong>" +
+          '<span class="snow-area__sub" data-area-sub>0 sq ft</span></div>' +
+        (hasPresets
+          ? '<select aria-label="' + area.name + ' size">' + opts + '<option value="custom">I\'ll enter my own size</option></select>'
+          : "") +
+        '<div class="snow-area__custom"' + (hasPresets ? " hidden" : "") + ">" +
+          '<div class="snow-area__dims">' +
+            '<input type="number" inputmode="decimal" min="0" step="any" placeholder="Length" aria-label="' + area.name + ' length in feet" />' +
+            '<span class="snow-measure__x">&times;</span>' +
+            '<input type="number" inputmode="decimal" min="0" step="any" placeholder="Width" aria-label="' + area.name + ' width in feet" />' +
+            '<span class="snow-measure__ft">feet</span>' +
+          "</div>" +
+          '<p class="snow-area__tip">Tip: a normal walking step is about 2½ feet.</p>' +
+        "</div>";
+      var sel = row.querySelector("select");
+      var custom = row.querySelector(".snow-area__custom");
+      if (sel) {
+        sel.addEventListener("change", function () {
+          custom.hidden = sel.value !== "custom";
+          if (sel.value === "custom") custom.querySelector("input").focus();
+          recalc();
+        });
+      }
       row.addEventListener("input", recalc);
-      rowsEl.appendChild(row);
+      return row;
     }
 
     function recalc() {
       var total = 0;
-      rowsEl.querySelectorAll(".snow-measure__row").forEach(function (row) {
-        var nums = row.querySelectorAll("input");
-        var area = (parseFloat(nums[0].value) || 0) * (parseFloat(nums[1].value) || 0);
-        if (area < 0) area = 0;
-        row.querySelector(".snow-measure__sub").textContent = Math.round(area).toLocaleString("en-US") + " sq ft";
-        total += area;
+      areasEl.querySelectorAll(".snow-area").forEach(function (row) {
+        var a = rowArea(row);
+        row.querySelector("[data-area-sub]").textContent = Math.round(a).toLocaleString("en-US") + " sq ft";
+        total += a;
       });
       total = Math.round(total);
-      totalEl.textContent = total.toLocaleString("en-US") + " sq ft";
       input.value = total > 0 ? String(total) : "";
       updateResult();
     }
 
-    mount.querySelector("[data-measure-add]").addEventListener("click", addRow);
-    addRow();
+    mount.querySelectorAll(".snow-chip input").forEach(function (box) {
+      box.addEventListener("change", function () {
+        var area = areaById(box.value);
+        var existing = areasEl.querySelector('[data-area="' + box.value + '"]');
+        if (box.checked && !existing) {
+          // keep rows in the same order as the chips
+          var row = buildRow(area);
+          var order = SNOW_AREAS.map(function (a) { return a.id; });
+          var placed = false;
+          areasEl.querySelectorAll(".snow-area").forEach(function (r) {
+            if (!placed && order.indexOf(r.getAttribute("data-area")) > order.indexOf(area.id)) {
+              areasEl.insertBefore(row, r);
+              placed = true;
+            }
+          });
+          if (!placed) areasEl.appendChild(row);
+        } else if (!box.checked && existing) {
+          existing.remove();
+        }
+        recalc();
+      });
+    });
 
-    // "I'm interested" carries the size into the signup form.
+    // "Get a quote" carries the size into the signup form.
     mount.querySelector("[data-pick-service]").addEventListener("click", function () {
       var f = formInput();
       if (f && input.value) {
@@ -483,6 +542,66 @@
         f.dispatchEvent(new Event("input", { bubbles: true }));
       }
     });
+  }
+
+  // One quote box with a tab for each service (Bin Valet / Snow Removal).
+  function initQuoteTabs() {
+    var wrap = document.querySelector("[data-quote-tabs]");
+    if (!wrap) return;
+    var tabs = Array.prototype.slice.call(wrap.querySelectorAll("[data-quote-tab]"));
+    var panels = Array.prototype.slice.call(wrap.querySelectorAll("[data-quote-panel]"));
+    var config = window.STREETSIDE_CONFIG || {};
+
+    // Fill in "from $X" lines from the pricing in the config.
+    var binSub = wrap.querySelector('[data-tab-sub="bin"]');
+    var snowSub = wrap.querySelector('[data-tab-sub="snow"]');
+    var tiers = (config.pricingTiers || []).map(function (t) { return t.price; });
+    if (binSub && tiers.length) binSub.textContent = "From $" + formatPrice(Math.min.apply(null, tiers)) + " a month";
+    var sr = config.snowRemoval;
+    if (snowSub && sr && sr.minimumPrice) snowSub.textContent = "From $" + formatPrice(sr.minimumPrice) + " a visit";
+
+    function select(name, focus) {
+      tabs.forEach(function (t) {
+        var on = t.getAttribute("data-quote-tab") === name;
+        t.classList.toggle("is-active", on);
+        t.setAttribute("aria-selected", on ? "true" : "false");
+        t.tabIndex = on ? 0 : -1;
+        if (on && focus) t.focus();
+      });
+      panels.forEach(function (p) {
+        p.hidden = p.getAttribute("data-quote-panel") !== name;
+      });
+    }
+
+    tabs.forEach(function (t, i) {
+      t.addEventListener("click", function () { select(t.getAttribute("data-quote-tab")); });
+      t.addEventListener("keydown", function (e) {
+        var next = null;
+        if (e.key === "ArrowRight" || e.key === "ArrowDown") next = tabs[(i + 1) % tabs.length];
+        else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = tabs[(i - 1 + tabs.length) % tabs.length];
+        if (next) { e.preventDefault(); select(next.getAttribute("data-quote-tab"), true); }
+      });
+    });
+
+    // Links elsewhere on the page ("See pricing", "measuring helper") open the right tab.
+    function fromHash() {
+      var h = window.location.hash;
+      if (h === "#snow-removal" || h === "#snow-pricing") select("snow");
+    }
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest ? e.target.closest('a[href="#snow-removal"], a[href="#snow-pricing"]') : null;
+      if (!a) return;
+      e.preventDefault();
+      select("snow");
+      var target = wrap.querySelector(".quote-tabs__bar");
+      if (target && target.scrollIntoView) target.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (window.history && history.replaceState) history.replaceState(null, "", "#snow-removal");
+    });
+    window.addEventListener("hashchange", fromHash);
+    fromHash();
+
+    // Other code (e.g. the quote form) can ask for a tab.
+    wrap._select = select;
   }
 
   function renderFAQ() {
@@ -639,6 +758,7 @@
     renderPricing();
     renderServices();
     renderSnowPricing();
+    initQuoteTabs();
     renderFAQ();
     renderHearAboutUs();
     renderFooterContact();

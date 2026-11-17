@@ -297,33 +297,39 @@ fbq('track', 'PageView');
     </div>
   </section>
 
-  <!-- ============ PRICING ============ -->
+  <!-- ============ PRICING / QUOTE BOX (Bin Valet + Snow Removal tabs) ============ -->
   <section class="pricing" id="pricing">
     <div class="container">
       <div class="section-head reveal">
-        <span class="eyebrow">Bin Valet Pricing</span>
+        <span class="eyebrow">Pricing</span>
         <h2>See your price in seconds.</h2>
-        <p>Pick a plan and how many bins you have. Looking for Snow Removal pricing? <a href="#snow-removal">See the estimator</a>.</p>
+        <p>Pick a service, answer a couple of quick questions, and see your estimate. Then call us or send a quote request.</p>
       </div>
 
       <div class="founding-offer reveal" data-founding-offer></div>
 
-      <div class="pricing-grid reveal-group" data-pricing-grid></div>
-
-      <p class="pricing__footnote">Prices are estimates. We confirm your plan, price, and start date with you before service begins.</p>
-    </div>
-  </section>
-
-  <!-- ============ SNOW REMOVAL ============ -->
-  <section class="snow-section" id="snow-removal">
-    <span id="snow-pricing" class="snow-section__anchor"></span>
-    <div class="container">
-      <div class="snow-section__head reveal">
-        <span class="eyebrow eyebrow--light">Now Signing Up</span>
-        <h2>Snow Removal.</h2>
-        <p class="lede">Driveways, sidewalks, walkways, steps and patios cleared and salted so you can get out the door. Priced by the square foot — enter your size and see your price.</p>
+      <div class="quote-tabs reveal" data-quote-tabs>
+        <span id="snow-removal" class="quote-tabs__anchor"></span>
+        <span id="snow-pricing" class="quote-tabs__anchor"></span>
+        <div class="quote-tabs__bar" role="tablist" aria-label="Choose a service">
+          <button type="button" class="quote-tab is-active" role="tab" id="tab-bin" aria-controls="panel-bin" aria-selected="true" data-quote-tab="bin">
+            <span class="quote-tab__name">Bin Valet</span>
+            <span class="quote-tab__sub" data-tab-sub="bin">Bins to the curb and back</span>
+          </button>
+          <button type="button" class="quote-tab" role="tab" id="tab-snow" aria-controls="panel-snow" aria-selected="false" tabindex="-1" data-quote-tab="snow">
+            <span class="quote-tab__name">Snow Removal</span>
+            <span class="quote-tab__sub" data-tab-sub="snow">Driveways, walks and steps</span>
+          </button>
+        </div>
+        <div class="quote-tabs__panel" role="tabpanel" id="panel-bin" aria-labelledby="tab-bin" data-quote-panel="bin">
+          <div data-pricing-grid></div>
+        </div>
+        <div class="quote-tabs__panel" role="tabpanel" id="panel-snow" aria-labelledby="tab-snow" data-quote-panel="snow" hidden>
+          <div class="snow-pricing" data-snow-pricing></div>
+        </div>
       </div>
-      <div class="snow-pricing reveal" data-snow-pricing></div>
+
+      <p class="pricing__footnote">Prices are estimates. We confirm your service, price, and start date with you before anything begins.</p>
     </div>
   </section>
 
@@ -439,7 +445,7 @@ fbq('track', 'PageView');
             <div class="snow-pricing__input"><input id="wl-snow-sqft" type="number" inputmode="numeric" min="1" max="1000000" step="1" placeholder="e.g. 1,800" disabled /><span>sq ft</span></div>
             <input type="hidden" id="wl-snow-label" name="snowPropertySize" value="" disabled />
             <input type="hidden" id="wl-valet-estimate" name="valetEstimate" value="" />
-            <p class="field-hint" data-snow-form-price>Driveway, sidewalks, walkways, steps and patios. A rough guess is fine &mdash; we'll confirm before service begins. Not sure? <a href="#snow-pricing">Use the measuring helper</a>.</p>
+            <p class="field-hint" data-snow-form-price>Driveway, sidewalks, walkways, steps and patios. A rough guess is fine &mdash; we'll confirm before service begins. Not sure? <a href="#snow-pricing">Use the easy size picker</a>.</p>
           </div>
 
           <div class="field-row cols-2">

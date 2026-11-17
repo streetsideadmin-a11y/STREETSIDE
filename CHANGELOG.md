@@ -4,7 +4,21 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v46.12 — current
+## v46.13 — current
+
+- **One quote box with a tab for each service.** Bin Valet and Snow Removal now share a single
+  "See your price in seconds" box with two big tabs. The tabs show "From $12.50 a month" and
+  "From $40 a visit" (taken from `config/site-config.js`, so they follow your prices). Links
+  like "See pricing" on the Snow Removal card open the Snow tab automatically. The separate
+  dark Snow Removal section is gone.
+- **Square footage is now tap-to-pick, no measuring.** Tap what you want cleared (Driveway,
+  Front walk, Steps/porch, Patio, Something else), then pick the closest size from a list
+  ("Regular, 2 cars: about 500 sq ft"). The total fills in by itself. Anyone who wants to can
+  still choose "I'll enter my own size" (length x width, with a tip that a step is about 2½
+  feet) or just type a total. The typical sizes live in `SNOW_AREAS` at the top of the snow
+  section of `scripts/main.js` if you ever want to adjust them.
+
+## v46.12
 
 - **You can now edit every detail of a quote request from the admin page.** On the Quote
   Requests tab each row has an **Edit** button: change the name, phone, email, address, bins,
