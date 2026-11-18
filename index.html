@@ -37,6 +37,7 @@
 <link rel="stylesheet" href="styles/sections.css" />
 <link rel="stylesheet" href="styles/theme-halloween.css" />
 <link rel="stylesheet" href="styles/theme-thanksgiving.css" />
+<link rel="stylesheet" href="styles/easy-read.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
@@ -131,6 +132,7 @@ fbq('track', 'PageView');
         Get a Quote
         <span class="btn-icon" aria-hidden="true">→</span>
       </a>
+      <a href="tel:+17406406628" class="header-call" aria-label="Call Streetside at (740) 640-6628"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></svg><span>Call</span></a>
       <button class="nav-toggle" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
         <span></span>
       </button>
@@ -215,7 +217,7 @@ fbq('track', 'PageView');
       <div class="services__head reveal">
         <span class="eyebrow">Our Services</span>
         <h2>One team. Your whole curb.</h2>
-        <p class="lede">Call us or get a quote for Bin Valet or Snow Removal. Bin Cleaning is coming soon — tell us you're interested and you'll hear from us first.</p>
+        <p>Call us or get a quote for Bin Valet or Snow Removal. Bin Cleaning is coming soon — tell us you're interested and you'll hear from us first.</p>
       </div>
       <div class="services__grid reveal-group" data-services></div>
     </div>
@@ -243,9 +245,9 @@ fbq('track', 'PageView');
               <path d="M131 122c0 12 8 20 20 20l3-6-7-4-3 3c-4-2-6-5-8-8l3-3-4-7z" fill="#fff"/>
             </svg>
           </div>
-          <div class="step-marker">Step 01</div>
+          <div class="step-card__body"><div class="step-marker">Step 01</div>
           <h3>Call or Get a Quote</h3>
-          <p>Call us at <a href="tel:+17406406628">(740) 640-6628</a>, or send a quick request. Tell us which services you want and where you live.</p>
+          <p>Call us at <a href="tel:+17406406628">(740) 640-6628</a>, or send a quick request. Tell us which services you want and where you live.</p></div>
         </article>
 
         <article class="step-card reveal-item">
@@ -260,9 +262,9 @@ fbq('track', 'PageView');
               <path d="M129 136 L137 144 L151 126" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </div>
-          <div class="step-marker">Step 02</div>
+          <div class="step-card__body"><div class="step-marker">Step 02</div>
           <h3>We Confirm the Details</h3>
-          <p>We go over your service, price, and schedule with you, so there are no surprises.</p>
+          <p>We go over your service, price, and schedule with you, so there are no surprises.</p></div>
         </article>
 
         <article class="step-card reveal-item">
@@ -279,9 +281,9 @@ fbq('track', 'PageView');
               <line x1="30" y1="160" x2="176" y2="160" stroke="var(--color-brand-strong)" stroke-width="4" stroke-linecap="round"/>
             </svg>
           </div>
-          <div class="step-marker">Step 03</div>
+          <div class="step-card__body"><div class="step-marker">Step 03</div>
           <h3>We Take Care of It</h3>
-          <p>Bins to the curb and back. Snow cleared and salted. You get on with your day.</p>
+          <p>Bins to the curb and back. Snow cleared and salted. You get on with your day.</p></div>
         </article>
       </div>
 
@@ -437,18 +439,18 @@ fbq('track', 'PageView');
             <legend class="visually-hidden">Services you're interested in (choose at least one)</legend>
             <label class="service-pick"><input type="checkbox" name="services" value="bin-valet" checked /><span><strong>Bin Valet</strong><small>Bins to the curb and back</small></span></label>
             <label class="service-pick"><input type="checkbox" name="services" value="bin-cleaning" /><span><strong>Bin Cleaning</strong><small>Coming soon</small></span></label>
-            <label class="service-pick"><input type="checkbox" name="services" value="snow-removal" /><span><strong>Snow Removal</strong><small>Now open &middot; from $40/visit</small></span></label>
+            <label class="service-pick"><input type="checkbox" name="services" value="snow-removal" /><span><strong>Snow Removal</strong><small>Now open &middot; from $45/visit</small></span></label>
           </fieldset>
 
           <div class="field" data-snow-size hidden>
-            <label for="wl-snow-sqft">Snow Removal: total square feet to clear <span class="optional">(optional)</span></label>
+            <label for="wl-snow-sqft">Snow Removal: about how many square feet should we clear? <span class="optional">(optional)</span></label>
             <div class="snow-pricing__input"><input id="wl-snow-sqft" type="number" inputmode="numeric" min="1" max="1000000" step="1" placeholder="e.g. 1,800" disabled /><span>sq ft</span></div>
             <input type="hidden" id="wl-snow-label" name="snowPropertySize" value="" disabled />
             <input type="hidden" id="wl-valet-estimate" name="valetEstimate" value="" />
-            <p class="field-hint" data-snow-form-price>Driveway, sidewalks, walkways, steps and patios. A rough guess is fine &mdash; we'll confirm before service begins. Not sure? <a href="#snow-pricing">Use the easy size picker</a>.</p>
+            <p class="field-hint" data-snow-form-price>A rough guess is fine. We'll confirm before service begins. Not sure? <a href="#snow-pricing">Tap what you want cleared and we'll fill this in for you</a>.</p>
           </div>
 
-          <div class="field-row cols-2">
+          <div class="field-row cols-2 stack-sm">
             <div class="field" data-valet-plan>
               <label for="wl-package">Which Bin Valet Plan?</label>
               <select id="wl-package" name="interestedPackage">
@@ -491,11 +493,20 @@ fbq('track', 'PageView');
   <!-- ============ FAQ ============ -->
   <section class="faq" id="faq">
     <div class="container">
-      <div class="section-head reveal">
-        <span class="eyebrow">FAQ</span>
-        <h2>Questions, answered.</h2>
+      <div class="faq__layout">
+        <div class="faq__intro reveal">
+          <div class="section-head">
+            <span class="eyebrow">FAQ</span>
+            <h2>Questions, answered.</h2>
+            <p>Can't find what you're looking for? Give us a call and we'll help.</p>
+          </div>
+          <div class="faq__call">
+            <span>Call us</span>
+            <a href="tel:+17406406628">(740) 640-6628</a>
+          </div>
+        </div>
+        <div class="faq__list reveal" data-faq-list></div>
       </div>
-      <div class="faq__list reveal" data-faq-list></div>
     </div>
   </section>
 

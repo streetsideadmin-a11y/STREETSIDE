@@ -101,13 +101,25 @@ h3 {
 
 .section-head {
   max-width: 640px;
-  margin-bottom: var(--space-7);
+  margin-bottom: clamp(var(--space-6), 4vw, var(--space-7));
 }
 
-.section-head p {
+/* Same spacing under every eyebrow and heading, in every section. */
+.section-head .eyebrow,
+.services__head .eyebrow,
+.service-area__grid .eyebrow,
+.waitlist-panel__head .eyebrow {
+  display: flex;
+  margin-bottom: var(--space-3);
+}
+
+.section-head p,
+.services__head p,
+.waitlist-panel__head .lede {
   margin-top: var(--space-4);
   font-size: 1.08rem;
   color: var(--color-ink-muted);
+  line-height: 1.55;
 }
 
 .lede {

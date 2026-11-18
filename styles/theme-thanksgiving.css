@@ -61,6 +61,8 @@ html[data-theme="thanksgiving"] .season-bar--thanksgiving a:hover { color: var(-
 @media (max-width: 560px) {
   /* Keep the bar to one short line on phones. */
   .season-bar--thanksgiving .season-bar__long { display: none; }
+  html[data-theme="thanksgiving"] .season-bar--thanksgiving { gap: 8px; padding: 7px var(--space-3); font-size: 0.8rem; flex-wrap: nowrap; }
+  .season-bar--thanksgiving .season-bar__icon { display: none; }
 }
 
 /* ---- Hero ---- */

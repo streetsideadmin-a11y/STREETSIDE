@@ -144,15 +144,20 @@ window.STREETSIDE_CONFIG = {
   },
 
   // Snow Removal pricing (per visit). Change the numbers here and the price
-  // estimator on the homepage and the signup form update automatically.
-  //   ratePerSqft = dollars per square foot
-  //   minimumPrice = lowest price, which covers up to minimumSqft
-  // Customers type their square footage (or use "Help me measure"), and the
-  // price is worked out from these numbers.
+  // box on the homepage, the signup form and the "From $X" lines all update.
+  //   price = basePrice + (square feet x ratePerSqft), rounded to the nearest
+  //           roundTo dollars, and never lower than minimumPrice
+  //   typicalSqft = a small and a large "typical home" size, used only for the
+  //           line "Typical homes: $X to $Y per visit"
+  // Customers never see the math. They tap what they want cleared, and the
+  // price appears. The base amount covers getting to the house, setting up
+  // and salting, which cost the same no matter how small the job is.
   snowRemoval: {
-    ratePerSqft: 0.05,
-    minimumPrice: 40,
-    minimumSqft: 800,
+    basePrice: 35,
+    ratePerSqft: 0.04,
+    minimumPrice: 45,
+    roundTo: 5,
+    typicalSqft: [400, 1200],
     includes: ["Salting", "Driveways", "Sidewalks", "Walkways", "Steps", "Patios"],
   },
 
@@ -179,8 +184,8 @@ window.STREETSIDE_CONFIG = {
       id: "snow-removal",
       name: "Snow Removal",
       status: "available",
-      description: "Snow cleared and salted so you can get out the door and your bins can get to the curb, even in winter weather.",
-      priceNote: "From $40 per visit",
+      description: "We shovel by hand and salt your driveway, walk and steps, so you can get out the door and your bins can get to the curb.",
+      priceNote: "From $45 per visit",
       cta: "See pricing",
       ctaHref: "#snow-removal",
     },
@@ -204,12 +209,11 @@ window.STREETSIDE_CONFIG = {
     },
     {
       q: "How much does Snow Removal cost?",
-      a: "Snow Removal is priced per visit, based on the size of the area we clear. Visits start at $40, and the price goes up with square footage. Type in your square footage in the Snow Removal section to see your estimate, then request a quote and we'll confirm it.",
+      a: "Snow Removal is priced per visit, based on how much we clear. Visits start at $45 and most homes are between $50 and $85. Salting is included. In the Snow Removal section, tap what you want cleared and your price appears. No measuring needed. Then send in your quote request and we'll confirm it with you.",
     },
     {
       q: "When do you take my bins out and bring them back?",
-      a: "We take them to the curb before your regular collection day and bring them back after your waste company has emptied them.",
-      placeholder: "Exact timing windows (evening before vs. morning of) to be finalized before launch.",
+      a: "We take them to the curb before your regular collection day and bring them back after your waste company has emptied them. If you have a question about timing for your street, just give us a call at (740) 640-6628.",
     },
     {
       q: "Can I have more than one bin?",
@@ -229,13 +233,11 @@ window.STREETSIDE_CONFIG = {
     },
     {
       q: "How does billing work?",
-      a: "Bin Valet is billed monthly based on the plan you choose. Snow Removal is priced per visit.",
-      placeholder: "Exact payment method/processor not yet finalized.",
+      a: "Bin Valet is billed monthly based on the plan you choose. Snow Removal is priced per visit. We'll go over how to pay with you when we confirm your quote.",
     },
     {
       q: "Can I cancel?",
-      a: null,
-      placeholder: "Cancellation policy not yet finalized.",
+      a: "Please give us a call at (740) 640-6628 and we'll be glad to help you.",
     },
   ],
 };
@@ -248,7 +250,9 @@ window.STREETSIDE_SNOW = (function () {
   function price(sqft) {
     sqft = Number(sqft);
     if (!(sqft > 0)) return null;
-    return Math.max(cfg.minimumPrice, Math.round(sqft * cfg.ratePerSqft * 100) / 100);
+    var raw = (cfg.basePrice || 0) + sqft * cfg.ratePerSqft;
+    var step = cfg.roundTo || 1;
+    return Math.max(cfg.minimumPrice, Math.round(raw / step) * step);
   }
   function money(n) {
     return "$" + n.toLocaleString("en-US", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
@@ -257,7 +261,7 @@ window.STREETSIDE_SNOW = (function () {
     var p = price(sqft);
     if (p === null) return "";
     var size = Math.round(Number(sqft)).toLocaleString("en-US") + " sq ft";
-    return size + " \u2014 about " + money(p) + "/visit" + (p === cfg.minimumPrice && sqft * cfg.ratePerSqft < cfg.minimumPrice ? " (minimum)" : "");
+    return size + " \u2014 about " + money(p) + "/visit";
   }
   return { price: price, money: money, label: label, cfg: cfg };
 })();

@@ -403,8 +403,15 @@
   gap: 0 var(--space-5);
 }
 
+@media (min-width: 380px) {
+  .field-row.cols-2 { grid-template-columns: 1fr 1fr; gap: 0 var(--space-3); }
+}
+/* Rows with a long helper line stack on phones so the text isn't squeezed. */
+@media (max-width: 519px) {
+  .field-row.cols-2.stack-sm { grid-template-columns: minmax(0, 1fr); }
+}
 @media (min-width: 640px) {
-  .field-row.cols-2 { grid-template-columns: 1fr 1fr; }
+  .field-row.cols-2 { gap: 0 var(--space-5); }
   .field-row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
 }
 
@@ -719,7 +726,8 @@
   padding-bottom: var(--space-2);
   border-bottom: 1px solid var(--color-border);
 }
-#waitlist-form .form-section-label:first-child { margin-top: 0; }
+#waitlist-form .form-section-label:first-child,
+#waitlist-form .hp-field + .form-section-label { margin-top: 0; }
 #waitlist-form .field { margin-bottom: var(--space-4); }
 .form-submit { margin-top: var(--space-5); }
 .address-check { margin-top: var(--space-6); }
@@ -842,7 +850,7 @@
 
 /* Contact section above the footer */
 .contact-band {
-  padding-block: var(--space-8);
+  padding-block: var(--section-pad);
   background: var(--paper);
   text-align: center;
 }

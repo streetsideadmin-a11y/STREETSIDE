@@ -317,13 +317,30 @@
       return;
     }
 
+    var SERVICE_ICONS = {
+      "bin-valet": '<path d="M5 7h14l-1.2 13H6.2L5 7z"/><path d="M3 7h18"/><path d="M9 7V4h6v3"/><path d="M10 11v6M14 11v6"/>',
+      "bin-cleaning": '<path d="M12 3c3 4 5 6.5 5 9.5a5 5 0 0 1-10 0C7 9.5 9 7 12 3z"/>',
+      "snow-removal": '<path d="M12 3v18M4.2 7.5l15.6 9M19.8 7.5l-15.6 9"/><path d="M9.5 4.5L12 6.5l2.5-2M9.5 19.5l2.5-2 2.5 2"/>'
+    };
+    var tiers = ((window.STREETSIDE_CONFIG || {}).pricingTiers || []).map(function (t) { return t.price; }).filter(Boolean);
+
     services.forEach(function (service) {
       var soon = service.status === "coming-soon";
       var card = el("div", "service-card reveal-item" + (soon ? " service-card--coming-soon" : " service-card--available"));
-      card.appendChild(el("span", "service-card__badge" + (soon ? "" : " service-card__badge--live"), soon ? "Coming Soon" : "Signups Open"));
+      var top = el("div", "service-card__top");
+      var icon = el("span", "service-card__icon");
+      icon.setAttribute("aria-hidden", "true");
+      icon.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (SERVICE_ICONS[service.id] || SERVICE_ICONS["bin-valet"]) + "</svg>";
+      top.appendChild(icon);
+      top.appendChild(el("span", "service-card__badge" + (soon ? "" : " service-card__badge--live"), soon ? "Coming Soon" : "Available Now"));
+      card.appendChild(top);
       card.appendChild(el("h3", null, service.name));
       card.appendChild(el("p", "service-card__desc", service.description));
-      if (service.priceNote) card.appendChild(el("p", "service-card__price", service.priceNote));
+      var priceNote = service.priceNote;
+      if (!priceNote && service.id === "bin-valet" && tiers.length) {
+        priceNote = "From $" + formatPrice(Math.min.apply(null, tiers)) + " per month";
+      }
+      if (priceNote) card.appendChild(el("p", "service-card__price", priceNote));
       var link = el("a", "service-card__cta", (service.cta || "I'm interested") + " \u2192");
       link.href = service.ctaHref || "#waitlist";
       if (!service.ctaHref) link.setAttribute("data-pick-service", service.id);
@@ -374,12 +391,20 @@
       return '<label class="snow-chip"><input type="checkbox" value="' + a.id + '" /><span>' + a.name + "</span></label>";
     }).join("");
 
+    // "Typical homes: $50 to $85 per visit" is worked out from the config.
+    var typical = cfg.typicalSqft && cfg.typicalSqft.length === 2
+      ? [snow.price(cfg.typicalSqft[0]), snow.price(cfg.typicalSqft[1])]
+      : null;
+    var typicalHtml = typical && typical[0] && typical[1]
+      ? "<p>Typical homes are <strong>" + snow.money(typical[0]) + " to " + snow.money(typical[1]) + "</strong> per visit, depending on how much we clear.</p>"
+      : "";
+
     mount.className = "snow-pricing";
     mount.innerHTML =
       '<div class="snow-pricing__inner">' +
         '<div class="snow-pricing__copy">' +
-          '<div class="snow-stat"><span class="snow-stat__big">$' + cfg.ratePerSqft.toFixed(2) + '</span><span class="snow-stat__unit">per square foot, per visit</span></div>' +
-          "<p>" + snow.money(cfg.minimumPrice) + " minimum, which covers up to " + cfg.minimumSqft.toLocaleString("en-US") + " sq ft.</p>" +
+          '<div class="snow-stat"><span class="snow-stat__big">' + snow.money(cfg.minimumPrice) + '</span><span class="snow-stat__unit">per visit, and up</span></div>' +
+          typicalHtml +
           '<p class="snow-pricing__includes-label">Every visit includes:</p>' +
           '<ul class="snow-pricing__includes">' + includes + "</ul>" +
           '<ol class="snow-steps">' +
@@ -394,8 +419,10 @@
             '<div class="snow-chips">' + chipsHtml + "</div>" +
             '<div class="snow-areas" data-snow-areas></div>' +
           "</fieldset>" +
-          '<label for="snow-sqft">Total square feet <span class="optional">(filled in for you, or type your own)</span></label>' +
-          '<div class="snow-pricing__input"><input id="snow-sqft" type="number" inputmode="numeric" min="1" max="1000000" step="1" placeholder="e.g. 1,800" /><span>sq ft</span></div>' +
+          '<details class="snow-exact"><summary>I know my exact square footage</summary>' +
+            '<label for="snow-sqft">Total square feet <span class="optional">(filled in for you, or type your own)</span></label>' +
+            '<div class="snow-pricing__input"><input id="snow-sqft" type="number" inputmode="numeric" min="1" max="1000000" step="1" placeholder="e.g. 1,800" /><span>sq ft</span></div>' +
+          "</details>" +
           promoFieldHtml("snow-promo") +
           '<div class="snow-pricing__result" aria-live="polite">' +
             '<span class="snow-pricing__result-label">Estimated price</span>' +
@@ -424,9 +451,7 @@
         promoFor(promoField, "snow-removal", 0, "Snow Removal");
       } else {
         var promo = promoFor(promoField, "snow-removal", price, "Snow Removal");
-        var base = sqft * cfg.ratePerSqft < cfg.minimumPrice
-          ? "Minimum price applies. Salting included."
-          : Math.round(sqft).toLocaleString("en-US") + " sq ft × $" + cfg.ratePerSqft.toFixed(2) + ". Salting included.";
+        var base = "Salting is included. We'll confirm the price with you first.";
         if (promo) {
           priceEl.innerHTML = snow.money(promo.price) + " <small>first visit</small>";
           noteEl.textContent = "Then " + snow.money(price) + " per visit. " + promoField.code() + " takes " + window.STREETSIDE_PROMO.words(promo.match) + " the first visit. " + base;
@@ -468,7 +493,7 @@
       var row = el("div", "snow-area");
       row.setAttribute("data-area", area.id);
       var opts = area.sizes.map(function (sz) {
-        return '<option value="' + sz[1] + '">' + sz[0] + " — about " + sz[1].toLocaleString("en-US") + " sq ft</option>";
+        return '<option value="' + sz[1] + '">' + sz[0] + "</option>";
       }).join("");
       var hasPresets = area.sizes.length > 0;
       row.innerHTML =
@@ -556,9 +581,9 @@
     var binSub = wrap.querySelector('[data-tab-sub="bin"]');
     var snowSub = wrap.querySelector('[data-tab-sub="snow"]');
     var tiers = (config.pricingTiers || []).map(function (t) { return t.price; });
-    if (binSub && tiers.length) binSub.textContent = "From $" + formatPrice(Math.min.apply(null, tiers)) + " a month";
+    if (binSub && tiers.length) binSub.innerHTML = "From $" + formatPrice(Math.min.apply(null, tiers)) + '<span class="tab-unit tab-unit--long"> a month</span><span class="tab-unit tab-unit--short">/month</span>';
     var sr = config.snowRemoval;
-    if (snowSub && sr && sr.minimumPrice) snowSub.textContent = "From $" + formatPrice(sr.minimumPrice) + " a visit";
+    if (snowSub && sr && sr.minimumPrice) snowSub.innerHTML = "From $" + formatPrice(sr.minimumPrice) + '<span class="tab-unit tab-unit--long"> a visit</span><span class="tab-unit tab-unit--short">/visit</span>';
 
     function select(name, focus) {
       tabs.forEach(function (t) {

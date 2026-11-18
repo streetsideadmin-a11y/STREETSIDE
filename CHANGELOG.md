@@ -4,7 +4,59 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v46.13 — current
+## v46.15 — current
+
+Snow Removal prices refined, and the whole site made easier to read and tap. Same maroon look.
+No database changes.
+
+- **Snow Removal prices refined for hand shoveling.** The old formula ($0.05 per sq ft, $40
+  minimum) made almost every house cost $40. The new one is a $35 base (getting there, setting
+  up, salting) plus $0.04 per sq ft, rounded to the nearest $5, with a $45 minimum. Typical
+  homes now come out to $50 to $85 per visit. Change `basePrice`, `ratePerSqft`,
+  `minimumPrice`, `roundTo` or `typicalSqft` in `config/site-config.js`. The price box, the
+  "From $45" lines and the quote form follow automatically. (The FAQ answer and the
+  "from $45/visit" line on the quote form are typed text, so edit those too if you change prices.)
+- **Plain wording for snow pricing.** The price box now says "$45 per visit, and up" and
+  "Typical homes are $50 to $85" instead of a per-square-foot rate. The exact square footage box
+  is tucked under "I know my exact square footage", so most people only tap what they want
+  cleared. The size menus say "Regular, 2 cars" without square-foot numbers.
+- **Text is bigger everywhere** (about 12% larger, with nothing small), with stronger contrast
+  on the orange "Get a quote" label in the dark section. All of this lives in the new
+  `styles/easy-read.css`. To turn it off, remove its `<link>` line from the pages.
+- **Bigger buttons and fields.** Buttons, menu links, FAQ questions and form fields are all at
+  least 48 to 56 pixels tall, labels are bold and larger, and checkboxes are bigger.
+- **Phones:** a big **Call** button now sits in the header next to **Menu** (the three-bar icon
+  now has the word "Menu" under it). Tab labels show "From $12.50/month" and "From $45/visit",
+  and the "Most popular" tag no longer covers a plan name.
+- **Wording:** "Signups Open" is now "Available Now". The snow card says the work is shoveled by
+  hand. FAQ answers for timing, billing and cancelling no longer show "not finalized" notes;
+  they point people to call (740) 640-6628.
+
+## v46.14
+
+Look-and-feel clean-up of the existing site (same maroon colors and fonts, nothing about how
+quotes/pricing/admin work has changed, and no database changes).
+
+- **Consistent spacing everywhere.** Every section now uses the same top/bottom padding
+  (`--section-pad` in `styles/tokens.css`) and the same heading style: small label, big
+  heading, one short line underneath. Sections alternate cream / light tan so the page has a
+  clear rhythm as you scroll.
+- **Services cards.** Three equal cards with an icon, the status badge on the same row, and the
+  price on the card ("From $12.50 per month", "From $40 per visit"). The Bin Cleaning card is
+  dashed so it is obviously "coming soon". The Bin Valet price follows `config/site-config.js`.
+- **How It Works.** Smaller, tidier step pictures; on phones each step is a short row with the
+  picture on the left and the text on the right instead of a tall stack.
+- **Hero.** Better vertical spacing so the headline, text, button and phone number are evenly
+  spaced.
+- **Service area.** The address box and the map are now the same height side by side.
+- **Quote form.** Sits in a clean white card with a two-column layout (first/last name,
+  city/ZIP). On phones the plan and bin-count fields stack so the helper text isn't squeezed.
+- **FAQ.** Heading and a big "Call us (740) 640-6628" box on the left, questions on the right
+  on desktop; single column on phones.
+- **Phones.** Thanksgiving banner is shorter, smaller paddings, and no horizontal scrolling at
+  320, 390 or 1440 pixels wide.
+
+## v46.13
 
 - **One quote box with a tab for each service.** Bin Valet and Snow Removal now share a single
   "See your price in seconds" box with two big tabs. The tabs show "From $12.50 a month" and

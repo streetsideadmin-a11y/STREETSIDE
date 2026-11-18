@@ -1,0 +1,216 @@
+/* ==========================================================================
+   STREETSIDE — EASY-READ LAYER
+   Loaded last on the public pages. Everything here exists to make the site
+   comfortable for older eyes and hands:
+     - bigger text (nothing small), calmer letter-spacing on small labels
+     - big tap targets (buttons, links, form fields, checkboxes)
+     - strong contrast and clear focus rings
+     - a "Call" button that is always visible on phones
+   It only changes sizes and spacing. Colors, fonts and layout stay as is.
+   To turn the whole layer off, remove its <link> line from the page.
+   ========================================================================== */
+
+/* ---- 1. Bigger base text. Every size on the site is in rem, so this one
+        line makes the whole site about 12% larger (18px instead of 16px). */
+html { font-size: 112.5%; }
+body { line-height: 1.65; }
+
+/* ---- 2. Text floors: small print is never really small ----------------- */
+small,
+.field-hint,
+.snow-pricing__fine,
+.faq-placeholder,
+.footer-brand__area,
+.snow-area__tip,
+.optional {
+  font-size: max(0.92rem, 16px);
+}
+
+.eyebrow,
+.step-marker,
+.form-section-label,
+.quote-tab__sub,
+.snow-stat__unit,
+.snow-pricing__result-label {
+  font-size: max(0.9rem, 16px);
+  letter-spacing: 0.06em;
+}
+
+.service-card__badge,
+.bin-plan__tag {
+  font-size: max(0.82rem, 14.5px);
+  letter-spacing: 0.04em;
+  padding: 0.3rem 0.7rem;
+}
+
+/* ---- 3. Big buttons and links ----------------------------------------- */
+.btn {
+  min-height: 56px;
+  font-size: max(1rem, 17px);
+  letter-spacing: 0.05em;
+}
+.header-actions .btn {
+  min-height: 52px;
+  font-size: max(0.95rem, 16px);
+}
+
+.primary-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  font-size: max(1rem, 17px);
+}
+
+.service-card__cta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  font-size: max(1.05rem, 18px);
+}
+
+.site-footer a { display: inline-block; padding-block: 0.4rem; font-size: max(1rem, 17px); }
+.site-footer .social-links a { width: 48px; height: 48px; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+
+/* Phone numbers and email addresses written inside a sentence stand out */
+a[href^="tel:"], a[href^="mailto:"] { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 2px; }
+.btn[href^="tel:"], .btn[href^="mailto:"], .btn[href^="sms:"], .mobile-menu a, .contact-panel a { text-decoration: none; }
+
+/* ---- 4. Forms: tall fields, readable labels, big checkboxes ------------- */
+input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+select,
+textarea {
+  min-height: 56px;
+  font-size: max(1.05rem, 18px);
+}
+.field label,
+.snow-pick legend,
+.snow-exact label,
+.field-row label {
+  font-size: max(1.02rem, 17px);
+  font-weight: 700;
+}
+.field label .optional { font-weight: 400; }
+.service-pick input,
+.bin-plan input,
+.consent input { width: 1.5rem; height: 1.5rem; }
+.service-pick strong { font-size: max(1.1rem, 19px); }
+.consent span, .consent label { font-size: max(1rem, 17px); }
+
+/* ---- 5. FAQ: big question rows ---------------------------------------- */
+.faq-item__q { font-size: max(1.15rem, 20px); padding-block: 1.1rem; min-height: 60px; }
+.faq-item__icon { width: 22px; height: 22px; }
+.faq-item__a p { font-size: max(1.05rem, 18px); line-height: 1.65; }
+
+/* ---- 6. Snow Removal box: the "exact square feet" box is tucked away
+        so most people only ever tap what they want cleared -------------- */
+.snow-exact { margin: var(--space-4) 0 var(--space-2); border-top: 1px dashed var(--color-border); padding-top: var(--space-3); }
+.snow-exact > summary { cursor: pointer; min-height: 48px; display: flex; align-items: center; font-weight: 700; font-size: max(1rem, 17px); color: var(--color-brand); text-decoration: underline; text-underline-offset: 3px; }
+.snow-exact[open] > summary { margin-bottom: var(--space-3); }
+.snow-area__sub { display: none; }
+.snow-chip span { min-height: 52px; font-size: max(1.02rem, 18px); }
+
+/* ---- 7. Phones: an always-visible Call button and a labelled Menu button */
+.header-call {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-brand-strong);
+  color: #fff;
+  font-family: var(--font-display);
+  font-stretch: condensed;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.header-call:hover { background: var(--color-brand); }
+.header-call svg { flex: none; }
+@media (min-width: 960px) {
+  .header-call { display: none; }
+}
+
+/* The three-bar menu icon gets the word "Menu" under it (stacked, so it stays narrow) */
+.nav-toggle { flex-direction: column; width: 60px; height: 60px; padding: 0; gap: 11px; flex: none; }
+.nav-toggle::after {
+  content: "Menu";
+  font-family: var(--font-display);
+  font-stretch: condensed;
+  font-weight: 700;
+  font-size: 0.85rem;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-ink);
+}
+.nav-toggle[aria-expanded="true"]::after { content: "Close"; }
+.header-actions { gap: var(--space-2); flex: none; }
+
+.mobile-menu a:not(.btn) { padding-block: var(--space-3); }
+
+/* Keep the phone header on one line: smaller logo, then "Call" and "Menu" */
+@media (max-width: 959px) {
+  .site-header__inner { gap: var(--space-3); }
+}
+@media (max-width: 560px) {
+  .brand-logo { min-width: 0; }
+  .brand-logo img { height: 32px; width: auto; max-width: 100%; }
+}
+@media (max-width: 379px) {
+  .header-call span { display: none; }
+  .header-call { padding: 0.55rem 0.85rem; }
+}
+@media (max-width: 339px) {
+  .site-header__inner { padding-inline: 12px; gap: 8px; }
+  .brand-logo img { height: 28px; }
+  .nav-toggle { width: 52px; }
+}
+
+/* ---- 8. Contrast and the top banner ------------------------------------ */
+/* Small orange label on the dark quote section was too faint: use gold. */
+.waitlist-panel__head .eyebrow { color: #f6b93b; }
+.waitlist-panel__head .eyebrow::before { background: #f6b93b; }
+
+/* Seasonal banner: bigger text, bigger "Get a quote" link */
+html[data-theme] .season-bar { font-size: max(0.95rem, 16.5px); }
+html[data-theme] .season-bar a { display: inline-flex; align-items: center; min-height: 44px; }
+@media (max-width: 560px) {
+  html[data-theme] .season-bar--thanksgiving { font-size: max(0.88rem, 15.5px); gap: 10px; }
+}
+
+.footer-brand__name small { font-size: max(0.85rem, 15px); }
+.bin-plan small, .snow-pricing__result-price small { font-size: max(0.9rem, 16px); }
+
+/* ---- 9. The two big quote tabs stay tidy on phones ---------------------- */
+.quote-tab__sub { letter-spacing: 0; font-size: max(0.88rem, 15.5px); }
+@media (max-width: 560px) {
+  .quote-tab { padding-inline: 6px; }
+  .quote-tab__name { font-size: 1.02rem; }
+}
+
+/* Tab subtitles use a shorter form on phones ("From $12.50/month") */
+.tab-unit--short { display: none; }
+@media (max-width: 560px) {
+  .tab-unit--long { display: none; }
+  .tab-unit--short { display: inline; }
+}
+
+/* ---- 10. Bin Valet plan cards: the "Most popular" tag never covers the
+        plan name, and on phones the price drops under the name ------------ */
+.bin-plan:has(.bin-plan__tag) { margin-top: 20px !important; }
+.bin-plan__tag { top: -15px; right: 14px; }
+.bin-plan__body strong { font-size: max(1.05rem, 18.5px); }
+.bin-plan__price { font-size: max(1.25rem, 22px); }
+@media (max-width: 480px) {
+  .bin-plan { display: grid !important; grid-template-columns: auto minmax(0, 1fr); column-gap: 0.75rem; row-gap: 0.25rem; align-items: start; padding: var(--space-3) var(--space-3) !important; }
+  .bin-plan input { margin-top: 0.25rem; }
+  .bin-plan__price { grid-column: 2; }
+}
+
+/* Consent checkbox keeps its size next to a long sentence */
+.consent input { flex: none; margin-top: 0.15rem; }
+.bin-plan:has(.bin-plan__tag) { padding-top: 1.4rem !important; }
