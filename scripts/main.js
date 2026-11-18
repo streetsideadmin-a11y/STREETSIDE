@@ -369,7 +369,7 @@
     { id: "driveway", name: "Driveway", sizes: [
       ["Short, 1 car", 300], ["Regular, 2 cars", 500], ["Wide, 3 cars", 750], ["Long driveway", 1500] ] },
     { id: "walk", name: "Front walk / sidewalk", sizes: [
-      ["Short front walk", 100], ["Walk out to the street", 200], ["Whole front of the house", 350] ] },
+      ["Short front walk", 100], ["Walk to the street", 200], ["Across the front", 350] ] },
     { id: "steps", name: "Steps / porch", sizes: [
       ["A few steps", 30], ["Steps and a porch", 80], ["Large porch or deck", 150] ] },
     { id: "patio", name: "Patio / back area", sizes: [
@@ -391,7 +391,12 @@
       return '<label class="snow-chip"><input type="checkbox" value="' + a.id + '" /><span>' + a.name + "</span></label>";
     }).join("");
 
-    // "Typical homes: $50 to $85 per visit" is worked out from the config.
+    // Anything up to this size is the minimum price ($40 / $0.05 = 800 sq ft).
+    var freeSqft = Math.round(cfg.minimumPrice / cfg.ratePerSqft);
+    function round10(n) { return Math.round(n / 10) * 10; }
+    function fmtSqft(n) { return Math.round(n).toLocaleString("en-US"); }
+
+    // "Typical homes: $40 to $60 per visit" is worked out from the config.
     var typical = cfg.typicalSqft && cfg.typicalSqft.length === 2
       ? [snow.price(cfg.typicalSqft[0]), snow.price(cfg.typicalSqft[1])]
       : null;
@@ -403,7 +408,8 @@
     mount.innerHTML =
       '<div class="snow-pricing__inner">' +
         '<div class="snow-pricing__copy">' +
-          '<div class="snow-stat"><span class="snow-stat__big">' + snow.money(cfg.minimumPrice) + '</span><span class="snow-stat__unit">per visit, and up</span></div>' +
+          '<div class="snow-stat"><span class="snow-stat__big">' + snow.money(cfg.minimumPrice) + '</span><span class="snow-stat__unit">per visit, up to ' + fmtSqft(freeSqft) + ' sq ft</span></div>' +
+          "<p>Bigger areas are <strong>$" + cfg.ratePerSqft.toFixed(2) + " per square foot</strong>.</p>" +
           typicalHtml +
           '<p class="snow-pricing__includes-label">Every visit includes:</p>' +
           '<ul class="snow-pricing__includes">' + includes + "</ul>" +
@@ -415,10 +421,11 @@
         "</div>" +
         '<div class="snow-pricing__calc">' +
           '<fieldset class="snow-pick"><legend>What would you like cleared?</legend>' +
-            '<p class="snow-pick__help">Tap everything that applies, then pick the closest size.</p>' +
+            '<p class="snow-pick__help">Tap everything that applies, then pick the closest size. Sizes shown are typical averages.</p>' +
             '<div class="snow-chips">' + chipsHtml + "</div>" +
             '<div class="snow-areas" data-snow-areas></div>' +
           "</fieldset>" +
+          '<p class="snow-total" data-snow-total hidden></p>' +
           '<details class="snow-exact"><summary>I know my exact square footage</summary>' +
             '<label for="snow-sqft">Total square feet <span class="optional">(filled in for you, or type your own)</span></label>' +
             '<div class="snow-pricing__input"><input id="snow-sqft" type="number" inputmode="numeric" min="1" max="1000000" step="1" placeholder="e.g. 1,800" /><span>sq ft</span></div>' +
@@ -439,6 +446,8 @@
     var areasEl = mount.querySelector("[data-snow-areas]");
     var priceEl = mount.querySelector("[data-snow-price]");
     var noteEl = mount.querySelector("[data-snow-note]");
+    var totalEl = mount.querySelector("[data-snow-total]");
+    var lastParts = null; // the sizes that were added up, e.g. ["500", "100", "30"]
     var formInput = function () { return document.getElementById("wl-snow-sqft"); };
     var promoField = wirePromoField(mount, function () { updateResult(); });
 
@@ -451,7 +460,9 @@
         promoFor(promoField, "snow-removal", 0, "Snow Removal");
       } else {
         var promo = promoFor(promoField, "snow-removal", price, "Snow Removal");
-        var base = "Salting is included. We'll confirm the price with you first.";
+        var base = sqft <= freeSqft
+          ? "Minimum price: " + snow.money(cfg.minimumPrice) + " covers up to " + fmtSqft(freeSqft) + " sq ft. Salting is included."
+          : fmtSqft(sqft) + " sq ft × $" + cfg.ratePerSqft.toFixed(2) + " = " + snow.money(price) + ". Salting is included.";
         if (promo) {
           priceEl.innerHTML = snow.money(promo.price) + " <small>first visit</small>";
           noteEl.textContent = "Then " + snow.money(price) + " per visit. " + promoField.code() + " takes " + window.STREETSIDE_PROMO.words(promo.match) + " the first visit. " + base;
@@ -460,18 +471,31 @@
           noteEl.textContent = base;
         }
       }
+      showTotal();
       var f = formInput();
       if (f && f.value !== input.value) {
         f.value = input.value;
         f.dispatchEvent(new Event("input", { bubbles: true }));
       }
     }
-    input.addEventListener("input", updateResult);
+
+    // "Total area: 630 sq ft (500 + 100 + 30)": shows how the sizes add up.
+    function showTotal() {
+      var n = parseFloat(input.value);
+      if (!(n > 0)) { totalEl.hidden = true; totalEl.textContent = ""; return; }
+      var txt = "Total area: <strong>" + fmtSqft(n) + " sq ft</strong>";
+      if (lastParts && lastParts.length > 1) txt += " <span>(" + lastParts.join(" + ") + ")</span>";
+      else if (!lastParts) txt += " <span>(the size you typed)</span>";
+      totalEl.innerHTML = txt;
+      totalEl.hidden = false;
+    }
+    input.addEventListener("input", function () { lastParts = null; updateResult(); });
 
     // Typing in the signup form's box updates this estimator too.
     document.addEventListener("input", function (e) {
       if (e.target && e.target.id === "wl-snow-sqft" && input.value !== e.target.value) {
         input.value = e.target.value;
+        lastParts = null;
         updateResult();
       }
     });
@@ -484,16 +508,16 @@
       var custom = row.querySelector(".snow-area__custom");
       if (!sel || sel.value === "custom") {
         var nums = custom.querySelectorAll("input");
-        return Math.max(0, (parseFloat(nums[0].value) || 0) * (parseFloat(nums[1].value) || 0));
+        return round10(Math.max(0, (parseFloat(nums[0].value) || 0) * (parseFloat(nums[1].value) || 0)));
       }
-      return parseFloat(sel.value) || 0;
+      return round10(parseFloat(sel.value) || 0);
     }
 
     function buildRow(area) {
       var row = el("div", "snow-area");
       row.setAttribute("data-area", area.id);
       var opts = area.sizes.map(function (sz) {
-        return '<option value="' + sz[1] + '">' + sz[0] + "</option>";
+        return '<option value="' + round10(sz[1]) + '">' + sz[0] + " · " + fmtSqft(round10(sz[1])) + " sq ft</option>";
       }).join("");
       var hasPresets = area.sizes.length > 0;
       row.innerHTML =
@@ -526,12 +550,15 @@
 
     function recalc() {
       var total = 0;
+      var parts = [];
       areasEl.querySelectorAll(".snow-area").forEach(function (row) {
         var a = rowArea(row);
-        row.querySelector("[data-area-sub]").textContent = Math.round(a).toLocaleString("en-US") + " sq ft";
+        row.querySelector("[data-area-sub]").textContent = fmtSqft(a) + " sq ft";
         total += a;
+        if (a > 0) parts.push(fmtSqft(a));
       });
       total = Math.round(total);
+      lastParts = parts;
       input.value = total > 0 ? String(total) : "";
       updateResult();
     }

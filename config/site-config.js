@@ -145,18 +145,16 @@ window.STREETSIDE_CONFIG = {
 
   // Snow Removal pricing (per visit). Change the numbers here and the price
   // box on the homepage, the signup form and the "From $X" lines all update.
-  //   price = basePrice + (square feet x ratePerSqft), rounded to the nearest
-  //           roundTo dollars, and never lower than minimumPrice
+  //   price = square feet x ratePerSqft, but never lower than minimumPrice.
+  //   With $0.05 and $40, anything up to 800 sq ft is $40 (800 x 0.05 = 40).
   //   typicalSqft = a small and a large "typical home" size, used only for the
-  //           line "Typical homes: $X to $Y per visit"
-  // Customers never see the math. They tap what they want cleared, and the
-  // price appears. The base amount covers getting to the house, setting up
-  // and salting, which cost the same no matter how small the job is.
+  //           line "Typical homes are $X to $Y per visit".
+  // Customers tap what they want cleared; each choice has a typical size
+  // (see SNOW_AREAS in scripts/main.js, all rounded to the nearest 10 sq ft)
+  // and the sizes are added up to get the price.
   snowRemoval: {
-    basePrice: 35,
-    ratePerSqft: 0.04,
-    minimumPrice: 45,
-    roundTo: 5,
+    ratePerSqft: 0.05,
+    minimumPrice: 40,
     typicalSqft: [400, 1200],
     includes: ["Salting", "Driveways", "Sidewalks", "Walkways", "Steps", "Patios"],
   },
@@ -185,7 +183,7 @@ window.STREETSIDE_CONFIG = {
       name: "Snow Removal",
       status: "available",
       description: "We shovel by hand and salt your driveway, walk and steps, so you can get out the door and your bins can get to the curb.",
-      priceNote: "From $45 per visit",
+      priceNote: "From $40 per visit",
       cta: "See pricing",
       ctaHref: "#snow-removal",
     },
@@ -209,7 +207,7 @@ window.STREETSIDE_CONFIG = {
     },
     {
       q: "How much does Snow Removal cost?",
-      a: "Snow Removal is priced per visit, based on how much we clear. Visits start at $45 and most homes are between $50 and $85. Salting is included. In the Snow Removal section, tap what you want cleared and your price appears. No measuring needed. Then send in your quote request and we'll confirm it with you.",
+      a: "Snow Removal is priced per visit, based on how much we clear. Visits start at $40, which covers up to 800 square feet, and most homes are between $40 and $60. Bigger areas are 5 cents per square foot. Salting is included. In the Snow Removal section, tap what you want cleared and your price appears. No measuring needed. Then send in your quote request and we'll confirm it with you.",
     },
     {
       q: "When do you take my bins out and bring them back?",
@@ -250,9 +248,7 @@ window.STREETSIDE_SNOW = (function () {
   function price(sqft) {
     sqft = Number(sqft);
     if (!(sqft > 0)) return null;
-    var raw = (cfg.basePrice || 0) + sqft * cfg.ratePerSqft;
-    var step = cfg.roundTo || 1;
-    return Math.max(cfg.minimumPrice, Math.round(raw / step) * step);
+    return Math.max(cfg.minimumPrice, Math.round(sqft * cfg.ratePerSqft * 100) / 100);
   }
   function money(n) {
     return "$" + n.toLocaleString("en-US", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
