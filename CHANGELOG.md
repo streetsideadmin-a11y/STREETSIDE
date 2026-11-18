@@ -4,11 +4,11 @@ Version numbers correspond to each delivered zip/package, starting
 at v25.0. Not tied to git commits — just a simple way to keep track
 of which round of changes you're looking at.
 
-## v46.16 — current
+## v46.17 — current
 
-- **Admin logo.** On the admin page, clicking the Streetside logo at the top now takes you
-  straight back to the **Overview** page (the admin main page), from any tab, without reloading.
-  On the admin **login** screen the logo links to the public website.
+- **Admin logo.** On the admin page (both the login screen and the dashboard), clicking the
+  Streetside logo at the top now takes you to the main website. (The Overview tab is still one
+  click away in the top bar.)
 - **Snow Removal: back to $40 minimum, with the sizes shown and added up.** Anything up to 800
   sq ft is **$40**; bigger areas are **$0.05 per sq ft** (so 1,180 sq ft is $59). This replaces
   the v46.15 formula. Every choice now shows its typical size in the menu ("Wide, 3 cars ·
